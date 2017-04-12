@@ -1,1 +1,15 @@
 * Linux Notification Center
+
+A haskell-written notification center for BSPWM and polybar users.
+
+** Install
+
+#+BEGIN_SRC shell-script
+stack setup
+stack build
+
+# run
+stack exec linux-notification-center
+#+END_SRC
+
+
