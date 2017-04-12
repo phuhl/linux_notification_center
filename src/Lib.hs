@@ -99,7 +99,9 @@ setTime objs = do
 startSetTimeThread :: [(Text.Text, GI.GObject.Objects.Object)] -> IO ()
 startSetTimeThread objs = do
   setTime objs
-  runAfterDelay 1000000 (startSetTimeThread objs)
+  time <- fromIntegral <$> diffTimeToPicoseconds <$> utctDayTime <$> getCurrentTime
+  let delay = (60 * 1000000) - ((ceiling (time / 1000000)) `mod` (1000000 * 60))
+  runAfterDelay delay (startSetTimeThread objs)
   return ()
 
 main :: IO ()
