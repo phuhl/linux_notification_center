@@ -24,7 +24,8 @@ import GI.Gtk
        , windowNew, widgetDestroy, dialogRun, setAboutDialogComments
        , setAboutDialogAuthors, setAboutDialogVersion
        , setAboutDialogProgramName, aboutDialogNew, labelNew, get
-       , afterWindowSetFocus, labelSetText)
+       , afterWindowSetFocus, labelSetText
+       , onWidgetFocusOutEvent, onWidgetKeyReleaseEvent, widgetGetParentWindow)
 import qualified GI.Gtk as Gtk (DrawingArea(..), unsafeCastTo, Window(..)
                                , builderGetObject, builderAddFromFile
                                , builderNew, Builder(..), Label(..))
@@ -52,7 +53,9 @@ import GI.Gdk
        (getEventMotionY, getEventMotionX, windowGetHeight
        , windowGetWidth, getEventMotionWindow, screenGetHeight, screenGetWidth
        , displayGetDefault, displayGetMonitorAtWindow, monitorGetGeometry
-       , getRectangleWidth)
+       , getRectangleWidth, SeatCapabilities(..)
+       , GrabStatus(..), displayGetDefaultSeat, seatGrab)
+import GI.Gdk.Constants
 import GI.Gdk.Flags (EventMask(..))
 import Control.Monad.Trans.Reader (ReaderT(..))
 import GI.Gtk.Enums
@@ -118,6 +121,7 @@ main = do
 
     mainWindow <- window objs "main_window"
     drawingArea <- drawingArea objs "drawing_area"
+    mainWindowGDK <- widgetGetParentWindow mainWindow
 
     startSetTimeThread objs
 
@@ -125,13 +129,18 @@ main = do
     visual <- #getRgbaVisual screen
     #setVisual mainWindow visual
 
-{-    (Just display) <- displayGetDefault
-    monitor <- Gtk.unsafeCastTo GI.Gdk.Objects.Window.Window mainWindow >>= displayGetMonitorAtWindow display
+    (Just display) <- displayGetDefault
+    seat <- displayGetDefaultSeat display
+--    GrabStatusSuccess <- seatGrab seat mainWindowGDK [SeatCapabilitiesPointer] True
+--      Nothing Nothing Nothing
+
+
+    monitor <- displayGetMonitorAtWindow display mainWindowGDK
     rect <- monitorGetGeometry monitor
     screenH <- getRectangleWidth rect
--}
 
-    screenH <- screenGetHeight screen
+
+--    screenH <- screenGetHeight screen
     screenW <- screenGetWidth screen
 
     onWidgetDraw drawingArea $ \(Context fp) -> withManagedPtr fp $ \p -> (`runReaderT` Cairo (castPtr p)) $ runRender $ do
@@ -140,6 +149,12 @@ main = do
       renderBG w h
       return True
 
+
+    -- onWidgetLeaveNotifyEvent
+    onWidgetKeyReleaseEvent mainWindow $ \(_) -> do
+--      mainQuit
+      putStrLn "focus"
+      return True
 
     setWindowTitle mainWindow "Notification area"
                                  -- w   h
