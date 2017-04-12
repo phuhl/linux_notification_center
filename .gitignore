@@ -1,0 +1,15 @@
+#haskell compilation files
+*.hi
+*.ho
+*.o
+
+~*
+
+#emacs backup files
+*~
+*\#
+
+#tern files
+.tern-port
+
+.stack-work/
