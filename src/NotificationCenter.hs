@@ -1,14 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE OverloadedLabels #-}
 
-module Lib where
+module NotificationCenter where
 
 import Control.Applicative
 import Prelude
 
 import Data.Maybe
 import GI.Gtk
-       (widgetShowAll, onWidgetDestroy, windowSetDefaultSize
+       (widgetShowAll, widgetHide, onWidgetDestroy, windowSetDefaultSize
        , setWindowTitle, boxPackStart, boxNew, setWindowWindowPosition
        , WindowPosition(..), windowMove
        , frameSetShadowType, aspectFrameNew
@@ -25,7 +25,8 @@ import GI.Gtk
        , setAboutDialogAuthors, setAboutDialogVersion
        , setAboutDialogProgramName, aboutDialogNew, labelNew, get
        , afterWindowSetFocus, labelSetText
-       , onWidgetFocusOutEvent, onWidgetKeyReleaseEvent, widgetGetParentWindow)
+       , onWidgetFocusOutEvent, onWidgetKeyReleaseEvent, widgetGetParentWindow
+       , onWidgetRealize)
 import qualified GI.Gtk as Gtk (DrawingArea(..), unsafeCastTo, Window(..)
                                , builderGetObject, builderAddFromFile
                                , builderNew, Builder(..), Label(..))
@@ -48,7 +49,8 @@ import Graphics.Rendering.Cairo
        , rectangle, setSourceRGBA, setSourceRGB, newPath, scale, translate
        , lineTo, moveTo, Render)
 import qualified GI.Gtk as GI (init, main)
-import GI.GLib (sourceRemove, timeoutAdd)
+import GI.GLib (sourceRemove, timeoutAdd, unixSignalAdd)
+import GI.GLib.Constants
 import GI.Gdk
        (getEventMotionY, getEventMotionX, windowGetHeight
        , windowGetWidth, getEventMotionWindow, screenGetHeight, screenGetWidth
@@ -68,10 +70,17 @@ import Foreign.Ptr (castPtr)
 import Graphics.Rendering.Cairo.Internal (Render(..))
 import qualified GI.Gdk.Objects.Window
 import Control.Concurrent (forkIO, threadDelay, ThreadId(..))
-
+import Control.Concurrent.STM
+--import NotificationCenter.Notifications
+import System.Posix.Signals (sigUSR1)
 
 -- constants
 barHeight = 25
+
+
+data State = State {
+  stMainWindow :: TVar (Maybe Gtk.Window)
+                   }
 
 getObjs :: Gtk.Builder -> [Text.Text] -> IO [(Text.Text, GI.GObject.Objects.Object)]
 getObjs builder dict = do
@@ -107,63 +116,9 @@ startSetTimeThread objs = do
   runAfterDelay delay (startSetTimeThread objs)
   return ()
 
-main :: IO ()
-main = do
 
-    GI.init Nothing
-
-    builder <- Gtk.builderNew
-    Gtk.builderAddFromFile builder "notification_center.glade"
-    objs <- getObjs builder [ "main_window"
-                            , "drawing_area"
-                            , "label_time"
-                            , "label_date"]
-
-    mainWindow <- window objs "main_window"
-    drawingArea <- drawingArea objs "drawing_area"
-    mainWindowGDK <- widgetGetParentWindow mainWindow
-
-    startSetTimeThread objs
-
-    screen <- mainWindow `get` #screen
-    visual <- #getRgbaVisual screen
-    #setVisual mainWindow visual
-
-    (Just display) <- displayGetDefault
-    seat <- displayGetDefaultSeat display
---    GrabStatusSuccess <- seatGrab seat mainWindowGDK [SeatCapabilitiesPointer] True
---      Nothing Nothing Nothing
-
-
-    monitor <- displayGetMonitorAtWindow display mainWindowGDK
-    rect <- monitorGetGeometry monitor
-    screenH <- getRectangleWidth rect
-
-
---    screenH <- screenGetHeight screen
-    screenW <- screenGetWidth screen
-
-    onWidgetDraw drawingArea $ \(Context fp) -> withManagedPtr fp $ \p -> (`runReaderT` Cairo (castPtr p)) $ runRender $ do
-      w <- liftIO $ fromIntegral <$> widgetGetAllocatedWidth drawingArea
-      h <- liftIO $ fromIntegral <$> widgetGetAllocatedHeight drawingArea
-      renderBG w h
-      return True
-
-
-    -- onWidgetLeaveNotifyEvent
-    onWidgetKeyReleaseEvent mainWindow $ \(_) -> do
---      mainQuit
-      putStrLn "focus"
-      return True
-
-    setWindowTitle mainWindow "Notification area"
-                                 -- w   h
-    windowSetDefaultSize mainWindow 500 (screenH - barHeight)
-    windowMove mainWindow (screenW - 500) barHeight
-    onWidgetDestroy mainWindow mainQuit
-    widgetShowAll mainWindow
-
-    GI.main
+runAfterDelay :: Int -> IO () -> IO ThreadId
+runAfterDelay t f = forkIO (threadDelay t >> f)
 
 renderBG :: Double -> Double -> Render ()
 renderBG w h = do
@@ -173,5 +128,82 @@ renderBG w h = do
   fill
 --  restore
 
-runAfterDelay :: Int -> IO () -> IO ThreadId
-runAfterDelay t f = forkIO (threadDelay t >> f)
+showNotiCenter :: State -> IO ()
+showNotiCenter state = do
+  builder <- Gtk.builderNew
+  Gtk.builderAddFromFile builder "notification_center.glade"
+  objs <- getObjs builder [ "main_window"
+                          , "drawing_area"
+                          , "label_time"
+                          , "label_date"]
+
+  mainWindow <- window objs "main_window"
+  drawingArea <- drawingArea objs "drawing_area"
+--  (Just mainWindowGDK) <- widgetGetParentWindow mainWindow
+  atomically $ modifyTVar (stMainWindow state) (\_ -> Just mainWindow)
+
+  startSetTimeThread objs
+
+  screen <- mainWindow `get` #screen
+  visual <- #getRgbaVisual screen
+  #setVisual mainWindow visual
+
+  (Just display) <- displayGetDefault
+  seat <- displayGetDefaultSeat display
+--    GrabStatusSuccess <- seatGrab seat mainWindowGDK [SeatCapabilitiesPointer] True
+--      Nothing Nothing Nothing
+
+
+--  monitor <- displayGetMonitorAtWindow display mainWindowGDK
+--  rect <- monitorGetGeometry monitor
+--  screenH <- getRectangleWidth rect
+
+
+  screenH <- screenGetHeight screen
+  screenW <- screenGetWidth screen
+
+  onWidgetDraw drawingArea $ \(Context fp) -> withManagedPtr fp $ \p -> (`runReaderT` Cairo (castPtr p)) $ runRender $ do
+    w <- liftIO $ fromIntegral <$> widgetGetAllocatedWidth drawingArea
+    h <- liftIO $ fromIntegral <$> widgetGetAllocatedHeight drawingArea
+    renderBG w h
+    return True
+
+
+--    onWidgetKeyReleaseEvent
+  onWidgetLeaveNotifyEvent mainWindow $ \(_) -> do
+--      mainQuit
+    widgetHide mainWindow
+    return True
+
+  onWidgetRealize mainWindow $ do
+--    startNotificationDaemon
+    return ()
+
+  setWindowTitle mainWindow "Notification area"
+                                 -- w   h
+  windowSetDefaultSize mainWindow 500 (screenH - barHeight)
+  windowMove mainWindow (screenW - 500) barHeight
+  onWidgetDestroy mainWindow mainQuit
+  widgetShowAll mainWindow
+
+
+getInitialState = do
+  windowVar <- newTVarIO Nothing
+  return $ State {
+    stMainWindow = windowVar
+                 }
+
+main :: IO ()
+main = do
+  GI.init Nothing
+
+  istate <- getInitialState
+  showNotiCenter istate
+
+  unixSignalAdd PRIORITY_HIGH (fromIntegral sigUSR1)
+    (do
+        (Just mainWindow) <- readTVarIO $ stMainWindow istate
+        widgetShowAll mainWindow
+        return True)
+
+  GI.main

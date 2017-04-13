@@ -1,6 +1,6 @@
 module Main where
 
-import qualified Lib
+import qualified NotificationCenter
 
 main :: IO ()
-main = Lib.main
+main = NotificationCenter.main

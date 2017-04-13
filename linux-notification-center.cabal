@@ -2,12 +2,12 @@ name:                linux-notification-center
 version:             0.1.0.0
 -- synopsis:
 -- description:
-homepage:            https://github.com/githubuser/linux-notification-center#readme
+homepage:            https://github.com/phuhl/linux-notification-center#readme
 license:             BSD3
 license-file:        LICENSE
-author:              Author name here
+author:              Philipp Uhl
 maintainer:          example@example.com
-copyright:           2017 Author name here
+copyright:           2017 Philipp Uhl
 category:            Web
 build-type:          Simple
 extra-source-files:  README.org
@@ -15,7 +15,8 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Lib
+  exposed-modules:     NotificationCenter
+                     , NotificationCenter.Notifications
   build-depends:       base >= 4.7 && < 5
                      , gtk3             >= 0.14.2
                      , transformers
@@ -26,11 +27,15 @@ library
                      , gi-glib
                      , gi-gdk
                      , gi-gdkpixbuf
-                     , gi-gtk
+                     , gi-gtk >= 3.0.12
                      , time
                      , system-locale
                      , gi-gobject
                      , text
+                     , dbus
+                     , containers
+                     , unix
+                     , stm
   default-language:    Haskell2010
 
 executable linux-notification-center
@@ -52,4 +57,4 @@ test-suite linux-notification-center-test
 
 source-repository head
   type:     git
-  location: https://github.com/githubuser/linux-notification-center
+  location: https://github.com/phuhl/linux-notification-center
