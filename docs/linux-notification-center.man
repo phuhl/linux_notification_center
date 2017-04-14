@@ -1,0 +1,30 @@
+.TH " " "1" 
+.SH "NAME"
+.PP
+Linux notification center - notification daemon
+.SH "SYNOPSIS"
+.RS
+.nf
+\fClinux-notification-center
+\fP
+.fi
+.RE
+
+.SH "DESCRIPTION"
+.PP
+A textual description of the functioning of the command or function.
+.SH "EXAMPLES"
+.PP
+Some examples of common usage.
+.SH "SEE ALSO"
+.PP
+A list of related commands or functions.
+.SH "BUGS"
+.PP
+List known bugs.
+.SH "AUTHOR"
+.PP
+Specify your contact information.
+.SH "COPYRIGHT"
+.PP
+Specify your copyright information.

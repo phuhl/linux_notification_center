@@ -1,0 +1,22 @@
+#+TITLE: linux-notification-center
+#+MAN_CLASS_OPTIONS: :section-id 1 :date "Apr 14, 2017"
+
+* NAME
+Linux notification center - notification daemon
+* SYNOPSIS
+#+BEGIN_SRC shell-script
+linux-notification-center
+#+END_SRC
+
+* DESCRIPTION
+    A textual description of the functioning of the command or function.
+* EXAMPLES
+    Some examples of common usage.
+* SEE ALSO
+    A list of related commands or functions.
+* BUGS
+    List known bugs.
+* AUTHOR
+   Specify your contact information.
+* COPYRIGHT
+    Specify your copyright information.
