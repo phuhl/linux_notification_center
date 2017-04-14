@@ -4,9 +4,10 @@ module NotificationCenter.Notifications (
   startNotificationDaemon
   ) where
 
-import NotificationCenter.Notifications.Notification (
-  showNotificationWindow,
-  Notification(..)
+import NotificationCenter.Notifications.Notification
+  ( showNotificationWindow
+  , Notification(..)
+  , DisplayingNotificaton(..)
   )
 
 import Control.Concurrent (forkIO)
@@ -22,8 +23,12 @@ import Data.Word ( Word32 )
 import Data.Int ( Int32 )
 import Data.Map ( Map )
 
+import GI.Gdk (threadsEnter, threadsLeave)
+
 data NotifyState = NotifyState
   { notiStList :: [Notification]
+  , notiDisplayingList :: [DisplayingNotificaton]
+  , notiStNextId :: Int
   }
 
 
@@ -49,9 +54,11 @@ notify :: TVar NotifyState
           -> IO Word32
 notify istate appName replaceId icon summary body
   actions hints timeout = do
+  istate' <- readTVarIO istate
   let newNoti = Notification
         { notiAppName = appName
-        , notiId = replaceId
+        , notiRepId = replaceId
+        , notiId = notiStNextId istate'
         , notiIcon = icon
         , notiSummary = summary
         , notiBody = body
@@ -60,11 +67,25 @@ notify istate appName replaceId icon summary body
         , notiTimeout = timeout
         }
   atomically $ modifyTVar istate $ \istate' ->
-    NotifyState { notiStList = newNoti : notiStList istate' }
+    istate' { notiStList = newNoti : notiStList istate'
+            , notiStNextId = notiStNextId istate' + 1}
   -- new noti-window
-  showNotificationWindow newNoti
+  threadsEnter
+  dnoti <- showNotificationWindow newNoti
+    (notiDisplayingList istate')
+    (removeNotiFromDistList istate $ notiId newNoti)
+  threadsLeave
+  atomically $ modifyTVar istate $ \istate' ->
+    istate' { notiDisplayingList = dnoti : notiDisplayingList istate' }
   -- trigger update in noti-center
   return 0
+
+removeNotiFromDistList istate id = do
+  atomically $ modifyTVar istate $ \istate' ->
+    istate' { notiDisplayingList =
+              filter (\n -> (dNotiId n) /= id)
+              (notiDisplayingList istate')}
+  return ()
 
 notificationDaemon :: (AutoMethod f) => f -> IO ()
 notificationDaemon onNote = do
@@ -84,7 +105,7 @@ notificationDaemon onNote = do
 
 startNotificationDaemon :: IO ()
 startNotificationDaemon = do
-  istate <- newTVarIO $ NotifyState []
+  istate <- newTVarIO $ NotifyState [] [] 0
   forkIO (notificationDaemon (notify istate))
   return ()
 

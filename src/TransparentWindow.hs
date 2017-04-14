@@ -9,8 +9,10 @@ module TransparentWindow
   , window
   , drawingArea
   , label
+  , box
   -- * General
   , getScreenProportions
+  , runAfterDelay
   ) where
 
 import Data.Maybe
@@ -19,6 +21,7 @@ import qualified Data.Text as Text
 import Control.Monad
 import Control.Monad.Trans.Reader (ReaderT(..))
 import Control.Monad.IO.Class (MonadIO(..))
+import Control.Concurrent (forkIO, threadDelay, ThreadId(..), killThread)
 
 import GI.Gtk
        (widgetShowAll, widgetHide, onWidgetDestroy, windowSetDefaultSize
@@ -40,9 +43,10 @@ import GI.Gtk
        , afterWindowSetFocus, labelSetText
        , onWidgetFocusOutEvent, onWidgetKeyReleaseEvent, widgetGetParentWindow
        , onWidgetRealize)
-import qualified GI.Gtk as Gtk (DrawingArea(..), unsafeCastTo, Window(..)
-                               , builderGetObject, builderAddFromString
-                               , builderNew, Builder(..), Label(..))
+import qualified GI.Gtk as Gtk
+  (DrawingArea(..), unsafeCastTo, Window(..)
+  , builderGetObject, builderAddFromString
+  , builderNew, Builder(..), Label(..), Box(..))
 import GI.Gdk (screenGetHeight, screenGetWidth)
 import GI.GObject.Objects (IsObject(..), Object(..))
 import GI.Cairo
@@ -66,6 +70,7 @@ gObjLookup f dict name = f $ fromJust $ lookup name dict
 window = gObjLookup (Gtk.unsafeCastTo Gtk.Window)
 drawingArea = gObjLookup (Gtk.unsafeCastTo Gtk.DrawingArea)
 label = gObjLookup (Gtk.unsafeCastTo Gtk.Label)
+box = gObjLookup (Gtk.unsafeCastTo Gtk.Box)
 
 
 getObjs :: Gtk.Builder -> [Text.Text] -> IO ObjDict
@@ -123,3 +128,6 @@ renderBG w h = do
   rectangle 0 0 w h
   fill
 --  restore
+
+runAfterDelay :: Int -> IO () -> IO ThreadId
+runAfterDelay t f = forkIO (threadDelay t >> f)

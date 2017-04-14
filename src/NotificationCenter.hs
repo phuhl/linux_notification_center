@@ -55,6 +55,7 @@ import qualified GI.Gtk as Gtk (Window(..))
 import qualified GI.Gtk as GI (init, main)
 import GI.GLib (sourceRemove, timeoutAdd, unixSignalAdd)
 import GI.GLib.Constants
+import GI.Gdk (threadsInit, threadsEnter, threadsLeave)
 import GI.Gdk.Constants
 import GI.Gdk.Flags (EventMask(..))
 import GI.Gtk.Enums
@@ -89,9 +90,6 @@ startSetTimeThread objs = do
   runAfterDelay delay (startSetTimeThread objs)
   return ()
 
-
-runAfterDelay :: Int -> IO () -> IO ThreadId
-runAfterDelay t f = forkIO (threadDelay t >> f)
 
 showNotiCenter :: State -> IO ()
 showNotiCenter state = do
@@ -152,6 +150,9 @@ main' :: IO ()
 main' = do
   GI.init Nothing
 
+  threadsInit
+
+  threadsEnter
   istate <- getInitialState
   showNotiCenter istate
 
@@ -164,3 +165,4 @@ main' = do
   startNotificationDaemon
 
   GI.main
+  threadsLeave
