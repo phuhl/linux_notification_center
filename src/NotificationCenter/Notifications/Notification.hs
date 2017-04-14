@@ -11,9 +11,9 @@ import TransparentWindow
 import NotificationCenter.Notifications.Notification.Glade (glade)
 
 import Data.Text as Text
-import Data.Word ( Word32 )
+import Data.Word ( Word8, Word32 )
 import Data.Int ( Int32 )
-import Data.Map ( Map )
+import qualified Data.Map as Map ( Map, lookup )
 import Data.List ( sortOn )
 
 import Control.Monad
@@ -23,7 +23,7 @@ import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , widgetGetPreferredHeightForWidth)
 import GI.Gdk (threadsEnter, threadsLeave)
 
-import DBus ( Variant (..) )
+import DBus ( Variant (..), fromVariant )
 data Notification = Notification
   { notiAppName :: Text -- ^ Application name
   , notiRepId:: Word32 -- ^ Replaces id
@@ -32,7 +32,7 @@ data Notification = Notification
   , notiSummary:: Text -- ^ Summary
   , notiBody:: Text -- ^ Body
   , notiActions:: [Text] -- ^ Actions
-  , notiHints:: Map Text Variant -- ^ Hints
+  , notiHints:: Map.Map Text Variant -- ^ Hints
   , notiTimeout:: Int32 -- ^ Expires timeout (milliseconds)
   }
 
@@ -41,6 +41,8 @@ data DisplayingNotificaton = DisplayingNotificaton
   , dNotiTop :: Int32
   , dNotiId :: Int
   }
+
+data Urgency = Normal | Low | High deriving Eq
 
 -- constants
 notiDefaultTimeout = 10000
@@ -51,14 +53,24 @@ showNotificationWindow :: Notification -> [DisplayingNotificaton]
   -> (IO ()) -> IO DisplayingNotificaton
 showNotificationWindow noti dispNotis onClose = do
 
---  startSetTimeThread objs
+  let urgency' = (do v <- Map.lookup "urgency" (notiHints noti)
+                     fromVariant v) :: Maybe Word8
+
+  let urgency = case urgency' of
+        Nothing -> Normal
+        (Just 0) -> Low
+        (Just 1) -> Normal
+        (Just 2) -> High
+
   objs <- createTransparentWindow (Text.pack glade)
     ["main_window"
     , "container_box"
     , "main_bg"
     , "label_titel"
     , "label_body"
-    , "label_appname"] Nothing
+    , "label_appname"]
+    Nothing
+    (if urgency == High then Just warningColor else Nothing )
 
   mainWindow <- window objs "main_window"
 

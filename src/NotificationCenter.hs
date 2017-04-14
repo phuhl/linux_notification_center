@@ -97,7 +97,7 @@ showNotiCenter state = do
     [ "main_window"
     , "label_time"
     , "label_date"]
-    (Just "Notification area")
+    (Just "Notification area") Nothing
 
   mainWindow <- window objs "main_window"
 

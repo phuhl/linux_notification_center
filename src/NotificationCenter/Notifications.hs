@@ -40,7 +40,7 @@ getServerInformation =
           "1.0")
 
 getCapabilities :: IO [Text]
-getCapabilities = return ["body", "body-markup"]
+getCapabilities = return ["body", "body-markup", "hints"]
 
 notify :: TVar NotifyState
           -> Text -- ^ Application name

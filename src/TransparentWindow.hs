@@ -13,6 +13,10 @@ module TransparentWindow
   -- * General
   , getScreenProportions
   , runAfterDelay
+  -- * Colors
+  , RGBAColor(..)
+  , defaultColor
+  , warningColor
   ) where
 
 import Data.Maybe
@@ -62,6 +66,12 @@ import qualified GHC.Int (Int32(..))
 
 type ObjDict = [(Text.Text, GI.GObject.Objects.Object)]
 
+type RGBAColor = (Double, Double, Double, Double)
+
+-- constants
+defaultColor = (0.1953125, 0.203125, 0, 0.6640625) :: RGBAColor
+warningColor = (1, 0, 0, 0.6640625) :: RGBAColor
+
 gObjLookup :: (GI.GObject.Objects.Object -> IO a)
   -> ObjDict -> Text.Text -> IO a
 gObjLookup f dict name = f $ fromJust $ lookup name dict
@@ -88,7 +98,7 @@ getScreenProportions window = do
   return (h, w)
 
 createTransparentWindow :: Text.Text -> [Text.Text] -> Maybe Text.Text
-                        -> IO ObjDict
+                        -> Maybe RGBAColor -> IO ObjDict
 createTransparentWindow
   glade
 -- ^ Content of glade-file
@@ -96,6 +106,8 @@ createTransparentWindow
 -- ^ List of widgets that should be returned, listed by name
   title
 -- ^ Optional, title of the window
+  mcolor
+-- ^ Optional, background color
   = do
   builder <- Gtk.builderNew
   Gtk.builderAddFromString builder glade (-1)
@@ -110,10 +122,11 @@ createTransparentWindow
   visual <- #getRgbaVisual screen
   #setVisual mainWindow visual
 
+  let color = maybe defaultColor id mcolor
   onWidgetDraw drawingArea $ \(Context fp) -> withManagedPtr fp $ \p -> (`runReaderT` Cairo (castPtr p)) $ runRender $ do
     w <- liftIO $ fromIntegral <$> widgetGetAllocatedWidth drawingArea
     h <- liftIO $ fromIntegral <$> widgetGetAllocatedHeight drawingArea
-    renderBG w h
+    renderBG w h color
     return True
 
   when (title /= Nothing) $ let (Just title') = title in
@@ -121,10 +134,10 @@ createTransparentWindow
 
   return objs
 
-renderBG :: Double -> Double -> Render ()
-renderBG w h = do
+renderBG :: Double -> Double -> RGBAColor -> Render ()
+renderBG w h (r, g, b, a) = do
 --  save
-  setSourceRGBA 0.1953125 0.203125 0 0.6640625
+  setSourceRGBA r g b a
   rectangle 0 0 w h
   fill
 --  restore
