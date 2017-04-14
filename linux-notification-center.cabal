@@ -16,6 +16,8 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     NotificationCenter
+                     , NotificationCenter.Notification
+                     , NotificationCenter.Notification.Glade
                      , NotificationCenter.Notifications
                      , NotificationCenter.Notifications.Notification
                      , NotificationCenter.Notifications.Notification.Glade

@@ -1,34 +1,38 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module NotificationCenter.Notifications (
-  startNotificationDaemon
+module NotificationCenter.Notifications
+  ( startNotificationDaemon
+  , NotifyState(..)
+  , Notification(..)
   ) where
 
 import NotificationCenter.Notifications.Notification
   ( showNotificationWindow
   , Notification(..)
   , DisplayingNotificaton(..)
+  , Urgency(..)
   )
 
 import Control.Concurrent (forkIO)
 import Control.Concurrent.STM
   (readTVarIO, modifyTVar, TVar(..), atomically, newTVarIO)
 
-import DBus ( Variant (..) )
+import DBus ( Variant (..), fromVariant )
 import DBus.Client
        ( connectSession, AutoMethod(..), autoMethod, requestName, export
        , nameAllowReplacement, nameReplaceExisting)
 import Data.Text ( Text )
-import Data.Word ( Word32 )
+import Data.Word ( Word8, Word32 )
 import Data.Int ( Int32 )
-import Data.Map ( Map )
+import qualified Data.Map as Map ( Map, lookup )
 
 import GI.Gdk (threadsEnter, threadsLeave)
 
 data NotifyState = NotifyState
-  { notiStList :: [Notification]
-  , notiDisplayingList :: [DisplayingNotificaton]
+  { notiStList :: [ Notification ]
+  , notiDisplayingList :: [ DisplayingNotificaton ]
   , notiStNextId :: Int
+  , notiStOnUpdate :: IO ()
   }
 
 
@@ -42,6 +46,17 @@ getServerInformation =
 getCapabilities :: IO [Text]
 getCapabilities = return ["body", "body-markup", "hints"]
 
+parseUrgency hints =
+  let urgency = (do v <- Map.lookup "urgency" hints
+                    fromVariant v) :: Maybe Word8
+  in
+    case urgency of
+      (Just 0) -> Low
+      Nothing  -> Normal
+      (Just 1) -> Normal
+      (Just 2) -> High
+
+
 notify :: TVar NotifyState
           -> Text -- ^ Application name
           -> Word32 -- ^ Replaces id
@@ -49,7 +64,7 @@ notify :: TVar NotifyState
           -> Text -- ^ Summary
           -> Text -- ^ Body
           -> [Text] -- ^ Actions
-          -> Map Text Variant -- ^ Hints
+          -> Map.Map Text Variant -- ^ Hints
           -> Int32 -- ^ Expires timeout (milliseconds)
           -> IO Word32
 notify istate appName replaceId icon summary body
@@ -64,6 +79,7 @@ notify istate appName replaceId icon summary body
         , notiBody = body
         , notiActions = actions
         , notiHints = hints
+        , notiUrgency = parseUrgency hints
         , notiTimeout = timeout
         }
   atomically $ modifyTVar istate $ \istate' ->
@@ -78,6 +94,7 @@ notify istate appName replaceId icon summary body
   atomically $ modifyTVar istate $ \istate' ->
     istate' { notiDisplayingList = dnoti : notiDisplayingList istate' }
   -- trigger update in noti-center
+  notiStOnUpdate istate'
   return 0
 
 removeNotiFromDistList istate id = do
@@ -103,9 +120,9 @@ notificationDaemon onNote = do
         "Notify" onNote
       ]
 
-startNotificationDaemon :: IO ()
-startNotificationDaemon = do
-  istate <- newTVarIO $ NotifyState [] [] 0
+startNotificationDaemon :: IO () ->  IO (TVar NotifyState)
+startNotificationDaemon onUpdate = do
+  istate <- newTVarIO $ NotifyState [] [] 0 onUpdate
   forkIO (notificationDaemon (notify istate))
-  return ()
+  return istate
 

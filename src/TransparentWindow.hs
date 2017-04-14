@@ -10,6 +10,7 @@ module TransparentWindow
   , drawingArea
   , label
   , box
+  , getObjs
   -- * General
   , getScreenProportions
   , runAfterDelay

@@ -3,7 +3,10 @@
 
 module NotificationCenter where
 
-import NotificationCenter.Notifications (startNotificationDaemon)
+import NotificationCenter.Notification
+  (DisplayingNotificaton(..), showNotification)
+import NotificationCenter.Notifications
+  (NotifyState(..), startNotificationDaemon, Notification(..))
 import NotificationCenter.Glade (glade)
 import TransparentWindow
 
@@ -21,9 +24,8 @@ import Data.Monoid ((<>))
 import Control.Monad
 import Control.Applicative
 import Control.Concurrent (forkIO, threadDelay, ThreadId(..))
-import Control.Concurrent.STM (readTVarIO, modifyTVar, TVar(..), atomically
-                              , newTVarIO)
-
+import Control.Concurrent.STM
+  ( readTVarIO, modifyTVar, TVar(..), atomically, newTVarIO )
 
 import System.Locale.Read
 import System.Posix.Signals (sigUSR1)
@@ -49,7 +51,7 @@ import GI.Gtk
        , afterWindowSetFocus, labelSetText
        , onWidgetFocusOutEvent, onWidgetKeyReleaseEvent, widgetGetParentWindow
        , onWidgetRealize)
-import qualified GI.Gtk as Gtk (Window(..))
+import qualified GI.Gtk as Gtk (Window(..), Box(..))
 --import GI.GObject.Objects (IsObject(..), Object(..))
 
 import qualified GI.Gtk as GI (init, main)
@@ -68,9 +70,12 @@ import qualified GI.Gdk.Objects.Window
 barHeight = 25
 
 
-data State = State {
-  stMainWindow :: TVar (Maybe Gtk.Window)
-                   }
+data State = State
+  { stMainWindow :: Gtk.Window
+  , stNotiBox :: Gtk.Box
+  , stNotiState :: TVar NotifyState
+  , stDisplayingNotiList :: [ DisplayingNotificaton ]
+  }
 
 
 setTime objs = do
@@ -91,18 +96,22 @@ startSetTimeThread objs = do
   return ()
 
 
-showNotiCenter :: State -> IO ()
+showNotiCenter :: TVar State -> IO ()
 showNotiCenter state = do
   objs <- createTransparentWindow (Text.pack glade)
     [ "main_window"
     , "label_time"
-    , "label_date"]
+    , "label_date"
+    , "box_notis"]
     (Just "Notification area") Nothing
 
   mainWindow <- window objs "main_window"
+  notiBox <- box objs "box_notis"
 
 --  (Just mainWindowGDK) <- widgetGetParentWindow mainWindow
-  atomically $ modifyTVar (stMainWindow state) (\_ -> Just mainWindow)
+  atomically $ modifyTVar state $
+    \state' -> state' { stMainWindow = mainWindow
+                      , stNotiBox = notiBox}
 
   startSetTimeThread objs
 
@@ -137,10 +146,8 @@ showNotiCenter state = do
 
 
 getInitialState = do
-  windowVar <- newTVarIO Nothing
-  return $ State {
-    stMainWindow = windowVar
-                 }
+  newTVarIO $ State
+    { stDisplayingNotiList = [] }
 
 main :: IO ()
 main = do
@@ -154,15 +161,40 @@ main' = do
 
   threadsEnter
   istate <- getInitialState
-  showNotiCenter istate
+  notiState <- startNotificationDaemon $ updateNotis istate
+  atomically $ modifyTVar istate $
+    \istate' -> istate' { stNotiState = notiState }
+  showNotiCenter $ istate
 
   unixSignalAdd PRIORITY_HIGH (fromIntegral sigUSR1)
     (do
-        (Just mainWindow) <- readTVarIO $ stMainWindow istate
+        mainWindow <- stMainWindow <$> readTVarIO istate
         widgetShowAll mainWindow
         return True)
 
-  startNotificationDaemon
-
   GI.main
   threadsLeave
+
+updateNotis :: TVar State -> IO()
+updateNotis tState = do
+  threadsEnter
+  state <- readTVarIO tState
+  notiState <- readTVarIO $ stNotiState state
+
+  let newNotis = filter (
+        \n -> (find (\nd -> dNotiId nd == notiId n )
+               (stDisplayingNotiList state))
+              == Nothing) $ notiStList notiState
+  newNotis' <- mapM (
+    \n -> do
+      let newNoti = DisplayingNotificaton
+                    { dNotiId = notiId n }
+      showNotification (stNotiBox state) newNoti
+        $ stNotiState state
+      return $ newNoti
+    ) newNotis
+  atomically $ modifyTVar tState (
+    \state -> state { stDisplayingNotiList =
+                      newNotis' ++ stDisplayingNotiList state})
+  threadsLeave
+  return ()

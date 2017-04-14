@@ -5,15 +5,16 @@ module NotificationCenter.Notifications.Notification
   ( showNotificationWindow
   , Notification(..)
   , DisplayingNotificaton(..)
+  , Urgency(..)
   ) where
 
 import TransparentWindow
 import NotificationCenter.Notifications.Notification.Glade (glade)
 
 import Data.Text as Text
-import Data.Word ( Word8, Word32 )
+import Data.Word ( Word32 )
 import Data.Int ( Int32 )
-import qualified Data.Map as Map ( Map, lookup )
+import qualified Data.Map as Map ( Map )
 import Data.List ( sortOn )
 
 import Control.Monad
@@ -23,17 +24,18 @@ import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , widgetGetPreferredHeightForWidth)
 import GI.Gdk (threadsEnter, threadsLeave)
 
-import DBus ( Variant (..), fromVariant )
+import DBus ( Variant (..) )
 data Notification = Notification
   { notiAppName :: Text -- ^ Application name
-  , notiRepId:: Word32 -- ^ Replaces id
-  , notiId:: Int -- ^ Id
-  , notiIcon:: Text -- ^ App icon
-  , notiSummary:: Text -- ^ Summary
-  , notiBody:: Text -- ^ Body
-  , notiActions:: [Text] -- ^ Actions
-  , notiHints:: Map.Map Text Variant -- ^ Hints
-  , notiTimeout:: Int32 -- ^ Expires timeout (milliseconds)
+  , notiRepId :: Word32 -- ^ Replaces id
+  , notiId :: Int -- ^ Id
+  , notiIcon :: Text -- ^ App icon
+  , notiSummary :: Text -- ^ Summary
+  , notiBody :: Text -- ^ Body
+  , notiActions :: [Text] -- ^ Actions
+  , notiHints :: Map.Map Text Variant -- ^ Hints
+  , notiUrgency :: Urgency
+  , notiTimeout :: Int32 -- ^ Expires timeout (milliseconds)
   }
 
 data DisplayingNotificaton = DisplayingNotificaton
@@ -53,15 +55,6 @@ showNotificationWindow :: Notification -> [DisplayingNotificaton]
   -> (IO ()) -> IO DisplayingNotificaton
 showNotificationWindow noti dispNotis onClose = do
 
-  let urgency' = (do v <- Map.lookup "urgency" (notiHints noti)
-                     fromVariant v) :: Maybe Word8
-
-  let urgency = case urgency' of
-        Nothing -> Normal
-        (Just 0) -> Low
-        (Just 1) -> Normal
-        (Just 2) -> High
-
   objs <- createTransparentWindow (Text.pack glade)
     ["main_window"
     , "container_box"
@@ -70,7 +63,8 @@ showNotificationWindow noti dispNotis onClose = do
     , "label_body"
     , "label_appname"]
     Nothing
-    (if urgency == High then Just warningColor else Nothing )
+    (if (notiUrgency noti) == High then Just warningColor
+     else Nothing )
 
   mainWindow <- window objs "main_window"
 
