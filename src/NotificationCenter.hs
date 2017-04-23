@@ -25,16 +25,16 @@ import Control.Monad
 import Control.Applicative
 import Control.Concurrent (forkIO, threadDelay, ThreadId(..))
 import Control.Concurrent.STM
-  ( readTVarIO, modifyTVar, TVar(..), atomically, newTVarIO )
+  ( readTVarIO, modifyTVar', TVar(..), atomically, newTVarIO )
 
 import System.Locale.Read
 import System.Posix.Signals (sigUSR1)
 import System.Posix.Daemonize (serviced, daemonize)
 
 import GI.Gtk
-       (widgetShowAll, widgetHide, onWidgetDestroy, windowSetDefaultSize
-       , setWindowTitle, boxPackStart, boxNew, setWindowWindowPosition
-       , WindowPosition(..), windowMove
+       (widgetShowAll, widgetShow, widgetHide, onWidgetDestroy
+       , windowSetDefaultSize, setWindowTitle, boxPackStart, boxNew
+       , setWindowWindowPosition, WindowPosition(..), windowMove
        , frameSetShadowType, aspectFrameNew
        , widgetGetAllocatedHeight, widgetGetAllocatedWidth, onWidgetDraw
        , onWidgetLeaveNotifyEvent, onWidgetMotionNotifyEvent
@@ -50,14 +50,12 @@ import GI.Gtk
        , setAboutDialogProgramName, aboutDialogNew, labelNew, get
        , afterWindowSetFocus, labelSetText
        , onWidgetFocusOutEvent, onWidgetKeyReleaseEvent, widgetGetParentWindow
-       , onWidgetRealize)
-import qualified GI.Gtk as Gtk (Window(..), Box(..))
---import GI.GObject.Objects (IsObject(..), Object(..))
+       , onButtonClicked)
+import qualified GI.Gtk as Gtk (Window(..), Box(..), Label(..), Button(..))
 
 import qualified GI.Gtk as GI (init, main)
 import GI.GLib (sourceRemove, timeoutAdd, unixSignalAdd)
 import GI.GLib.Constants
-import GI.Gdk (threadsInit, threadsEnter, threadsLeave)
 import GI.Gdk.Constants
 import GI.Gdk.Flags (EventMask(..))
 import GI.Gtk.Enums
@@ -73,26 +71,35 @@ barHeight = 25
 data State = State
   { stMainWindow :: Gtk.Window
   , stNotiBox :: Gtk.Box
+  , stTimeLabel :: Gtk.Label
+  , stDateLabel :: Gtk.Label
+  , stDeleteAll :: Gtk.Button
   , stNotiState :: TVar NotifyState
   , stDisplayingNotiList :: [ DisplayingNotificaton ]
   }
 
 
-setTime objs = do
-  timeL <- label objs "label_time"
-  timeD <- label objs "label_date"
+setTime :: TVar State -> IO Bool
+setTime tState = do
+  state <- readTVarIO tState
   now <- zonedTimeToLocalTime <$> getZonedTime
   zone <- System.Locale.Read.getCurrentLocale
   let format = Text.pack . flip (formatTime zone) now
-  labelSetText timeL $ format "%H:%M"
-  labelSetText timeD $ format "%A, %x"
+  labelSetText (stTimeLabel state) $ format "%H:%M"
+  labelSetText (stDateLabel state) $ format "%A, %x"
+  return False
 
-startSetTimeThread :: ObjDict -> IO ()
-startSetTimeThread objs = do
-  setTime objs
+startSetTimeThread :: TVar State -> IO ()
+startSetTimeThread tState = do
+  runAfterDelay 1000 (startSetTimeThread' tState)
+  return ()
+
+startSetTimeThread' :: TVar State -> IO ()
+startSetTimeThread' tState = do
+  addSource (setTime tState)
   time <- fromIntegral <$> diffTimeToPicoseconds <$> utctDayTime <$> getCurrentTime
   let delay = (60 * 1000000) - ((ceiling (time / 1000000)) `mod` (1000000 * 60))
-  runAfterDelay delay (startSetTimeThread objs)
+  runAfterDelay delay (startSetTimeThread' tState)
   return ()
 
 
@@ -102,46 +109,43 @@ showNotiCenter state = do
     [ "main_window"
     , "label_time"
     , "label_date"
-    , "box_notis"]
+    , "box_notis"
+    , "button_deleteAll" ]
     (Just "Notification area") Nothing
 
   mainWindow <- window objs "main_window"
   notiBox <- box objs "box_notis"
+  timeL <- label objs "label_time"
+  timeD <- label objs "label_date"
+  deleteButton <- button objs "button_deleteAll"
 
 --  (Just mainWindowGDK) <- widgetGetParentWindow mainWindow
-  atomically $ modifyTVar state $
+  atomically $ modifyTVar' state $
     \state' -> state' { stMainWindow = mainWindow
-                      , stNotiBox = notiBox}
+                      , stNotiBox = notiBox
+                      , stTimeLabel = timeL
+                      , stDateLabel = timeD
+                      , stDeleteAll = deleteButton }
 
-  startSetTimeThread objs
-
-
---  (Just display) <- displayGetDefault
---  seat <- displayGetDefaultSeat display
---    GrabStatusSuccess <- seatGrab seat mainWindowGDK [SeatCapabilitiesPointer] True
---      Nothing Nothing Nothing
+  startSetTimeThread state
 
 
---  monitor <- displayGetMonitorAtWindow display mainWindowGDK
---  rect <- monitorGetGeometry monitor
---  screenH <- getRectangleWidth rect
+  onButtonClicked deleteButton $ do
+    displayList <- stDisplayingNotiList <$> readTVarIO state
+    mapM (removeNoti state) displayList
+    return ()
+
 
   (screenH, screenW) <- getScreenProportions mainWindow
 
   onWidgetLeaveNotifyEvent mainWindow $ \(_) -> do
---      mainQuit
     widgetHide mainWindow
     return True
-
---  onWidgetRealize mainWindow $ do
---    startNotificationDaemon
---    return ()
 
                                  -- w   h
   windowSetDefaultSize mainWindow 500 (screenH - barHeight)
   windowMove mainWindow (screenW - 500) barHeight
   onWidgetDestroy mainWindow mainQuit
---  widgetShowAll mainWindow
   return ()
 
 
@@ -151,33 +155,29 @@ getInitialState = do
 
 main :: IO ()
 main = do
-  daemonize main'
+--  daemonize main'
+  main'
 
 main' :: IO ()
 main' = do
   GI.init Nothing
 
-  threadsInit
-
-  threadsEnter
   istate <- getInitialState
   notiState <- startNotificationDaemon $ updateNotis istate
-  atomically $ modifyTVar istate $
+  atomically $ modifyTVar' istate $
     \istate' -> istate' { stNotiState = notiState }
   showNotiCenter $ istate
 
   unixSignalAdd PRIORITY_HIGH (fromIntegral sigUSR1)
     (do
         mainWindow <- stMainWindow <$> readTVarIO istate
-        widgetShowAll mainWindow
+        widgetShow mainWindow
         return True)
 
   GI.main
-  threadsLeave
 
 updateNotis :: TVar State -> IO()
 updateNotis tState = do
-  threadsEnter
   state <- readTVarIO tState
   notiState <- readTVarIO $ stNotiState state
 
@@ -190,11 +190,37 @@ updateNotis tState = do
       let newNoti = DisplayingNotificaton
                     { dNotiId = notiId n }
       showNotification (stNotiBox state) newNoti
-        $ stNotiState state
-      return $ newNoti
+        (stNotiState state) $ removeNoti tState
     ) newNotis
-  atomically $ modifyTVar tState (
+  atomically $ modifyTVar' tState (
     \state -> state { stDisplayingNotiList =
                       newNotis' ++ stDisplayingNotiList state})
-  threadsLeave
+  setDeleteAllState tState
+  return ()
+
+
+removeNoti :: TVar State -> DisplayingNotificaton -> IO ()
+removeNoti tState dNoti = do
+  state <- readTVarIO tState
+  atomically $ modifyTVar' tState $ \state ->
+    state { stDisplayingNotiList =
+            filter ((/=) dNoti) $ stDisplayingNotiList state}
+  setDeleteAllState tState
+  atomically $ modifyTVar' (stNotiState state) $ \state ->
+    state { notiStList = filter
+                         (\n -> notiId n /= dNotiId dNoti) $
+                         notiStList state }
+  addSource $ do
+    dNotiDestroy dNoti
+    return False
+  return ()
+
+setDeleteAllState tState = do
+  addSource $ do
+    state <- readTVarIO tState
+    if (length $ stDisplayingNotiList state) > 1 then
+      widgetShow $ stDeleteAll state
+      else
+      widgetHide $ stDeleteAll state
+    return False
   return ()

@@ -22,7 +22,6 @@ import Control.Monad
 import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , labelSetText, widgetSetSizeRequest, labelSetXalign
               , widgetGetPreferredHeightForWidth)
-import GI.Gdk (threadsEnter, threadsLeave)
 
 import DBus ( Variant (..) )
 data Notification = Notification
@@ -36,6 +35,7 @@ data Notification = Notification
   , notiHints :: Map.Map Text Variant -- ^ Hints
   , notiUrgency :: Urgency
   , notiTimeout :: Int32 -- ^ Expires timeout (milliseconds)
+  , notiTime :: Text
   }
 
 data DisplayingNotificaton = DisplayingNotificaton
@@ -110,11 +110,12 @@ startTimeoutThread objs timeout onClose = do
     let timeout' = if timeout > 0 then timeout
                    else notiDefaultTimeout
     runAfterDelay (1000 * timeout') $ do
-      mainWindow <- window objs "main_window"
-      threadsEnter
-      widgetDestroy mainWindow
-      threadsLeave
-      onClose
+      addSource $ do
+        mainWindow <- window objs "main_window"
+        widgetDestroy mainWindow
+        onClose
+        return False
+      return ()
     return ()
   return ()
 

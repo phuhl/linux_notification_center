@@ -46,7 +46,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton">
+              <object class="GtkButton" id="button_close">
                 <property name="label" translatable="yes">x</property>
                 <property name="width_request">15</property>
                 <property name="height_request">15</property>
@@ -74,14 +74,12 @@
         </child>
         <child>
           <object class="GtkLabel" id="label_body">
+            <property name="height_request">1</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">start</property>
+            <property name="valign">start</property>
             <property name="margin_right">10</property>
-            <property name="margin_top">10</property>
-            <property name="margin_bottom">10</property>
-            <property name="label" translatable="yes">My notification-text
-It spans over multiple lines</property>
             <attributes>
               <attribute name="foreground" value="#ffffa3a3a6a5"/>
             </attributes>

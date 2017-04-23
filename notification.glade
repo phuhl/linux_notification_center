@@ -2,10 +2,10 @@
 <!-- Generated with glade 3.20.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
+  <!-- interface-css-provider-path style.css -->
   <object class="GtkWindow" id="main_window">
     <property name="width_request">300</property>
     <property name="height_request">30</property>
-    <property name="app_paintable">True</property>
     <property name="can_focus">False</property>
     <property name="hexpand">False</property>
     <property name="vexpand">True</property>
@@ -124,5 +124,8 @@
     <child type="titlebar">
       <placeholder/>
     </child>
+    <style>
+      <class name="blurredBG"/>
+    </style>
   </object>
 </interface>

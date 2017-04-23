@@ -10,16 +10,19 @@ module TransparentWindow
   , drawingArea
   , label
   , box
+  , button
   , getObjs
   -- * General
   , getScreenProportions
   , runAfterDelay
+  , addSource
   -- * Colors
   , RGBAColor(..)
   , defaultColor
   , warningColor
   ) where
 
+import Data.Word ( Word32 )
 import Data.Maybe
 import Data.List (elem)
 import qualified Data.Text as Text
@@ -51,9 +54,13 @@ import GI.Gtk
 import qualified GI.Gtk as Gtk
   (DrawingArea(..), unsafeCastTo, Window(..)
   , builderGetObject, builderAddFromString
-  , builderNew, Builder(..), Label(..), Box(..))
+  , builderNew, Builder(..), Label(..), Box(..), Button(..))
 import GI.Gdk (screenGetHeight, screenGetWidth)
 import GI.GObject.Objects (IsObject(..), Object(..))
+
+import GI.GLib (idleSourceNew, sourceSetCallback, sourceAttach
+               , sourceUnref, idleAdd, )
+import GI.GLib.Constants
 import GI.Cairo
 import Graphics.Rendering.Cairo
        (fill, restore, save, stroke, arc, setDash, setLineWidth, rotate
@@ -82,6 +89,7 @@ window = gObjLookup (Gtk.unsafeCastTo Gtk.Window)
 drawingArea = gObjLookup (Gtk.unsafeCastTo Gtk.DrawingArea)
 label = gObjLookup (Gtk.unsafeCastTo Gtk.Label)
 box = gObjLookup (Gtk.unsafeCastTo Gtk.Box)
+button = gObjLookup (Gtk.unsafeCastTo Gtk.Button)
 
 
 getObjs :: Gtk.Builder -> [Text.Text] -> IO ObjDict
@@ -124,12 +132,12 @@ createTransparentWindow
   #setVisual mainWindow visual
 
   let color = maybe defaultColor id mcolor
-  onWidgetDraw drawingArea $ \(Context fp) -> withManagedPtr fp $ \p -> (`runReaderT` Cairo (castPtr p)) $ runRender $ do
+{-  onWidgetDraw drawingArea $ \(Context fp) -> withManagedPtr fp $ \p -> (`runReaderT` Cairo (castPtr p)) $ runRender $ do
     w <- liftIO $ fromIntegral <$> widgetGetAllocatedWidth drawingArea
     h <- liftIO $ fromIntegral <$> widgetGetAllocatedHeight drawingArea
     renderBG w h color
     return True
-
+-}
   when (title /= Nothing) $ let (Just title') = title in
     setWindowTitle mainWindow title'
 
@@ -145,3 +153,8 @@ renderBG w h (r, g, b, a) = do
 
 runAfterDelay :: Int -> IO () -> IO ThreadId
 runAfterDelay t f = forkIO (threadDelay t >> f)
+
+
+addSource :: IO Bool -> IO Word32
+addSource f = do
+  idleAdd PRIORITY_DEFAULT f
