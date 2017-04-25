@@ -6,7 +6,8 @@ module NotificationCenter where
 import NotificationCenter.Notification
   (DisplayingNotificaton(..), showNotification)
 import NotificationCenter.Notifications
-  (NotifyState(..), startNotificationDaemon, Notification(..))
+  (NotifyState(..), startNotificationDaemon, Notification(..)
+  , hideAllNotis)
 import NotificationCenter.Glade (glade)
 import TransparentWindow
 
@@ -170,6 +171,7 @@ main' = do
 
   unixSignalAdd PRIORITY_HIGH (fromIntegral sigUSR1)
     (do
+        hideAllNotis notiState
         mainWindow <- stMainWindow <$> readTVarIO istate
         widgetShow mainWindow
         return True)

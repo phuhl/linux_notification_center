@@ -4,6 +4,7 @@ module NotificationCenter.Notifications
   ( startNotificationDaemon
   , NotifyState(..)
   , Notification(..)
+  , hideAllNotis
   ) where
 
 import NotificationCenter.Notifications.Notification
@@ -25,6 +26,7 @@ import DBus.Client
 import Data.Text ( Text, pack )
 import Data.Word ( Word8, Word32 )
 import Data.Int ( Int32 )
+import Data.List
 import qualified Data.Map as Map ( Map, lookup )
 import Data.Time
 import Data.Time.LocalTime
@@ -114,11 +116,22 @@ notify istate appName replaceId icon summary body
     return False
   return 0
 
-removeNotiFromDistList istate id = do
-  atomically $ modifyTVar' istate $ \istate' ->
-    istate' { notiDisplayingList =
+removeNotiFromDistList tState id = do
+  state <- readTVarIO tState
+  atomically $ modifyTVar' tState $ \state ->
+    state { notiDisplayingList =
               filter (\n -> (dNotiId n) /= id)
-              (notiDisplayingList istate')}
+              (notiDisplayingList state)}
+  addSource $ do
+    let mDn = find (\n -> dNotiId n == id) $ notiDisplayingList state
+    maybe (return ()) dNotiDestroy mDn
+    return False
+  return ()
+
+hideAllNotis tState = do
+  state <- readTVarIO tState
+  mapM (removeNotiFromDistList tState . dNotiId)
+    $ notiDisplayingList state
   return ()
 
 notificationDaemon :: (AutoMethod f) => f -> IO ()

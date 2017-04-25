@@ -42,6 +42,7 @@ data DisplayingNotificaton = DisplayingNotificaton
   { dNotiGetHeight :: IO Int32
   , dNotiTop :: Int32
   , dNotiId :: Int
+  , dNotiDestroy :: IO ()
   }
 
 data Urgency = Normal | Low | High deriving Eq
@@ -99,6 +100,7 @@ showNotificationWindow noti dispNotis onClose = do
     { dNotiGetHeight = (getHeight container)
     , dNotiId = notiId noti
     , dNotiTop = hBefore
+    , dNotiDestroy = widgetDestroy mainWindow
     }
 
 getHeight widget = do
@@ -111,8 +113,6 @@ startTimeoutThread objs timeout onClose = do
                    else notiDefaultTimeout
     runAfterDelay (1000 * timeout') $ do
       addSource $ do
-        mainWindow <- window objs "main_window"
-        widgetDestroy mainWindow
         onClose
         return False
       return ()
