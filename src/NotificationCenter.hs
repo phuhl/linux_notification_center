@@ -77,6 +77,7 @@ data State = State
   , stDeleteAll :: Gtk.Button
   , stNotiState :: TVar NotifyState
   , stDisplayingNotiList :: [ DisplayingNotificaton ]
+  , stCenterShown :: Bool
   }
 
 
@@ -152,7 +153,8 @@ showNotiCenter state = do
 
 getInitialState = do
   newTVarIO $ State
-    { stDisplayingNotiList = [] }
+    { stDisplayingNotiList = []
+    , stCenterShown = False}
 
 main :: IO ()
 main = do
@@ -171,9 +173,19 @@ main' = do
 
   unixSignalAdd PRIORITY_HIGH (fromIntegral sigUSR1)
     (do
-        hideAllNotis notiState
+        state <- readTVarIO istate
         mainWindow <- stMainWindow <$> readTVarIO istate
-        widgetShow mainWindow
+        newShown <- if stCenterShown state then
+          do
+            widgetHide mainWindow
+            return False
+          else
+          do
+            hideAllNotis notiState
+            widgetShow mainWindow
+            return True
+        atomically $ modifyTVar' istate
+          (\state -> state {stCenterShown = newShown })
         return True)
 
   GI.main
