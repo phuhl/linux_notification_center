@@ -11,8 +11,9 @@ import NotificationCenter.Notifications.Notification
   ( showNotificationWindow
   , Notification(..)
   , DisplayingNotificaton(..)
-  , Urgency(..)
   )
+import NotificationCenter.Notifications.Data
+  (Urgency(..))
 import TransparentWindow
 
 import Control.Concurrent (forkIO)
@@ -84,15 +85,15 @@ notify :: TVar NotifyState
           -> Map.Map Text Variant -- ^ Hints
           -> Int32 -- ^ Expires timeout (milliseconds)
           -> IO Word32
-notify istate appName replaceId icon summary body
+notify tState appName replaceId icon summary body
   actions hints timeout = do
   addSource $ do
-    istate' <- readTVarIO istate
+    state <- readTVarIO tState
     time <- getTime
     let newNoti = Notification
           { notiAppName = appName
           , notiRepId = replaceId
-          , notiId = notiStNextId istate'
+          , notiId = notiStNextId state
           , notiIcon = icon
           , notiSummary = summary
           , notiBody = body
@@ -102,17 +103,17 @@ notify istate appName replaceId icon summary body
           , notiTimeout = timeout
           , notiTime = time
           }
-    atomically $ modifyTVar' istate $ \istate' ->
-      istate' { notiStList = newNoti : notiStList istate'
-              , notiStNextId = notiStNextId istate' + 1}
+    atomically $ modifyTVar' tState $ \state ->
+      state { notiStList = newNoti : notiStList state
+              , notiStNextId = notiStNextId state + 1}
     -- new noti-window
     dnoti <- showNotificationWindow newNoti
-      (notiDisplayingList istate')
-      (removeNotiFromDistList istate $ notiId newNoti)
-    atomically $ modifyTVar' istate $ \istate' ->
-      istate' { notiDisplayingList = dnoti : notiDisplayingList istate' }
+      (notiDisplayingList state)
+      (removeNotiFromDistList tState $ notiId newNoti)
+    atomically $ modifyTVar' tState $ \state ->
+      state { notiDisplayingList = dnoti : notiDisplayingList state }
     -- trigger update in noti-center
-    notiStOnUpdate istate'
+    notiStOnUpdate state
     return False
   return 0
 

@@ -1,11 +1,16 @@
 .blurredBG, #main_window, .blurredBG.low, .blurredBG.normal {
-    background: rgba(52, 50, 0, 0.6640625);
+    /*    background: rgba(52, 50, 0, 0.6640625);*/
+    background: rgba(0, 50, 50, 0.8);
+}
+
+.critical {
+    background: rgba(255, 0, 0, 0.2);
 }
 
 .blurredBG.critical {
-    background: rgba(152, 50, 0, 0.6640625);
+    /*    background: rgba(152, 50, 0, 0.6640625);*/
+    background: rgba(100, 50, 50, 0.8);
 }
-
 
 .undershoot.top, .undershoot.right, .undershoot.bottom,
 .undershoot.left {
@@ -15,10 +20,14 @@
 
 button {
     background: transparent;
-    color: #FFA3A6;
+    /*    color: #FFA3A6;*/
     border-radius: 0;
     border-width: 0;
     background-position: 0 0;
+}
+
+label, button {
+    color: #FFF;
 }
 
 button:hover {

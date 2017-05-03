@@ -106,8 +106,8 @@ startSetTimeThread' tState = do
   return ()
 
 
-showNotiCenter :: TVar State -> IO ()
-showNotiCenter state = do
+createNotiCenter :: TVar State -> IO ()
+createNotiCenter tState = do
   objs <- createTransparentWindow (Text.pack glade)
     [ "main_window"
     , "label_time"
@@ -126,26 +126,26 @@ showNotiCenter state = do
   setStyle screen $ BS.pack style
 
 --  (Just mainWindowGDK) <- widgetGetParentWindow mainWindow
-  atomically $ modifyTVar' state $
-    \state' -> state' { stMainWindow = mainWindow
+  atomically $ modifyTVar' tState $
+    \state -> state { stMainWindow = mainWindow
                       , stNotiBox = notiBox
                       , stTimeLabel = timeL
                       , stDateLabel = timeD
                       , stDeleteAll = deleteButton }
 
-  startSetTimeThread state
+  startSetTimeThread tState
 
 
   onButtonClicked deleteButton $ do
-    displayList <- stDisplayingNotiList <$> readTVarIO state
-    mapM (removeNoti state) displayList
+    displayList <- stDisplayingNotiList <$> readTVarIO tState
+    mapM (removeNoti tState) displayList
     return ()
 
 
   (screenH, screenW) <- getScreenProportions mainWindow
 
   onWidgetLeaveNotifyEvent mainWindow $ \(_) -> do
-    widgetHide mainWindow
+    hideNotiCenter tState
     return True
 
                                  -- w   h
@@ -154,6 +154,29 @@ showNotiCenter state = do
   onWidgetDestroy mainWindow mainQuit
   return ()
 
+hideNotiCenter tState = do
+  state <- readTVarIO tState
+  mainWindow <- stMainWindow <$> readTVarIO tState
+  widgetHide mainWindow
+  atomically $ modifyTVar' tState
+    (\state -> state {stCenterShown = False })
+
+
+showNotiCenter tState notiState = do
+  state <- readTVarIO tState
+  mainWindow <- stMainWindow <$> readTVarIO tState
+  newShown <- if stCenterShown state then
+    do
+      widgetHide mainWindow
+      return False
+    else
+    do
+      hideAllNotis $ stNotiState state
+      widgetShow mainWindow
+      return True
+  atomically $ modifyTVar' tState
+    (\state -> state {stCenterShown = newShown })
+  return True
 
 getInitialState = do
   newTVarIO $ State
@@ -173,24 +196,10 @@ main' = do
   notiState <- startNotificationDaemon $ updateNotis istate
   atomically $ modifyTVar' istate $
     \istate' -> istate' { stNotiState = notiState }
-  showNotiCenter $ istate
+  createNotiCenter $ istate
 
   unixSignalAdd PRIORITY_HIGH (fromIntegral sigUSR1)
-    (do
-        state <- readTVarIO istate
-        mainWindow <- stMainWindow <$> readTVarIO istate
-        newShown <- if stCenterShown state then
-          do
-            widgetHide mainWindow
-            return False
-          else
-          do
-            hideAllNotis notiState
-            widgetShow mainWindow
-            return True
-        atomically $ modifyTVar' istate
-          (\state -> state {stCenterShown = newShown })
-        return True)
+    (showNotiCenter istate notiState)
 
   GI.main
 
@@ -214,6 +223,9 @@ updateNotis tState = do
     \state -> state { stDisplayingNotiList =
                       newNotis' ++ stDisplayingNotiList state})
   setDeleteAllState tState
+  when (stCenterShown state) $
+    do
+      hideAllNotis $ stNotiState state
   return ()
 
 

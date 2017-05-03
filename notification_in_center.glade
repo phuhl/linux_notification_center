@@ -38,7 +38,6 @@
                 <attributes>
                   <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 12"/>
                   <attribute name="weight" value="bold"/>
-                  <attribute name="foreground" value="#ffffa3a3a6a5"/>
                 </attributes>
               </object>
               <packing>
@@ -82,9 +81,6 @@
             <property name="halign">start</property>
             <property name="valign">start</property>
             <property name="margin_right">10</property>
-            <attributes>
-              <attribute name="foreground" value="#ffffa3a3a6a5"/>
-            </attributes>
           </object>
           <packing>
             <property name="expand">True</property>
@@ -105,7 +101,6 @@
                 <property name="label" translatable="yes">23:49</property>
                 <attributes>
                   <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 8"/>
-                  <attribute name="foreground" value="#ffffa3a3a6a5"/>
                 </attributes>
               </object>
               <packing>
@@ -122,7 +117,6 @@
                 <property name="justify">right</property>
                 <attributes>
                   <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 8"/>
-                  <attribute name="foreground" value="#ffffa3a3a6a5"/>
                 </attributes>
               </object>
               <packing>

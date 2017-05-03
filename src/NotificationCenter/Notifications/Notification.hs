@@ -5,10 +5,10 @@ module NotificationCenter.Notifications.Notification
   ( showNotificationWindow
   , Notification(..)
   , DisplayingNotificaton(..)
-  , Urgency(..)
   ) where
 
 import TransparentWindow
+import NotificationCenter.Notifications.Data (Urgency(..))
 import NotificationCenter.Notifications.Notification.Glade (glade)
 
 import Data.Text as Text
@@ -44,8 +44,6 @@ data DisplayingNotificaton = DisplayingNotificaton
   , dNotiId :: Int
   , dNotiDestroy :: IO ()
   }
-
-data Urgency = Normal | Low | High deriving Eq
 
 -- constants
 notiDefaultTimeout = 10000

@@ -19,6 +19,7 @@ library
                      , NotificationCenter.Notification
                      , NotificationCenter.Notification.Glade
                      , NotificationCenter.Notifications
+                     , NotificationCenter.Notifications.Data
                      , NotificationCenter.Notifications.Notification
                      , NotificationCenter.Notifications.Notification.Glade
                      , NotificationCenter.Glade

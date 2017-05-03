@@ -63,7 +63,7 @@
                     <attributes>
                       <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 12"/>
                       <attribute name="weight" value="bold"/>
-                      <attribute name="foreground" value="#ffffa3a3a6a5"/>
+                      
                     </attributes>
                   </object>
                   <packing>
@@ -81,7 +81,7 @@
                     <property name="label" translatable="yes">Es könnten Daten auf die Festplatte geschrieben werden...</property>
                     <property name="wrap">True</property>
                     <attributes>
-                      <attribute name="foreground" value="#ffffa3a3a6a5"/>
+                      
                       <attribute name="gravity" value="east"/>
                     </attributes>
                   </object>
@@ -101,7 +101,6 @@
                     <property name="label" translatable="yes">Appname</property>
                     <attributes>
                       <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 8"/>
-                      <attribute name="foreground" value="#ffffa3a3a6a5"/>
                     </attributes>
                   </object>
                   <packing>

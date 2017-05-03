@@ -10,6 +10,7 @@ import TransparentWindow
 import NotificationCenter.Notification.Glade (glade)
 import NotificationCenter.Notifications
   (NotifyState(..), Notification(..))
+import NotificationCenter.Notifications.Data (Urgency(..))
 
 import Data.List
 import qualified Data.Text as Text
@@ -62,6 +63,11 @@ showNotification mainBox dNoti tNState closeNotification = do
   labelTime <- label objs "label_time"
   buttonClose <- button objs "button_close"
   container <- box objs "box_container"
+
+  case (notiUrgency noti) of
+    High -> addClass container "critical"
+    Low -> addClass container "low"
+    Normal -> addClass container "normal"
 
   let dNoti' = dNoti { dNotiDestroy = widgetDestroy container }
 
