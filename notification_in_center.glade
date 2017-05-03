@@ -35,6 +35,7 @@
                 <property name="can_focus">False</property>
                 <property name="halign">start</property>
                 <property name="label" translatable="yes">Sample notification</property>
+                <property name="wrap">True</property>
                 <attributes>
                   <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 12"/>
                   <attribute name="weight" value="bold"/>
@@ -81,6 +82,7 @@
             <property name="halign">start</property>
             <property name="valign">start</property>
             <property name="margin_right">10</property>
+            <property name="wrap">True</property>
           </object>
           <packing>
             <property name="expand">True</property>

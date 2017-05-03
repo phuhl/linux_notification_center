@@ -10,6 +10,7 @@ import NotificationCenter.Notifications
   , hideAllNotis)
 import NotificationCenter.Glade (glade, style)
 import TransparentWindow
+import Helpers
 
 import Prelude
 
@@ -32,6 +33,7 @@ import Control.Concurrent.STM
 import System.Locale.Read
 import System.Posix.Signals (sigUSR1)
 import System.Posix.Daemonize (serviced, daemonize)
+import System.Directory (getHomeDirectory)
 
 import GI.Gtk
        (widgetShowAll, widgetShow, widgetHide, onWidgetDestroy
@@ -66,9 +68,10 @@ import Data.GI.Base.BasicConversions (gflagsToWord)
 import qualified GI.Gdk.Objects.Window
 
 
--- constants
-barHeight = 25
-
+data Config = Config
+  {
+    configBarHeight :: Int
+  } deriving Show
 
 data State = State
   { stMainWindow :: Gtk.Window
@@ -106,8 +109,8 @@ startSetTimeThread' tState = do
   return ()
 
 
-createNotiCenter :: TVar State -> IO ()
-createNotiCenter tState = do
+createNotiCenter :: TVar State -> Config -> IO ()
+createNotiCenter tState config = do
   objs <- createTransparentWindow (Text.pack glade)
     [ "main_window"
     , "label_time"
@@ -153,13 +156,14 @@ createNotiCenter tState = do
   windowMove mainWindow (screenW - 500) barHeight
   onWidgetDestroy mainWindow mainQuit
   return ()
+    where barHeight = fromIntegral $ configBarHeight config
 
 hideNotiCenter tState = do
   state <- readTVarIO tState
   mainWindow <- stMainWindow <$> readTVarIO tState
   widgetHide mainWindow
   atomically $ modifyTVar' tState
-    (\state -> state {stCenterShown = False })
+    (\state -> state { stCenterShown = False })
 
 
 showNotiCenter tState notiState = do
@@ -178,6 +182,10 @@ showNotiCenter tState notiState = do
     (\state -> state {stCenterShown = newShown })
   return True
 
+getConfig parser =
+  Config
+    { configBarHeight = readConfig 0 parser "notification-center" "margintop" }
+
 getInitialState = do
   newTVarIO $ State
     { stDisplayingNotiList = []
@@ -192,11 +200,16 @@ main' :: IO ()
 main' = do
   GI.init Nothing
 
+  homeDir <- getHomeDirectory
+  config <- getConfig <$> (readConfigFile
+    (homeDir ++ "/.config/deadd/deadd.conf"))
+  putStrLn $ show config
+
   istate <- getInitialState
   notiState <- startNotificationDaemon $ updateNotis istate
   atomically $ modifyTVar' istate $
     \istate' -> istate' { stNotiState = notiState }
-  createNotiCenter $ istate
+  createNotiCenter istate config
 
   unixSignalAdd PRIORITY_HIGH (fromIntegral sigUSR1)
     (showNotiCenter istate notiState)
