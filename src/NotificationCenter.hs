@@ -8,7 +8,7 @@ import NotificationCenter.Notification
 import NotificationCenter.Notifications
   (NotifyState(..), startNotificationDaemon, Notification(..)
   , hideAllNotis)
-import NotificationCenter.Glade (glade)
+import NotificationCenter.Glade (glade, style)
 import TransparentWindow
 
 import Prelude
@@ -19,6 +19,7 @@ import Data.List
 import Data.Time
 import Data.Time.LocalTime
 import qualified Data.Text as Text
+import qualified Data.ByteString.Char8 as BS
 import Data.Complex
 import Data.Monoid ((<>))
 
@@ -51,7 +52,7 @@ import GI.Gtk
        , setAboutDialogProgramName, aboutDialogNew, labelNew, get
        , afterWindowSetFocus, labelSetText
        , onWidgetFocusOutEvent, onWidgetKeyReleaseEvent, widgetGetParentWindow
-       , onButtonClicked)
+       , onButtonClicked, windowGetScreen)
 import qualified GI.Gtk as Gtk (Window(..), Box(..), Label(..), Button(..))
 
 import qualified GI.Gtk as GI (init, main)
@@ -113,13 +114,16 @@ showNotiCenter state = do
     , "label_date"
     , "box_notis"
     , "button_deleteAll" ]
-    (Just "Notification area") Nothing
+    (Just "Notification area")
 
   mainWindow <- window objs "main_window"
   notiBox <- box objs "box_notis"
   timeL <- label objs "label_time"
   timeD <- label objs "label_date"
   deleteButton <- button objs "button_deleteAll"
+
+  screen <- windowGetScreen mainWindow
+  setStyle screen $ BS.pack style
 
 --  (Just mainWindowGDK) <- widgetGetParentWindow mainWindow
   atomically $ modifyTVar' state $

@@ -16,16 +16,16 @@ module TransparentWindow
   , getScreenProportions
   , runAfterDelay
   , addSource
+  , setStyle
+  , addClass
   -- * Colors
-  , RGBAColor(..)
-  , defaultColor
-  , warningColor
   ) where
 
 import Data.Word ( Word32 )
 import Data.Maybe
 import Data.List (elem)
 import qualified Data.Text as Text
+import qualified Data.ByteString as BS
 import Control.Monad
 import Control.Monad.Trans.Reader (ReaderT(..))
 import Control.Monad.IO.Class (MonadIO(..))
@@ -50,12 +50,15 @@ import GI.Gtk
        , setAboutDialogProgramName, aboutDialogNew, labelNew, get
        , afterWindowSetFocus, labelSetText
        , onWidgetFocusOutEvent, onWidgetKeyReleaseEvent, widgetGetParentWindow
-       , onWidgetRealize)
+       , onWidgetRealize, styleContextAddProviderForScreen
+       , cssProviderLoadFromData, cssProviderNew, styleContextAddClass
+       , widgetGetStyleContext)
 import qualified GI.Gtk as Gtk
-  (DrawingArea(..), unsafeCastTo, Window(..)
+  (DrawingArea(..), unsafeCastTo, Window(..), IsWidget(..)
   , builderGetObject, builderAddFromString
   , builderNew, Builder(..), Label(..), Box(..), Button(..))
-import GI.Gdk (screenGetHeight, screenGetWidth)
+import GI.Gtk.Constants
+import GI.Gdk (screenGetHeight, screenGetWidth, Screen (..))
 import GI.GObject.Objects (IsObject(..), Object(..))
 
 import GI.GLib (idleSourceNew, sourceSetCallback, sourceAttach
@@ -73,12 +76,6 @@ import qualified GHC.Int (Int32(..))
 
 
 type ObjDict = [(Text.Text, GI.GObject.Objects.Object)]
-
-type RGBAColor = (Double, Double, Double, Double)
-
--- constants
-defaultColor = (0.1953125, 0.203125, 0, 0.6640625) :: RGBAColor
-warningColor = (1, 0, 0, 0.6640625) :: RGBAColor
 
 gObjLookup :: (GI.GObject.Objects.Object -> IO a)
   -> ObjDict -> Text.Text -> IO a
@@ -107,7 +104,7 @@ getScreenProportions window = do
   return (h, w)
 
 createTransparentWindow :: Text.Text -> [Text.Text] -> Maybe Text.Text
-                        -> Maybe RGBAColor -> IO ObjDict
+                        -> IO ObjDict
 createTransparentWindow
   glade
 -- ^ Content of glade-file
@@ -115,8 +112,6 @@ createTransparentWindow
 -- ^ List of widgets that should be returned, listed by name
   title
 -- ^ Optional, title of the window
-  mcolor
--- ^ Optional, background color
   = do
   builder <- Gtk.builderNew
   Gtk.builderAddFromString builder glade (-1)
@@ -131,25 +126,10 @@ createTransparentWindow
   visual <- #getRgbaVisual screen
   #setVisual mainWindow visual
 
-  let color = maybe defaultColor id mcolor
-{-  onWidgetDraw drawingArea $ \(Context fp) -> withManagedPtr fp $ \p -> (`runReaderT` Cairo (castPtr p)) $ runRender $ do
-    w <- liftIO $ fromIntegral <$> widgetGetAllocatedWidth drawingArea
-    h <- liftIO $ fromIntegral <$> widgetGetAllocatedHeight drawingArea
-    renderBG w h color
-    return True
--}
   when (title /= Nothing) $ let (Just title') = title in
     setWindowTitle mainWindow title'
 
   return objs
-
-renderBG :: Double -> Double -> RGBAColor -> Render ()
-renderBG w h (r, g, b, a) = do
---  save
-  setSourceRGBA r g b a
-  rectangle 0 0 w h
-  fill
---  restore
 
 runAfterDelay :: Int -> IO () -> IO ThreadId
 runAfterDelay t f = forkIO (threadDelay t >> f)
@@ -158,3 +138,17 @@ runAfterDelay t f = forkIO (threadDelay t >> f)
 addSource :: IO Bool -> IO Word32
 addSource f = do
   idleAdd PRIORITY_DEFAULT f
+
+
+setStyle :: Screen -> BS.ByteString -> IO ()
+setStyle screen style = do
+  provider <- cssProviderNew
+  cssProviderLoadFromData provider style
+  styleContextAddProviderForScreen screen provider
+    $ fromIntegral STYLE_PROVIDER_PRIORITY_USER
+  return ()
+
+addClass :: Gtk.IsWidget a => a -> Text.Text -> IO ()
+addClass w clazz = do
+  context <- widgetGetStyleContext w
+  styleContextAddClass context clazz

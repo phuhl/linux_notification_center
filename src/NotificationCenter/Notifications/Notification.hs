@@ -64,8 +64,6 @@ showNotificationWindow noti dispNotis onClose = do
     , "label_body"
     , "label_appname"]
     Nothing
-    (if (notiUrgency noti) == High then Just warningColor
-     else Nothing )
 
   mainWindow <- window objs "main_window"
 
@@ -80,6 +78,11 @@ showNotificationWindow noti dispNotis onClose = do
   labelSetText labelAppname $ notiAppName noti
   labelSetXalign labelTitel 0
   labelSetXalign labelBody 0
+
+  case (notiUrgency noti) of
+    High -> addClass mainWindow "critical"
+    Low -> addClass mainWindow "low"
+    Normal -> addClass mainWindow "normal"
 
   height <- getHeight container
   widgetSetSizeRequest background (-1) height

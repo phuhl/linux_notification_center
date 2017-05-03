@@ -38,6 +38,7 @@ library
                      , system-locale
                      , gi-gobject
                      , text
+                     , bytestring
                      , dbus
                      , containers
                      , unix
