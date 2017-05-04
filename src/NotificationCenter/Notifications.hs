@@ -111,9 +111,7 @@ notify tState appName replaceId icon summary body
   atomically $ modifyTVar' tState $ \state ->
     state { notiStList = updatedNotiList (notiStList state)
                          newNoti (fromIntegral (notiRepId newNoti))
-
           , notiStNextId = notiStNextId state + 1}
-
   if length notis == 0 then
     insertNewNoti newNoti tState
     else
@@ -199,7 +197,7 @@ notificationDaemon onNote = do
 
 startNotificationDaemon :: Config -> IO () ->  IO (TVar NotifyState)
 startNotificationDaemon config onUpdate = do
-  istate <- newTVarIO $ NotifyState [] [] 0 onUpdate config
+  istate <- newTVarIO $ NotifyState [] [] 1 onUpdate config
   forkIO (notificationDaemon (notify istate))
   return istate
 

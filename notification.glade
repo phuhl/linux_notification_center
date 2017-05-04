@@ -4,44 +4,37 @@
   <requires lib="gtk+" version="3.20"/>
   <!-- interface-css-provider-path style.css -->
   <object class="GtkWindow" id="main_window">
+    <property name="width_request">300</property>
+    <property name="height_request">30</property>
     <property name="can_focus">False</property>
+    <property name="hexpand">False</property>
+    <property name="vexpand">True</property>
     <property name="type">popup</property>
-    <property name="default_width">300</property>
+    <property name="resizable">False</property>
     <child>
-      <object class="GtkBox" id="container_box">
+      <object class="GtkOverlay">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="margin_left">2</property>
-        <property name="margin_right">5</property>
+        <property name="vexpand">True</property>
         <child>
-          <object class="GtkImage">
+          <object class="GtkLabel" id="label_background">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="vexpand">True</property>
           </object>
           <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
+            <property name="index">-1</property>
           </packing>
         </child>
-        <child>
-          <object class="GtkBox">
+        <child type="overlay">
+          <object class="GtkBox" id="container_box">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="orientation">vertical</property>
+            <property name="vexpand">True</property>
             <child>
-              <object class="GtkLabel" id="label_titel">
+              <object class="GtkImage">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="halign">start</property>
-                <property name="margin_top">10</property>
-                <property name="label" translatable="yes">Titel</property>
-                <property name="wrap">True</property>
-                <property name="wrap_mode">word-char</property>
-                <attributes>
-                  <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 12"/>
-                  <attribute name="weight" value="bold"/>
-                </attributes>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -50,16 +43,68 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="label_body">
+              <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="halign">start</property>
-                <property name="label" translatable="yes">Es könnten Daten auf die Festplatte geschrieben werden... Dieser Text ist zu lang für eine Zeile</property>
-                <property name="wrap">True</property>
-                <property name="wrap_mode">word-char</property>
-                <attributes>
-                  <attribute name="gravity" value="east"/>
-                </attributes>
+                <property name="valign">baseline</property>
+                <property name="margin_left">10</property>
+                <property name="margin_right">10</property>
+                <property name="vexpand">True</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkLabel" id="label_titel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">start</property>
+                    <property name="margin_top">10</property>
+                    <property name="label" translatable="yes">Titel</property>
+                    <property name="wrap">True</property>
+                    <property name="wrap_mode">word-char</property>
+                    <attributes>
+                      <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 12"/>
+                      <attribute name="weight" value="bold"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="label_body">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">start</property>
+                    <property name="label" translatable="yes">Es könnten Daten auf die Festplatte geschrieben werden... Dieser Text ist zu lang für eine Zeile</property>
+                    <property name="wrap">True</property>
+                    <attributes>
+                      <attribute name="gravity" value="east"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="label_appname">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">end</property>
+                    <property name="margin_bottom">8</property>
+                    <property name="label" translatable="yes">Appname</property>
+                    <attributes>
+                      <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 8"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -67,29 +112,7 @@
                 <property name="position">1</property>
               </packing>
             </child>
-            <child>
-              <object class="GtkLabel" id="label_appname">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="halign">end</property>
-                <property name="margin_bottom">8</property>
-                <property name="label" translatable="yes">Appname</property>
-                <attributes>
-                  <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 8"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
           </object>
-          <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
         </child>
       </object>
     </child>
