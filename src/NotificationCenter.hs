@@ -186,7 +186,8 @@ updateNotis tState = do
   let newNotis = filter (
         \n -> (find (\nd -> dNotiId nd == notiId n )
                (stDisplayingNotiList state))
-              == Nothing) $ notiStList notiState
+              == Nothing
+              && (not $ notiTransient n)) $ notiStList notiState
   newNotis' <- mapM (
     \n -> do
       let newNoti = DisplayingNotificaton

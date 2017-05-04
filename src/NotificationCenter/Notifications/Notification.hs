@@ -42,6 +42,7 @@ data Notification = Notification
   , notiUrgency :: Urgency
   , notiTimeout :: Int32 -- ^ Expires timeout (milliseconds)
   , notiTime :: Text
+  , notiTransient :: Bool
   }
 
 instance Eq Notification where

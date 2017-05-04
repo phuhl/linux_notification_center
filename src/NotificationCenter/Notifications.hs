@@ -27,10 +27,10 @@ import DBus.Client
        ( connectSession, AutoMethod(..), autoMethod, requestName, export
        , nameAllowReplacement, nameReplaceExisting)
 import Data.Text ( Text, pack )
-import Data.Word ( Word8, Word32 )
+import Data.Word ( Word, Word8, Word32 )
 import Data.Int ( Int32 )
 import Data.List
-import qualified Data.Map as Map ( Map, lookup )
+import qualified Data.Map as Map
 import Data.Time
 import Data.Time.LocalTime
 
@@ -71,6 +71,13 @@ parseUrgency hints =
       (Just 2) -> High
 
 
+parseTransient :: Map.Map Text Variant -> Bool
+parseTransient hints =
+  let transient = Map.lookup "transient" hints
+  in case transient of
+    Nothing -> False
+    (Just b) -> True
+
 getTime = do
   now <- zonedTimeToLocalTime <$> getZonedTime
   zone <- System.Locale.Read.getCurrentLocale
@@ -104,7 +111,9 @@ notify tState appName replaceId icon summary body
         , notiUrgency = parseUrgency hints
         , notiTimeout = timeout
         , notiTime = time
+        , notiTransient = parseTransient hints
         }
+
   let notis = filter (\n -> dNotiId n ==
                        fromIntegral (notiRepId newNoti))
                 $ notiDisplayingList state
