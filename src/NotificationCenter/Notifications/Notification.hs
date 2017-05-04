@@ -44,6 +44,10 @@ data Notification = Notification
   , notiTime :: Text
   }
 
+instance Eq Notification where
+  a == b = notiId a == notiId b
+
+
 data DisplayingNotificaton = DisplayingNotificaton
   { dNotiGetHeight :: IO Int32
   , dNotiTop :: Int32

@@ -108,21 +108,28 @@ notify tState appName replaceId icon summary body
   let notis = filter (\n -> dNotiId n ==
                        fromIntegral (notiRepId newNoti))
                 $ notiDisplayingList state
+  atomically $ modifyTVar' tState $ \state ->
+    state { notiStList = updatedNotiList (notiStList state)
+                         newNoti (fromIntegral (notiRepId newNoti))
+
+          , notiStNextId = notiStNextId state + 1}
+
   if length notis == 0 then
     insertNewNoti newNoti tState
     else
     replaceNoti newNoti tState
   return $ fromIntegral $ notiId newNoti
+    where
+      updatedNotiList :: [Notification] -> Notification
+                      -> Int -> [Notification]
+      updatedNotiList notis newNoti repId =
+        let notis' = map (\n -> if notiId n == repId then newNoti
+                                else n) notis
+        in if (find ((==) newNoti) notis') /= Nothing then notis'
+           else (newNoti:notis')
+
 
 replaceNoti newNoti tState = do
-  let repId = fromIntegral (notiRepId newNoti)
-  atomically $ modifyTVar' tState $ \state ->
-    state { notiStList = map
-            (\n -> if notiId n == repId then newNoti
-                   else n)
-            (notiStList state)
-          , notiStNextId = notiStNextId state + 1}
-
   addSource $ do
     atomically $ modifyTVar tState $ \state ->
       state { notiDisplayingList = map
@@ -132,17 +139,14 @@ replaceNoti newNoti tState = do
     state <- readTVarIO tState
     let notis = filter (\n -> dNotiId n == notiId newNoti)
                 $ notiDisplayingList state
-    putStrLn $ show $ length notis
     mapM (updateNoti (notiConfig state)
            (removeNotiFromDistList tState $ notiId newNoti)
            newNoti) notis
+    notiStOnUpdate state
     return False
+      where repId = fromIntegral (notiRepId newNoti)
 
 insertNewNoti newNoti tState = do
-  atomically $ modifyTVar' tState $ \state ->
-    state { notiStList = newNoti : notiStList state
-          , notiStNextId = notiStNextId state + 1}
-
   addSource $ do
     state <- readTVarIO tState
     -- new noti-window

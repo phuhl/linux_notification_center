@@ -4,7 +4,7 @@
 module NotificationCenter where
 
 import NotificationCenter.Notification
-  (DisplayingNotificaton(..), showNotification)
+  (DisplayingNotificaton(..), showNotification, updateNoti)
 import NotificationCenter.Notifications
   (NotifyState(..), startNotificationDaemon, Notification(..)
   , hideAllNotis)
@@ -194,10 +194,14 @@ updateNotis tState = do
       showNotification (stNotiBox state) newNoti
         (stNotiState state) $ removeNoti tState
     ) newNotis
+  let delNotis = filter (\nd -> (find (\n -> dNotiId nd == notiId n)
+                                $ notiStList notiState) == Nothing)
+                 $ stDisplayingNotiList state
   atomically $ modifyTVar' tState (
     \state -> state { stDisplayingNotiList =
                       newNotis' ++ stDisplayingNotiList state})
   setDeleteAllState tState
+  mapM (removeNoti tState) $ delNotis
   when (stCenterShown state) $
     do
       hideAllNotis $ stNotiState state

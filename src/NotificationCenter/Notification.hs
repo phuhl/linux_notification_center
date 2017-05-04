@@ -3,6 +3,7 @@
 
 module NotificationCenter.Notification
   ( showNotification
+  , updateNoti
   , DisplayingNotificaton(..)
   ) where
 
