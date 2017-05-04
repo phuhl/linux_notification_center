@@ -160,6 +160,11 @@ insertNewNoti newNoti tState = do
     return False
 
 
+removeNotiFromDistList' :: TVar NotifyState -> Word32 -> IO ()
+removeNotiFromDistList' tState id =
+  removeNotiFromDistList tState $ fromIntegral id
+
+removeNotiFromDistList :: TVar NotifyState -> Int -> IO ()
 removeNotiFromDistList tState id = do
   state <- readTVarIO tState
   atomically $ modifyTVar' tState $ \state ->
@@ -178,8 +183,9 @@ hideAllNotis tState = do
     $ notiDisplayingList state
   return ()
 
-notificationDaemon :: (AutoMethod f) => f -> IO ()
-notificationDaemon onNote = do
+notificationDaemon :: (AutoMethod f1, AutoMethod f2) =>
+                      f1 -> f2 -> IO ()
+notificationDaemon onNote onCloseNote = do
   putStrLn "notificationDaemon started"
   client <- connectSession
   _ <- requestName client "org.freedesktop.Notifications"
@@ -189,8 +195,8 @@ notificationDaemon onNote = do
       "GetServerInformation" getServerInformation
     , autoMethod "org.freedesktop.Notifications"
       "GetCapabilities" getCapabilities
---      , autoMethod "org.freedesktop.Notifications"
---        "CloseNotification" onCloseNote
+    , autoMethod "org.freedesktop.Notifications"
+      "CloseNotification" onCloseNote
     , autoMethod "org.freedesktop.Notifications"
       "Notify" onNote
     ]
@@ -198,6 +204,7 @@ notificationDaemon onNote = do
 startNotificationDaemon :: Config -> IO () ->  IO (TVar NotifyState)
 startNotificationDaemon config onUpdate = do
   istate <- newTVarIO $ NotifyState [] [] 1 onUpdate config
-  forkIO (notificationDaemon (notify istate))
+  forkIO (notificationDaemon (notify istate)
+           (removeNotiFromDistList' istate))
   return istate
 

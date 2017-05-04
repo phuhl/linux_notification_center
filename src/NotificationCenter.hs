@@ -257,7 +257,6 @@ main' = do
   homeDir <- getHomeDirectory
   config <- getConfig <$> (readConfigFile
     (homeDir ++ "/.config/deadd/deadd.conf"))
-  putStrLn $ show config
 
   istate <- getInitialState
   notiState <- startNotificationDaemon config $ updateNotis istate
