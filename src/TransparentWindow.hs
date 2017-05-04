@@ -116,11 +116,10 @@ createTransparentWindow
   builder <- Gtk.builderNew
   Gtk.builderAddFromString builder glade (-1)
   let objsToGet' = objsToGet ++
-        (filter (\name -> not $ elem name objsToGet) ["main_window", "main_bg"])
+        (filter (\name -> not $ elem name objsToGet) ["main_window"])
   objs <- getObjs builder objsToGet'
 
   mainWindow <- window objs "main_window"
-  drawingArea <- drawingArea objs "main_bg"
 
   screen <- mainWindow `get` #screen
   visual <- #getRgbaVisual screen

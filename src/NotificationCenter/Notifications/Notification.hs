@@ -3,12 +3,14 @@
 
 module NotificationCenter.Notifications.Notification
   ( showNotificationWindow
+  , updateNoti
   , Notification(..)
   , DisplayingNotificaton(..)
   ) where
 
 import TransparentWindow
-import NotificationCenter.Notifications.Data (Urgency(..))
+import NotificationCenter.Notifications.Data
+  (Urgency(..), Config(..))
 import NotificationCenter.Notifications.Notification.Glade (glade)
 
 import Data.Text as Text
@@ -21,7 +23,11 @@ import Control.Monad
 
 import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , labelSetText, widgetSetSizeRequest, labelSetXalign
-              , widgetGetPreferredHeightForWidth)
+              , widgetGetPreferredHeightForWidth
+
+              , setWidgetWidthRequest)
+import qualified GI.Gtk as Gtk
+  (Box(..), Label(..), Button(..))
 
 import DBus ( Variant (..) )
 data Notification = Notification
@@ -43,21 +49,23 @@ data DisplayingNotificaton = DisplayingNotificaton
   , dNotiTop :: Int32
   , dNotiId :: Int
   , dNotiDestroy :: IO ()
+  , dLabelTitel :: Gtk.Label
+  , dLabelBody :: Gtk.Label
+  , dLabelAppname :: Gtk.Label
+  , dContainer :: Gtk.Box
   }
 
--- constants
-notiDefaultTimeout = 10000
-distanceTop = 50
-distanceBetween = 20
+showNotificationWindow :: Config -> Notification
+  -> [DisplayingNotificaton] -> (IO ()) -> IO DisplayingNotificaton
+showNotificationWindow config noti dispNotis onClose = do
 
-showNotificationWindow :: Notification -> [DisplayingNotificaton]
-  -> (IO ()) -> IO DisplayingNotificaton
-showNotificationWindow noti dispNotis onClose = do
+  let notiDefaultTimeout = configNotiDefaultTimeout config
+      distanceTop = configDistanceTop config
+      distanceBetween = configDistanceBetween config
 
   objs <- createTransparentWindow (Text.pack glade)
-    ["main_window"
+    [ "main_window"
     , "container_box"
-    , "main_bg"
     , "label_titel"
     , "label_body"
     , "label_appname"]
@@ -69,13 +77,6 @@ showNotificationWindow noti dispNotis onClose = do
   labelBody <- label objs "label_body"
   labelAppname <- label objs "label_appname"
   container <- box objs "container_box"
-  background <- drawingArea objs "main_bg"
-
-  labelSetText labelTitel $ notiSummary noti
-  labelSetText labelBody $ notiBody noti
-  labelSetText labelAppname $ notiAppName noti
-  labelSetXalign labelTitel 0
-  labelSetXalign labelBody 0
 
   case (notiUrgency noti) of
     High -> addClass mainWindow "critical"
@@ -83,32 +84,51 @@ showNotificationWindow noti dispNotis onClose = do
     Normal -> addClass mainWindow "normal"
 
   height <- getHeight container
-  widgetSetSizeRequest background (-1) height
+  widgetSetSizeRequest mainWindow (300) (-1)
 
   hBefores <- sortOn fst <$> mapM
     (\n -> (,) (dNotiTop n) <$> (dNotiGetHeight n)) dispNotis
 
-  let hBefore = findBefore hBefores distanceTop height
+  let hBefore = findBefore hBefores (fromIntegral distanceTop)
+                height (fromIntegral distanceBetween)
 
   (screenH, screenW) <- getScreenProportions mainWindow
   windowMove mainWindow (screenW - 350) hBefore
 
-  startTimeoutThread objs (fromIntegral $ notiTimeout noti) onClose
+  startTimeoutThread notiDefaultTimeout objs
+    (fromIntegral $ notiTimeout noti) onClose
 
+  let dNoti = DisplayingNotificaton
+        { dNotiGetHeight = (getHeight container)
+        , dNotiId = notiId noti
+        , dNotiTop = hBefore
+        , dNotiDestroy = widgetDestroy mainWindow
+        , dLabelTitel = labelTitel
+        , dLabelBody = labelBody
+        , dLabelAppname = labelAppname
+        , dContainer = container
+        }
+
+  updateNoti dNoti noti
   widgetShowAll mainWindow
 
-  return $ DisplayingNotificaton
-    { dNotiGetHeight = (getHeight container)
-    , dNotiId = notiId noti
-    , dNotiTop = hBefore
-    , dNotiDestroy = widgetDestroy mainWindow
-    }
+  return dNoti
+
+updateNoti dNoti noti = do
+  addSource $ do
+    labelSetText (dLabelTitel dNoti) $ notiSummary noti
+    labelSetText (dLabelBody dNoti) $ notiBody noti
+    labelSetText (dLabelAppname dNoti) $ notiAppName noti
+    labelSetXalign (dLabelTitel dNoti) 0
+    labelSetXalign (dLabelBody dNoti) 0
+    return False
+  return ()
 
 getHeight widget = do
   (a, b) <- widgetGetPreferredHeightForWidth widget 300
   return a
 
-startTimeoutThread objs timeout onClose = do
+startTimeoutThread notiDefaultTimeout objs timeout onClose = do
   when (timeout /= 0) $ do
     let timeout' = if timeout > 0 then timeout
                    else notiDefaultTimeout
@@ -121,9 +141,9 @@ startTimeoutThread objs timeout onClose = do
   return ()
 
 
-findBefore ((s, l):bs) p height =
+findBefore ((s, l):bs) p height distanceBetween =
   if ((p + height) <= (s - distanceBetween)) then
     p
   else
-    findBefore bs (s + l + distanceBetween) height
-findBefore [] p _ = p
+    findBefore bs (s + l + distanceBetween) height distanceBetween
+findBefore [] p _ _ = p

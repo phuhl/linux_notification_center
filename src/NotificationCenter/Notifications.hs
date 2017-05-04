@@ -9,12 +9,14 @@ module NotificationCenter.Notifications
 
 import NotificationCenter.Notifications.Notification
   ( showNotificationWindow
+  , updateNoti
   , Notification(..)
   , DisplayingNotificaton(..)
   )
 import NotificationCenter.Notifications.Data
   (Urgency(..))
 import TransparentWindow
+import NotificationCenter.Notifications.Data
 
 import Control.Concurrent (forkIO)
 import Control.Concurrent.STM
@@ -44,6 +46,7 @@ data NotifyState = NotifyState
     -- ^ Id for the next noti
   , notiStOnUpdate :: IO ()
     -- ^ Update-function for the NotificationCenter
+  , notiConfig :: Config
   }
 
 
@@ -55,7 +58,7 @@ getServerInformation =
           "1.0")
 
 getCapabilities :: IO [Text]
-getCapabilities = return ["body", "body-markup", "hints"]
+getCapabilities = return ["body", "body-markup", "hints", "persistence"]
 
 parseUrgency hints =
   let urgency = (do v <- Map.lookup "urgency" hints
@@ -87,27 +90,53 @@ notify :: TVar NotifyState
           -> IO Word32
 notify tState appName replaceId icon summary body
   actions hints timeout = do
+  state <- readTVarIO tState
+  time <- getTime
+  let newNoti = Notification
+        { notiAppName = appName
+        , notiRepId = replaceId
+        , notiId = notiStNextId state
+        , notiIcon = icon
+        , notiSummary = summary
+        , notiBody = body
+        , notiActions = actions
+        , notiHints = hints
+        , notiUrgency = parseUrgency hints
+        , notiTimeout = timeout
+        , notiTime = time
+        }
+  if replaceId == 0 then
+    insertNewNoti newNoti tState
+    else
+    replaceNoti newNoti tState
+  return $ fromIntegral $ notiId newNoti
+
+replaceNoti newNoti tState = do
+  atomically $ modifyTVar' tState $ \state ->
+    state { notiStList = map
+            (\n -> if notiId n == notiId newNoti then newNoti
+                   else n)
+            (notiStList state)
+          , notiStNextId = notiStNextId state + 1}
+
   addSource $ do
     state <- readTVarIO tState
-    time <- getTime
-    let newNoti = Notification
-          { notiAppName = appName
-          , notiRepId = replaceId
-          , notiId = notiStNextId state
-          , notiIcon = icon
-          , notiSummary = summary
-          , notiBody = body
-          , notiActions = actions
-          , notiHints = hints
-          , notiUrgency = parseUrgency hints
-          , notiTimeout = timeout
-          , notiTime = time
-          }
-    atomically $ modifyTVar' tState $ \state ->
-      state { notiStList = newNoti : notiStList state
-              , notiStNextId = notiStNextId state + 1}
+    let notis = filter (\n -> dNotiId n == notiId newNoti)
+                $ notiDisplayingList state
+    mapM (flip updateNoti $ newNoti) notis
+    return False
+
+insertNewNoti newNoti tState = do
+  atomically $ modifyTVar' tState $ \state ->
+    state { notiStList = newNoti : notiStList state
+          , notiStNextId = notiStNextId state + 1}
+
+  addSource $ do
+    state <- readTVarIO tState
     -- new noti-window
-    dnoti <- showNotificationWindow newNoti
+    dnoti <- showNotificationWindow
+      (notiConfig state)
+      newNoti
       (notiDisplayingList state)
       (removeNotiFromDistList tState $ notiId newNoti)
     atomically $ modifyTVar' tState $ \state ->
@@ -115,7 +144,7 @@ notify tState appName replaceId icon summary body
     -- trigger update in noti-center
     notiStOnUpdate state
     return False
-  return 0
+
 
 removeNotiFromDistList tState id = do
   state <- readTVarIO tState
@@ -152,9 +181,9 @@ notificationDaemon onNote = do
       "Notify" onNote
     ]
 
-startNotificationDaemon :: IO () ->  IO (TVar NotifyState)
-startNotificationDaemon onUpdate = do
-  istate <- newTVarIO $ NotifyState [] [] 0 onUpdate
+startNotificationDaemon :: Config -> IO () ->  IO (TVar NotifyState)
+startNotificationDaemon config onUpdate = do
+  istate <- newTVarIO $ NotifyState [] [] 0 onUpdate config
   forkIO (notificationDaemon (notify istate))
   return istate
 

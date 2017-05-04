@@ -9,7 +9,7 @@ readConfig defaultVal conf sec opt = fromEither defaultVal
 
 readConfigFile :: String -> IO CF.ConfigParser
 readConfigFile path = do
-  c <- Error.catchError (CF.readfile CF.emptyCP path)
+  c <- Error.catchError (CF.readfile CF.emptyCP{CF.optionxform = id} path)
     (\e ->  do
         putStrLn $ show e
         return $ return CF.emptyCP)

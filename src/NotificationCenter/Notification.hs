@@ -25,13 +25,21 @@ import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , widgetGetPreferredHeightForWidth, onButtonClicked
               , widgetDestroy)
 import qualified GI.Gtk as Gtk
-  (Box(..), builderGetObject
-  , builderAddFromString , builderNew, Builder(..), containerAdd)
+  (builderGetObject, builderAddFromString , builderNew
+  , Builder(..), containerAdd
+  , Box(..), Label(..), Button(..))
 
 data DisplayingNotificaton = DisplayingNotificaton
   { dNotiId :: Int
   , dNotiDestroy :: IO ()
+  , dLabelTitel :: Gtk.Label
+  , dLabelBody :: Gtk.Label
+  , dLabelAppname :: Gtk.Label
+  , dLabelTime :: Gtk.Label
+  , dButtonClose :: Gtk.Button
+  , dContainer :: Gtk.Box
   }
+
 
 instance Eq DisplayingNotificaton where
   a == b = dNotiId a == dNotiId b
@@ -69,14 +77,16 @@ showNotification mainBox dNoti tNState closeNotification = do
     Low -> addClass container "low"
     Normal -> addClass container "normal"
 
-  let dNoti' = dNoti { dNotiDestroy = widgetDestroy container }
+  let dNoti' = dNoti { dNotiDestroy = widgetDestroy container
+                     , dLabelTitel = labelTitel
+                     , dLabelBody = labelBody
+                     , dLabelAppname = labelAppname
+                     , dLabelTime = labelTime
+                     , dButtonClose = buttonClose
+                     , dContainer = container
+                     }
 
-  labelSetText labelTitel $ notiSummary noti
-  labelSetText labelBody $ notiBody noti
-  labelSetText labelAppname $ notiAppName noti
-  labelSetText labelTime $ notiTime noti
-  labelSetXalign labelTitel 0
-  labelSetXalign labelBody 0
+  updateNoti dNoti' tNState
 
   onButtonClicked buttonClose $ do
     closeNotification dNoti'
@@ -85,3 +95,17 @@ showNotification mainBox dNoti tNState closeNotification = do
 
   widgetShowAll container
   return dNoti'
+
+updateNoti dNoti tNState = do
+  addSource $ do
+    nState <- readTVarIO tNState
+    let (Just noti) = find (\n -> notiId n == dNotiId dNoti)
+          $ notiStList nState
+    labelSetText (dLabelTitel dNoti) $ notiSummary noti
+    labelSetText (dLabelBody dNoti) $ notiBody noti
+    labelSetText (dLabelAppname dNoti) $ notiAppName noti
+    labelSetText (dLabelTime dNoti) $ notiTime noti
+    labelSetXalign (dLabelTitel dNoti) 0
+    labelSetXalign (dLabelBody dNoti) 0
+    return False
+  return ()
