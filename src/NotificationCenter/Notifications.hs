@@ -20,7 +20,7 @@ import NotificationCenter.Notifications.Data
 
 import Control.Concurrent (forkIO)
 import Control.Concurrent.STM
-  (readTVarIO, modifyTVar', TVar(..), atomically, newTVarIO)
+  (readTVarIO, modifyTVar, modifyTVar', TVar(..), atomically, newTVarIO)
 
 import DBus ( Variant (..), fromVariant )
 import DBus.Client
@@ -105,25 +105,37 @@ notify tState appName replaceId icon summary body
         , notiTimeout = timeout
         , notiTime = time
         }
-  if replaceId == 0 then
+  let notis = filter (\n -> dNotiId n ==
+                       fromIntegral (notiRepId newNoti))
+                $ notiDisplayingList state
+  if length notis == 0 then
     insertNewNoti newNoti tState
     else
     replaceNoti newNoti tState
   return $ fromIntegral $ notiId newNoti
 
 replaceNoti newNoti tState = do
+  let repId = fromIntegral (notiRepId newNoti)
   atomically $ modifyTVar' tState $ \state ->
     state { notiStList = map
-            (\n -> if notiId n == notiId newNoti then newNoti
+            (\n -> if notiId n == repId then newNoti
                    else n)
             (notiStList state)
           , notiStNextId = notiStNextId state + 1}
 
   addSource $ do
+    atomically $ modifyTVar tState $ \state ->
+      state { notiDisplayingList = map
+              (\n -> if dNotiId n /= repId then n
+                     else n { dNotiId = notiId newNoti } )
+              $ notiDisplayingList state}
     state <- readTVarIO tState
     let notis = filter (\n -> dNotiId n == notiId newNoti)
                 $ notiDisplayingList state
-    mapM (flip updateNoti $ newNoti) notis
+    putStrLn $ show $ length notis
+    mapM (updateNoti (notiConfig state)
+           (removeNotiFromDistList tState $ notiId newNoti)
+           newNoti) notis
     return False
 
 insertNewNoti newNoti tState = do

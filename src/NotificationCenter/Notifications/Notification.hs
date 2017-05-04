@@ -59,8 +59,7 @@ showNotificationWindow :: Config -> Notification
   -> [DisplayingNotificaton] -> (IO ()) -> IO DisplayingNotificaton
 showNotificationWindow config noti dispNotis onClose = do
 
-  let notiDefaultTimeout = configNotiDefaultTimeout config
-      distanceTop = configDistanceTop config
+  let distanceTop = configDistanceTop config
       distanceBetween = configDistanceBetween config
 
   objs <- createTransparentWindow (Text.pack glade)
@@ -95,9 +94,6 @@ showNotificationWindow config noti dispNotis onClose = do
   (screenH, screenW) <- getScreenProportions mainWindow
   windowMove mainWindow (screenW - 350) hBefore
 
-  startTimeoutThread notiDefaultTimeout objs
-    (fromIntegral $ notiTimeout noti) onClose
-
   let dNoti = DisplayingNotificaton
         { dNotiGetHeight = (getHeight container)
         , dNotiId = notiId noti
@@ -109,12 +105,13 @@ showNotificationWindow config noti dispNotis onClose = do
         , dContainer = container
         }
 
-  updateNoti dNoti noti
+  updateNoti config onClose noti dNoti
   widgetShowAll mainWindow
 
   return dNoti
 
-updateNoti dNoti noti = do
+updateNoti config onClose noti dNoti  = do
+  let notiDefaultTimeout = configNotiDefaultTimeout config
   addSource $ do
     labelSetText (dLabelTitel dNoti) $ notiSummary noti
     labelSetText (dLabelBody dNoti) $ notiBody noti
@@ -122,13 +119,15 @@ updateNoti dNoti noti = do
     labelSetXalign (dLabelTitel dNoti) 0
     labelSetXalign (dLabelBody dNoti) 0
     return False
+  startTimeoutThread notiDefaultTimeout
+    (fromIntegral $ notiTimeout noti) onClose
   return ()
 
 getHeight widget = do
   (a, b) <- widgetGetPreferredHeightForWidth widget 300
   return a
 
-startTimeoutThread notiDefaultTimeout objs timeout onClose = do
+startTimeoutThread notiDefaultTimeout timeout onClose = do
   when (timeout /= 0) $ do
     let timeout' = if timeout > 0 then timeout
                    else notiDefaultTimeout
