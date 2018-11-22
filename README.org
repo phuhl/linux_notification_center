@@ -16,7 +16,7 @@ sudo make install
 
 *** Stack commands
 
-If you want to run stack yourself instead of make use:
+If you want to run stack yourself instead of using make:
 #+BEGIN_SRC sh
 stack setup
 stack build
@@ -33,3 +33,6 @@ Toggle between hide and show:
 kill -s USR1 $(pidof linux-notification-center)
 #+END_SRC
 
+** See also
+
+Also take a look at my [[https://github.com/phuhl/notify-send.py][notify-send.py]] which imitates notify-send (libnotify) but also is able to replace notifications.
