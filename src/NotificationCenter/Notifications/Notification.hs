@@ -24,7 +24,7 @@ import Control.Monad
 import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , labelSetText, widgetSetSizeRequest, labelSetXalign
               , widgetGetPreferredHeightForWidth
-
+              , onWidgetButtonPressEvent
               , setWidgetWidthRequest)
 import qualified GI.Gtk as Gtk
   (Box(..), Label(..), Button(..), Window(..))
@@ -113,6 +113,9 @@ showNotificationWindow config noti dispNotis onClose = do
   (screenH, screenW) <- getScreenProportions mainWindow
   windowMove mainWindow (screenW - 350) hBefore
 
+  onWidgetButtonPressEvent mainWindow $ \(_) -> do
+    onClose
+    return False
   widgetShowAll mainWindow
 
   return $ dNoti { dNotiTop = hBefore }
