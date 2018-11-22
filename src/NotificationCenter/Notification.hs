@@ -73,10 +73,17 @@ showNotification mainBox dNoti tNState closeNotification = do
   buttonClose <- button objs "button_close"
   container <- box objs "box_container"
 
+  let elemsLabel = [labelTitel, labelBody, labelAppname, labelTime]
   case (notiUrgency noti) of
-    High -> addClass container "critical"
-    Low -> addClass container "low"
-    Normal -> addClass container "normal"
+    High -> do
+      sequence $ (flip addClass) "critical" <$> elemsLabel
+      addClass container "critical"
+    Low -> do
+      sequence $ (flip addClass) "low" <$> elemsLabel
+      addClass container "low"
+    Normal -> do
+      sequence $ (flip addClass) "normal" <$> elemsLabel
+      addClass container "normal"
 
   let dNoti' = dNoti { dNotiDestroy = widgetDestroy container
                      , dLabelTitel = labelTitel

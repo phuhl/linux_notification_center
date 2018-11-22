@@ -122,8 +122,8 @@ createNotiCenter tState config = do
   deleteButton <- button objs "button_deleteAll"
 
   screen <- windowGetScreen mainWindow
-  setStyle screen $ BS.pack style
-
+  setStyle screen $ BS.pack $
+    replaceColors config style
 --  (Just mainWindowGDK) <- widgetGetParentWindow mainWindow
   atomically $ modifyTVar' tState $
     \state -> state { stMainWindow = mainWindow
@@ -148,8 +148,8 @@ createNotiCenter tState config = do
     return True
 
                                  -- w   h
-  windowSetDefaultSize mainWindow 500 (screenH - barHeight)
-  windowMove mainWindow (screenW - 500) barHeight
+  windowSetDefaultSize mainWindow (fromIntegral $ configWidth config) (screenH - barHeight)
+  windowMove mainWindow (screenW - (fromIntegral $ configWidth config)) barHeight
   onWidgetDestroy mainWindow mainQuit
   return ()
     where barHeight = fromIntegral $ configBarHeight config
@@ -237,14 +237,45 @@ setDeleteAllState tState = do
 
 getConfig p =
   Config
-    { configBarHeight = r 0 p nCenter "marginTop"
+    {
+    -- notification-center
+      configBarHeight = r 0 p nCenter "marginTop"
+    , configWidth = r 500 p nCenter "width"
+
+    -- notification-center-notification-popup
     , configNotiDefaultTimeout = r 10000 p nPopup "notiDefaultTimeout"
     , configDistanceTop = r 50 p nPopup "distanceTop"
+    , configDistanceRight = r 50 p nPopup "distanceRight"
     , configDistanceBetween = r 20 p nPopup "distanceBetween"
+    , configWidthNoti = r 300 p nPopup "width"
+
+    -- colors
+    , configBackground = r' "rgba(10, 50, 50, 0.8)" p colors "background"
+    , configCritical = r' "rgba(255, 0, 0, 0.2)" p colors "critical"
+    , configCriticalInCenter = r' "rgba(100, 50, 50, 0.8)" p colors "criticalInCenter"
+    , configButtonColor = r' "#FFFFFF" p colors "buttonColor"
+    , configButtonHover = r' "darker(rgba(52, 50, 0, 0.8))" p colors "buttonHover"
+    , configButtonBackground = r' "transparent" p colors "buttonBackground"
+    , configLabelColor = r' "#FFFFFF" p colors "labelColor"
+    , configCriticalColor = r' "#FFFFFF" p colors "criticalColor"
+    , configCriticalInCenterColor = r' "#FFFFFF" p colors "criticalInCenterColor"
 }
   where nPopup = "notification-center-notification-popup"
         nCenter = "notification-center"
+        colors = "colors"
         r = readConfig
+        r' = readConfig
+
+replaceColors config style =
+  replace "replaceme0000" (configBackground config) $
+  replace "replaceme0001" (configCritical config) $
+  replace "replaceme0002" (configCriticalInCenter config) $
+  replace "replaceme0003" (configButtonColor config) $
+  replace "replaceme0004" (configButtonHover config) $
+  replace "replaceme0005" (configButtonBackground config) $
+  replace "replaceme0006" (configLabelColor config) $
+  replace "replaceme0007" (configCriticalColor config) $
+  replace "replaceme0008" (configCriticalInCenterColor config) style
 
 getInitialState = do
   newTVarIO $ State

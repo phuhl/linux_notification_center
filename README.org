@@ -36,3 +36,27 @@ kill -s USR1 $(pidof linux-notification-center)
 ** See also
 
 Also take a look at my [[https://github.com/phuhl/notify-send.py][notify-send.py]] which imitates notify-send (libnotify) but also is able to replace notifications.
+
+* Todos
+
+** TODO Post to reddit (haskell/unixporn)
+
+** TODO Image support
+
+** DONE Color configurable
+
+** DONE Sizes configurable
+:LOGBOOK:
+CLOCK: [2018-11-22 Thu 20:48]--[2018-11-22 Thu 21:05] =>  0:17
+:END:
+
+- Window dimensions for all windows
+
+** TODO Buttons at bottom
+:LOGBOOK:
+CLOCK: [2018-11-22 Thu 23:33]
+:END:
+
+- In the configuration one could specify button-captions and
+  shell-commands
+- The buttons could be generated dynamically 

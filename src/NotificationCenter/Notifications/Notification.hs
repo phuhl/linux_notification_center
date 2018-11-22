@@ -27,7 +27,7 @@ import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , onWidgetButtonPressEvent
               , setWidgetWidthRequest)
 import qualified GI.Gtk as Gtk
-  (Box(..), Label(..), Button(..), Window(..))
+  (IsWidget, Box(..), Label(..), Button(..), Window(..))
 
 import DBus ( Variant (..) )
 data Notification = Notification
@@ -86,13 +86,21 @@ showNotificationWindow config noti dispNotis onClose = do
   labelBG <- label objs "label_background"
   container <- box objs "container_box"
 
+  setWidgetWidthRequest mainWindow $ fromIntegral $ configWidthNoti config
+  let elemsLabel = [labelTitel, labelBody, labelAppname]
   case (notiUrgency noti) of
-    High -> addClass mainWindow "critical"
-    Low -> addClass mainWindow "low"
-    Normal -> addClass mainWindow "normal"
+    High -> do
+      sequence $ (flip addClass) "critical" <$> elemsLabel
+      addClass mainWindow "critical"
+    Low -> do
+      sequence $ (flip addClass) "low" <$> elemsLabel
+      addClass mainWindow "low"
+    Normal -> do
+      sequence $ (flip addClass) "normal" <$> elemsLabel
+      addClass mainWindow "normal"
 
   let dNoti = DisplayingNotificaton
-        { dNotiGetHeight = (getHeight container)
+        { dNotiGetHeight = (getHeight container config)
         , dNotiId = notiId noti
         , dNotiDestroy = widgetDestroy mainWindow
         , dMainWindow = mainWindow
@@ -111,7 +119,10 @@ showNotificationWindow config noti dispNotis onClose = do
                 height (fromIntegral distanceBetween)
 
   (screenH, screenW) <- getScreenProportions mainWindow
-  windowMove mainWindow (screenW - 350) hBefore
+  windowMove mainWindow
+    (screenW - fromIntegral
+     (configWidthNoti config + configDistanceRight config))
+    hBefore
 
   onWidgetButtonPressEvent mainWindow $ \(_) -> do
     onClose
@@ -126,7 +137,7 @@ updateNoti' config onClose noti dNoti  = do
   labelSetText (dLabelAppname dNoti) $ notiAppName noti
   labelSetXalign (dLabelTitel dNoti) 0
   labelSetXalign (dLabelBody dNoti) 0
-  height <- getHeight $ dContainer dNoti
+  height <- getHeight (dContainer dNoti) config
   widgetSetSizeRequest (dLabelBG dNoti) (-1) height
   let notiDefaultTimeout = configNotiDefaultTimeout config
   startTimeoutThread notiDefaultTimeout
@@ -139,8 +150,9 @@ updateNoti config onClose noti dNoti  = do
     return False
   return ()
 
-getHeight widget = do
-  (a, b) <- widgetGetPreferredHeightForWidth widget 300
+getHeight widget config = do
+  (a, b) <- widgetGetPreferredHeightForWidth widget
+    $ fromIntegral $ configWidthNoti config
   return a
 
 startTimeoutThread notiDefaultTimeout timeout onClose = do

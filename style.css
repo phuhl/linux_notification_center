@@ -1,15 +1,14 @@
 .blurredBG, #main_window, .blurredBG.low, .blurredBG.normal {
     /*    background: rgba(52, 50, 0, 0.6640625);*/
-    background: rgba(10, 50, 50, 0.8);
+    background: replaceme0000;
 }
 
-.critical {
-    background: rgba(255, 0, 0, 0.2);
+window.critical {
+    background: replaceme0001;
 }
 
-.blurredBG.critical {
-    /*    background: rgba(152, 50, 0, 0.6640625);*/
-    background: rgba(100, 50, 50, 0.8);
+.notificationInCenter.critical {
+    background: replaceme0002;
 }
 
 .undershoot.top, .undershoot.right, .undershoot.bottom,
@@ -19,20 +18,27 @@
 
 
 button {
-    background: transparent;
-    /*    color: #FFA3A6;*/
+    background: replaceme0005;
+    color: replaceme0003;
     border-radius: 0;
     border-width: 0;
     background-position: 0 0;
 }
 
-label, button {
-    color: #FFF;
+label {
+    color: replaceme0006;
+}
+
+label.critical {
+    color: replaceme0007;
+}
+.notificationInCenter label.critical {
+    color: replaceme0008;
 }
 
 button:hover {
     border-radius: 0px;
-    background: darker(rgba(52, 50, 0, 0.8));
+    background: replaceme0004;
     border-width: 0;
     border-top: transparent;
     border-color: #f00;
