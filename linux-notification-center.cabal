@@ -32,10 +32,10 @@ library
                      , haskell-gi
                      , haskell-gi-base
                      , gi-cairo
-                     , gi-glib
+                     , gi-glib >= 2.0.17
                      , gi-gdk
                      , gi-gdkpixbuf
-                     , gi-gtk >= 3.0.12
+                     , gi-gtk >= 3.0.19
                      , time
                      , system-locale
                      , gi-gobject
@@ -43,7 +43,7 @@ library
                      , bytestring
                      , ConfigFile
                      , mtl
-                     , dbus
+                     , dbus >= 0.10.15 && < 1
                      , containers
                      , unix
                      , stm

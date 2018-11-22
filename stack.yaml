@@ -15,7 +15,7 @@
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: lts-8.9
+resolver: lts-12.19
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -39,11 +39,10 @@ packages:
 - '.'
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
-extra-deps: [ system-locale-0.1.0.0
-            , megaparsec-5.1.2
-            , dbus-0.10.12
-            , libxml-sax-0.7.5
-            , gi-gtk-3.0.12 ]
+extra-deps: [ ConfigFile-1.1.4
+            , system-locale-0.3.0.0
+            , dbus-0.10.15
+            ]
 
 # Override default flag values for local packages and extra-deps
 flags: {}
