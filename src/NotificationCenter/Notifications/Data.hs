@@ -7,14 +7,27 @@ data Urgency = Normal | Low | High deriving Eq
 
 data Config = Config
   {
+  -- notification-center
     configBarHeight :: Int
   , configWidth :: Int
 
+  -- notification-center-notification-popup
   , configNotiDefaultTimeout :: Int
   , configDistanceTop :: Int
   , configDistanceRight :: Int
   , configDistanceBetween :: Int
   , configWidthNoti :: Int
+
+  -- buttons
+  , configButtonsPerRow :: Int
+  , configButtonHeight :: Int
+  , configButtonMargin :: Int
+  , configLabels :: String
+  , configCommands :: String
+  , configUserButtonColor :: String
+  , configUserButtonHover :: String
+  , configUserButtonBackground :: String
+  , configUserButtonTextSize :: String
 
   -- colors
   , configBackground :: String

@@ -43,3 +43,16 @@ button:hover {
     border-top: transparent;
     border-color: #f00;
 }
+
+.userbutton {
+    background: replaceme0011;
+    color: replaceme0009;
+}
+
+.userbutton:hover {
+    background: replaceme0010;
+}
+
+.userbuttonlabel {
+    font-size: replaceme0012;
+}

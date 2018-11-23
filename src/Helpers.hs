@@ -25,9 +25,8 @@ fromEither a e = case e of
   Left _ -> a
   Right x -> x
 
+
 replace a b c = replace' c a b
-
-
 replace' :: Eq a => [a] -> [a] -> [a] -> [a]
 replace' [] _ _ = []
 replace' s find repl =
@@ -35,3 +34,20 @@ replace' s find repl =
         then repl ++ (replace' (drop (length find) s) find repl)
         else [head s] ++ (replace' (tail s) find repl)
 
+-- split a string at ":"
+split :: String -> [String]
+split ('"':':':'"':ds) = "" : split ds
+split (a:bs) = (a:(split bs !! 0)): (tail $ split bs)
+split [] = [""]
+
+removeOuterLetters (a:as) = reverse $ tail $ reverse as
+removeOuterLetters [] = []
+
+
+splitEvery :: Int -> [a] -> [[a]]
+splitEvery _ [] = []
+splitEvery n as = (take n as) : (splitEvery n $ tailAt n as)
+  where
+    tailAt 0 as = as
+    tailAt n (a:as) = tailAt (n - 1) as
+    tailAt _ [] = []

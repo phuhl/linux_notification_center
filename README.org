@@ -52,11 +52,17 @@ CLOCK: [2018-11-22 Thu 20:48]--[2018-11-22 Thu 21:05] =>  0:17
 
 - Window dimensions for all windows
 
-** TODO Buttons at bottom
+** DONE Buttons at bottom
 :LOGBOOK:
-CLOCK: [2018-11-22 Thu 23:33]
+CLOCK: [2018-11-23 Fri 14:27]--[2018-11-23 Fri 15:48] =>  1:21
+CLOCK: [2018-11-23 Fri 00:33]--[2018-11-23 Fri 02:30] =>  1:57
+CLOCK: [2018-11-22 Thu 23:33]--[2018-11-23 Fri 00:11] =>  0:38
 :END:
 
 - In the configuration one could specify button-captions and
   shell-commands
 - The buttons could be generated dynamically 
+
+
+- [X] Problem: all commands are executed simultaneously... solved
+- [X] Problem 2: to many buttons overlap to the right

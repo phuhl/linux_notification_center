@@ -14,6 +14,7 @@ import Helpers
 import NotificationCenter.Notifications.Data
 
 import Prelude
+import System.Process (runCommand)
 
 import Data.Maybe
 import Data.IORef
@@ -37,7 +38,7 @@ import System.Posix.Daemonize (serviced, daemonize)
 import System.Directory (getHomeDirectory)
 
 import GI.Gtk
-       (widgetShowAll, widgetShow, widgetHide, onWidgetDestroy
+       (widgetSetHalign, widgetSetHexpand, buttonNew, setWidgetMargin, buttonSetRelief, widgetSetSizeRequest, widgetShowAll, widgetShow, widgetHide, onWidgetDestroy
        , windowSetDefaultSize, setWindowTitle, boxPackStart, boxNew
        , setWindowWindowPosition, WindowPosition(..), windowMove
        , frameSetShadowType, aspectFrameNew
@@ -55,8 +56,8 @@ import GI.Gtk
        , setAboutDialogProgramName, aboutDialogNew, labelNew, get
        , afterWindowSetFocus, labelSetText
        , onWidgetFocusOutEvent, onWidgetKeyReleaseEvent, widgetGetParentWindow
-       , onButtonClicked, windowGetScreen)
-import qualified GI.Gtk as Gtk (Window(..), Box(..), Label(..), Button(..))
+       , onButtonClicked, windowGetScreen, boxNew, widgetSetValign)
+import qualified GI.Gtk as Gtk (containerAdd, Window(..), Box(..), Label(..), Button(..))
 
 import qualified GI.Gtk as GI (init, main)
 import GI.GLib (sourceRemove, timeoutAdd, unixSignalAdd)
@@ -64,7 +65,8 @@ import GI.GLib.Constants
 import GI.Gdk.Constants
 import GI.Gdk.Flags (EventMask(..))
 import GI.Gtk.Enums
-       (Orientation(..), WindowType(..), ShadowType(..), PositionType(..))
+       (Orientation(..), WindowType(..), ShadowType(..)
+       , PositionType(..), ReliefStyle(..), Align(..))
 import Data.GI.Base.BasicConversions (gflagsToWord)
 import qualified GI.Gdk.Objects.Window
 
@@ -112,11 +114,13 @@ createNotiCenter tState config = do
     , "label_time"
     , "label_date"
     , "box_notis"
+    , "box_buttons"
     , "button_deleteAll" ]
     (Just "Notification area")
 
   mainWindow <- window objs "main_window"
   notiBox <- box objs "box_notis"
+  buttonBox <- box objs "box_buttons"
   timeL <- label objs "label_time"
   timeD <- label objs "label_date"
   deleteButton <- button objs "button_deleteAll"
@@ -139,6 +143,40 @@ createNotiCenter tState config = do
     displayList <- stDisplayingNotiList <$> readTVarIO tState
     mapM (removeNoti tState) displayList
     return ()
+
+
+  let buttons = zip
+        (split $ removeOuterLetters $ configLabels config)
+        (split $ removeOuterLetters $ configCommands config)
+      (buttonLabels, buttonCommands) = unzip buttons
+      margin = fromIntegral $ configButtonMargin config
+      width = fromIntegral (((configWidth config) - 20)
+                            `div` (configButtonsPerRow config))
+              - margin * 2
+      height = fromIntegral $ configButtonHeight config
+      linesNeeded = fromIntegral $ ceiling
+        $ ((fromIntegral $ length buttons) / (fromIntegral $ configButtonsPerRow config))
+  lines' <- sequence $ take linesNeeded $ repeat $ boxNew OrientationHorizontal 0
+  buttons' <- sequence $ map (\button -> buttonNew) buttonLabels
+  labels' <- sequence $ map (\l -> labelNew $ Just $ Text.pack l) buttonLabels
+  sequence $ (flip (flip widgetSetSizeRequest width) height) <$> buttons'
+  sequence $ (flip addClass) "userbutton" <$> buttons'
+  sequence $ (flip buttonSetRelief) ReliefStyleNone <$> buttons'
+  sequence $ (flip setWidgetMargin) margin <$> buttons'
+  sequence $ (flip widgetSetHalign AlignStart) <$> labels'
+  sequence $ (flip widgetSetValign AlignEnd) <$> labels'
+  sequence $ (flip addClass "userbuttonlabel") <$> labels'
+  sequence $ map (\(button, command) ->
+                    onButtonClicked button (do
+                                               runCommand command
+                                               return ()
+                                           )) $ zip buttons' buttonCommands
+  sequence $ Gtk.containerAdd <$> buttons' <*> labels'
+  sequence $ map (\(box, buttons'') ->
+                    sequence $ Gtk.containerAdd box <$> buttons'')
+    $ zip (reverse lines') (splitEvery (configButtonsPerRow config) buttons')
+  sequence $ Gtk.containerAdd buttonBox <$> lines'
+  sequence $ widgetShowAll <$> lines'
 
 
   (screenH, screenW) <- getScreenProportions mainWindow
@@ -249,6 +287,17 @@ getConfig p =
     , configDistanceBetween = r 20 p nPopup "distanceBetween"
     , configWidthNoti = r 300 p nPopup "width"
 
+    -- buttons
+    , configButtonsPerRow = r 5 p buttons "buttonsPerRow"
+    , configButtonHeight = r 60 p buttons "buttonHeight"
+    , configButtonMargin = r 5 p buttons "buttonMargin"
+    , configLabels = r' "" p buttons "labels"
+    , configCommands = r' "" p buttons "commands"
+    , configUserButtonColor = r' "#004" p buttons "buttonColor"
+    , configUserButtonHover = r' "rgba(0, 20, 20, 0.2)" p buttons "buttonHover"
+    , configUserButtonBackground = r' "rgba(100, 120, 120, 0.2)" p buttons "buttonBackground"
+    , configUserButtonTextSize = r' "12px" p buttons "buttonTextSize"
+
     -- colors
     , configBackground = r' "rgba(10, 50, 50, 0.8)" p colors "background"
     , configCritical = r' "rgba(255, 0, 0, 0.2)" p colors "critical"
@@ -263,6 +312,7 @@ getConfig p =
   where nPopup = "notification-center-notification-popup"
         nCenter = "notification-center"
         colors = "colors"
+        buttons = "buttons"
         r = readConfig
         r' = readConfig
 
@@ -275,7 +325,11 @@ replaceColors config style =
   replace "replaceme0005" (configButtonBackground config) $
   replace "replaceme0006" (configLabelColor config) $
   replace "replaceme0007" (configCriticalColor config) $
-  replace "replaceme0008" (configCriticalInCenterColor config) style
+  replace "replaceme0008" (configCriticalInCenterColor config) $
+  replace "replaceme0009" (configUserButtonColor config) $
+  replace "replaceme0010" (configUserButtonHover config) $
+  replace "replaceme0011" (configUserButtonBackground config) $
+  replace "replaceme0012" (configUserButtonTextSize config) style
 
 getInitialState = do
   newTVarIO $ State

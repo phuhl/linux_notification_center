@@ -50,6 +50,7 @@ library
                      , here
                      , hdaemonize
                      , directory
+                     , process
   default-language:    Haskell2010
 
 executable linux-notification-center
