@@ -27,6 +27,7 @@ button {
     border-radius: 0;
     border-width: 0;
     background-position: 0 0;
+    text-shadow: none;
 }
 
 label {
