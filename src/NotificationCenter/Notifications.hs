@@ -46,7 +46,14 @@ data NotifyState = NotifyState
     -- ^ Id for the next noti
   , notiStOnUpdate :: IO ()
     -- ^ Update-function for the NotificationCenter
+  , notiStOnUpdateForMe :: IO ()
+    -- ^ Update-function for the NotificationCenter for notifications
+    -- for internal use
   , notiConfig :: Config
+    -- ^ Configuration
+  , notiForMeList :: [ Notification ]
+    -- ^ Notifications that should not be displayed but are used as
+    --   as hints for this notification daemon
   }
 
 
@@ -114,26 +121,38 @@ notify tState appName replaceId icon summary body
         , notiTransient = parseTransient hints
         }
 
-  let notis = filter (\n -> dNotiId n ==
-                       fromIntegral (notiRepId newNoti))
-                $ notiDisplayingList state
-  atomically $ modifyTVar' tState $ \state ->
-    state { notiStList = updatedNotiList (notiStList state)
-                         newNoti (fromIntegral (notiRepId newNoti))
-          , notiStNextId = notiStNextId state + 1}
-  if length notis == 0 then
-    insertNewNoti newNoti tState
+  if Map.member (pack "linux-notification-center")
+    $ notiHints newNoti
+    then
+    do
+      atomically $ modifyTVar' tState $ \state ->
+        state { notiForMeList = newNoti:(notiForMeList state) }
+      notiStOnUpdateForMe state
+      return $ fromIntegral 0
     else
-    replaceNoti newNoti tState
-  return $ fromIntegral $ notiId newNoti
-    where
-      updatedNotiList :: [Notification] -> Notification
-                      -> Int -> [Notification]
-      updatedNotiList notis newNoti repId =
-        let notis' = map (\n -> if notiId n == repId then newNoti
-                                else n) notis
-        in if (find ((==) newNoti) notis') /= Nothing then notis'
-           else (newNoti:notis')
+    do
+      let notis = filter (\n -> dNotiId n ==
+                           fromIntegral (notiRepId newNoti))
+                  $ notiDisplayingList state
+      atomically $ modifyTVar' tState
+        $ \state ->
+            state { notiStList =
+                      updatedNotiList (notiStList state) newNoti
+                      (fromIntegral (notiRepId newNoti))
+                  , notiStNextId = notiStNextId state + 1}
+      if length notis == 0 then
+        insertNewNoti newNoti tState
+        else
+        replaceNoti newNoti tState
+      return $ fromIntegral $ notiId newNoti
+        where
+          updatedNotiList :: [Notification] -> Notification
+                          -> Int -> [Notification]
+          updatedNotiList notis newNoti repId =
+            let notis' = map (\n -> if notiId n == repId then newNoti
+                                    else n) notis
+            in if (find ((==) newNoti) notis') /= Nothing then notis'
+               else (newNoti:notis')
 
 
 replaceNoti newNoti tState = do
@@ -210,9 +229,9 @@ notificationDaemon onNote onCloseNote = do
       "Notify" onNote
     ]
 
-startNotificationDaemon :: Config -> IO () ->  IO (TVar NotifyState)
-startNotificationDaemon config onUpdate = do
-  istate <- newTVarIO $ NotifyState [] [] 1 onUpdate config
+startNotificationDaemon :: Config -> IO () ->  IO () ->  IO (TVar NotifyState)
+startNotificationDaemon config onUpdate onUpdateForMe = do
+  istate <- newTVarIO $ NotifyState [] [] 1 onUpdate onUpdateForMe config []
   forkIO (notificationDaemon (notify istate)
            (removeNotiFromDistList' istate))
   return istate

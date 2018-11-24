@@ -28,9 +28,13 @@ data Config = Config
   , configUserButtonHover :: String
   , configUserButtonBackground :: String
   , configUserButtonTextSize :: String
+  , configUserButtonActivated :: String
+  , configUserButtonActivatedColor :: String
 
   -- colors
   , configBackground :: String
+  , configBackgroundNoti :: String
+  , configNotiLabelColor :: String
   , configCritical :: String
   , configCriticalInCenter :: String
   , configButtonColor :: String

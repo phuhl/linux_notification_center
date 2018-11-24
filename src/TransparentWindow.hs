@@ -18,6 +18,7 @@ module TransparentWindow
   , addSource
   , setStyle
   , addClass
+  , removeClass
   -- * Colors
   ) where
 
@@ -32,7 +33,7 @@ import Control.Monad.IO.Class (MonadIO(..))
 import Control.Concurrent (forkIO, threadDelay, ThreadId(..), killThread)
 
 import GI.Gtk
-       (widgetShowAll, widgetHide, onWidgetDestroy, windowSetDefaultSize
+       (styleContextRemoveClass, widgetShowAll, widgetHide, onWidgetDestroy, windowSetDefaultSize
        , setWindowTitle, boxPackStart, boxNew, setWindowWindowPosition
        , WindowPosition(..), windowMove
        , frameSetShadowType, aspectFrameNew
@@ -151,3 +152,8 @@ addClass :: Gtk.IsWidget a => a -> Text.Text -> IO ()
 addClass w clazz = do
   context <- widgetGetStyleContext w
   styleContextAddClass context clazz
+
+removeClass :: Gtk.IsWidget a => a -> Text.Text -> IO ()
+removeClass w clazz = do
+  context <- widgetGetStyleContext w
+  styleContextRemoveClass context clazz

@@ -37,8 +37,9 @@ replace' s find repl =
 -- split a string at ":"
 split :: String -> [String]
 split ('"':':':'"':ds) = "" : split ds
+split (a:[]) = [[a]]
 split (a:bs) = (a:(split bs !! 0)): (tail $ split bs)
-split [] = [""]
+split [] = []
 
 removeOuterLetters (a:as) = reverse $ tail $ reverse as
 removeOuterLetters [] = []
@@ -51,3 +52,4 @@ splitEvery n as = (take n as) : (splitEvery n $ tailAt n as)
     tailAt 0 as = as
     tailAt n (a:as) = tailAt (n - 1) as
     tailAt _ [] = []
+

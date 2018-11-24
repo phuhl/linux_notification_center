@@ -3,6 +3,10 @@
     background: replaceme0000;
 }
 
+.blurredBG.notification {
+    background: replaceme0015;
+}
+
 window.critical {
     background: replaceme0001;
 }
@@ -29,6 +33,10 @@ label {
     color: replaceme0006;
 }
 
+label.notification {
+    color: replaceme0016;
+}
+
 label.critical {
     color: replaceme0007;
 }
@@ -46,7 +54,6 @@ button:hover {
 
 .userbutton {
     background: replaceme0011;
-    color: replaceme0009;
 }
 
 .userbutton:hover {
@@ -54,5 +61,14 @@ button:hover {
 }
 
 .userbuttonlabel {
+    color: replaceme0009;
     font-size: replaceme0012;
+}
+
+button.buttonState1 {
+    background: replaceme0013;
+}
+
+.userbuttonlabel.buttonState1 {
+    color: replaceme0014;
 }

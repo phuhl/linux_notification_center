@@ -2,6 +2,48 @@
 
 A haskell-written notification center for BSPWM and polybar users.
 
+** Features
+
+The notification center receives notifications via DBUS (like any
+notification daemon) and shows them in the upper right corner of the
+screen. The notification (if not specified in the notification
+otherwise) will also be shown in the notification center even after
+the notification disappeared by itself. The notifications can be
+clicked to make them disappear.
+
+Notifications can be replaced by the use of the =replaces-id= feature
+of the notification specification.
+
+The notification center can (optionally) show user-specified buttons
+in the bottom that can be in two states (highlighted/not highlighted)
+and that can run customable shell commands.
+
+** Usage
+
+To start it:
+#+BEGIN_SRC sh
+> linux-notification-center
+#+END_SRC
+
+
+Toggle between hidden and shown state of the notification center:
+#+BEGIN_SRC sh
+kill -s USR1 $(pidof linux-notification-center)
+#+END_SRC
+
+
+Set the state of a user defined button (in this example the first
+button, which has =id= 0):
+#+BEGIN_SRC sh
+# turn highlighting on
+notify-send.py a --hint boolean:linux-notification-center:true int:id:0 boolean:state:true
+
+# turn highlighting off
+notify-send.py a --hint boolean:linux-notification-center:true int:id:0 boolean:state:true
+#+END_SRC
+This snippet uses [[https://github.com/phuhl/notify-send.py][notify-send.py]], a improved version of libnotify
+(notify-send).
+
 ** Install
 
 Requires [[https://www.archlinux.org/packages/community/x86_64/stack/][stack]] on Arch and [[https://packages.ubuntu.com/search?keywords=haskell-stack&searchon=names&suite=all&section=all][haskell-stack]] on Ubuntu. Alternatively
@@ -22,16 +64,51 @@ stack setup
 stack build
 #+END_SRC
 
-** Usage
+** Configuration
 
-#+BEGIN_SRC sh
-> linux-notification-center
-#+END_SRC
+No configuration is necessary, the notification center comes with
+sensible defaults™.
 
-Toggle between hide and show:
-#+BEGIN_SRC sh
-kill -s USR1 $(pidof linux-notification-center)
-#+END_SRC
+Nearly all colors and many sizes are customizable, as well well as the
+default timeout for notifications and the optional buttons in the
+notification center. Below are possible configurable options shown.
+
+#+BEGIN_EXAMPLE
+[notification-center]
+marginTop = 25
+width = 500
+
+[notification-center-notification-popup]
+notiDefaultTimeout = 10000
+distanceTop = 50
+distanceRight = 50
+distanceBetween = 20
+width = 300
+
+[colors]
+background = rgba(230, 255, 255, 0.9)
+critical = rgba(255, 0, 50, 0.5)
+criticalColor = #FFF
+criticalInCenter = rgba(155, 0, 20, 0.5)
+criticalInCenterColor = #FFF
+buttonColor = #002
+buttonHover = #cdd
+buttonBackground = transparent
+labelColor = #004
+
+[buttons]
+buttonsPerRow = 5
+buttonHeight = 60
+buttonMargin = 2
+labels = "VPN":"Bluetooth":"Wifi":"Screensaver"
+commands = "toggleVPN":"notify-send.py "Not implemented" --app-name Bluetooth":"notify-send.py "Not implemented" --app-name Wifi":"xset dpms 10 10 && notify-send.py "Screen timeout" "Screen timeout at 10 seconds now" --app-name dpms --replaces-process dpms"
+buttonBackground = rgba(100, 120, 120, 0.2)
+buttonHover = rgba(0, 20, 20, 0.2)
+buttonColor = #004
+buttonTextSize = 12px;
+buttonStatus1 = rgba(60, 80, 150, 0.4)
+buttonStatus1Color = #fff
+#+END_EXAMPLE
 
 ** See also
 
@@ -66,3 +143,14 @@ CLOCK: [2018-11-22 Thu 23:33]--[2018-11-23 Fri 00:11] =>  0:38
 
 - [X] Problem: all commands are executed simultaneously... solved
 - [X] Problem 2: to many buttons overlap to the right
+
+** DONE Buttons with info-updates
+:LOGBOOK:
+CLOCK: [2018-11-23 Fri 18:46]--[2018-11-23 Fri 20:24] =>  1:38
+CLOCK: [2018-11-23 Fri 16:01]--[2018-11-23 Fri 18:01] =>  2:00
+:END:
+
+- [X] Problem: i don't know if multiple hints per noti possible are
+  - but are currently required
+
+** TODO Sort notis by time with newest on top

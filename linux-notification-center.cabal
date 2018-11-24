@@ -17,6 +17,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     NotificationCenter
                      , NotificationCenter.Notification
+                     , NotificationCenter.Button
                      , NotificationCenter.Notification.Glade
                      , NotificationCenter.Notifications
                      , NotificationCenter.Notifications.Data
@@ -51,6 +52,7 @@ library
                      , hdaemonize
                      , directory
                      , process
+                     , tuple
   default-language:    Haskell2010
 
 executable linux-notification-center

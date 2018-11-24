@@ -9,13 +9,16 @@ import NotificationCenter.Notifications
   (NotifyState(..), startNotificationDaemon, Notification(..)
   , hideAllNotis)
 import NotificationCenter.Glade (glade, style)
+import NotificationCenter.Button
+  (Button(..), createButton, setButtonState)
 import TransparentWindow
 import Helpers
 import NotificationCenter.Notifications.Data
 
 import Prelude
-import System.Process (runCommand)
 
+import Data.Int (Int32(..))
+import Data.Tuple.Sequence (sequenceT)
 import Data.Maybe
 import Data.IORef
 import Data.List
@@ -23,6 +26,7 @@ import Data.Time
 import Data.Time.LocalTime
 import qualified Data.Text as Text
 import qualified Data.ByteString.Char8 as BS
+import qualified Data.Map as Map
 import Data.Complex
 import Data.Monoid ((<>))
 
@@ -36,6 +40,8 @@ import System.Locale.Read
 import System.Posix.Signals (sigUSR1)
 import System.Posix.Daemonize (serviced, daemonize)
 import System.Directory (getHomeDirectory)
+
+import DBus ( fromVariant )
 
 import GI.Gtk
        (widgetSetHalign, widgetSetHexpand, buttonNew, setWidgetMargin, buttonSetRelief, widgetSetSizeRequest, widgetShowAll, widgetShow, widgetHide, onWidgetDestroy
@@ -77,8 +83,10 @@ data State = State
   , stTimeLabel :: Gtk.Label
   , stDateLabel :: Gtk.Label
   , stDeleteAll :: Gtk.Button
+  , stUserButtons :: [ Button ]
   , stNotiState :: TVar NotifyState
   , stDisplayingNotiList :: [ DisplayingNotificaton ]
+  , stNotisForMe :: [ Notification ]
   , stCenterShown :: Bool
   }
 
@@ -129,15 +137,6 @@ createNotiCenter tState config = do
   setStyle screen $ BS.pack $
     replaceColors config style
 --  (Just mainWindowGDK) <- widgetGetParentWindow mainWindow
-  atomically $ modifyTVar' tState $
-    \state -> state { stMainWindow = mainWindow
-                      , stNotiBox = notiBox
-                      , stTimeLabel = timeL
-                      , stDateLabel = timeD
-                      , stDeleteAll = deleteButton }
-
-  startSetTimeThread tState
-
 
   onButtonClicked deleteButton $ do
     displayList <- stDisplayingNotiList <$> readTVarIO tState
@@ -157,27 +156,28 @@ createNotiCenter tState config = do
       linesNeeded = fromIntegral $ ceiling
         $ ((fromIntegral $ length buttons) / (fromIntegral $ configButtonsPerRow config))
   lines' <- sequence $ take linesNeeded $ repeat $ boxNew OrientationHorizontal 0
-  buttons' <- sequence $ map (\button -> buttonNew) buttonLabels
-  labels' <- sequence $ map (\l -> labelNew $ Just $ Text.pack l) buttonLabels
-  sequence $ (flip (flip widgetSetSizeRequest width) height) <$> buttons'
-  sequence $ (flip addClass) "userbutton" <$> buttons'
-  sequence $ (flip buttonSetRelief) ReliefStyleNone <$> buttons'
-  sequence $ (flip setWidgetMargin) margin <$> buttons'
-  sequence $ (flip widgetSetHalign AlignStart) <$> labels'
-  sequence $ (flip widgetSetValign AlignEnd) <$> labels'
-  sequence $ (flip addClass "userbuttonlabel") <$> labels'
-  sequence $ map (\(button, command) ->
-                    onButtonClicked button (do
-                                               runCommand command
-                                               return ()
-                                           )) $ zip buttons' buttonCommands
-  sequence $ Gtk.containerAdd <$> buttons' <*> labels'
+  buttons' <- sequence $ map
+    (\(label, command) -> createButton config width height command label)
+    buttons
+
+
   sequence $ map (\(box, buttons'') ->
                     sequence $ Gtk.containerAdd box <$> buttons'')
-    $ zip (reverse lines') (splitEvery (configButtonsPerRow config) buttons')
+    $ zip (reverse lines') (splitEvery (configButtonsPerRow config)
+                            $ (buttonButton <$> buttons'))
   sequence $ Gtk.containerAdd buttonBox <$> lines'
   sequence $ widgetShowAll <$> lines'
 
+  atomically $ modifyTVar' tState $
+    \state -> state { stMainWindow = mainWindow
+                      , stNotiBox = notiBox
+                      , stTimeLabel = timeL
+                      , stDateLabel = timeD
+                      , stDeleteAll = deleteButton
+                      , stNotisForMe = []
+                      , stUserButtons = buttons' }
+
+  startSetTimeThread tState
 
   (screenH, screenW) <- getScreenProportions mainWindow
 
@@ -191,6 +191,33 @@ createNotiCenter tState config = do
   onWidgetDestroy mainWindow mainQuit
   return ()
     where barHeight = fromIntegral $ configBarHeight config
+
+parseNotisForMe tState = do
+  state <- readTVarIO tState
+  -- do stuff
+  let buttons = stUserButtons state
+      notisForMe = stNotisForMe state
+      myNotiHints = notiHints <$> notisForMe
+      maybeIds = Map.lookup "id" <$> myNotiHints
+      ids = join <$> map (\id' -> fromVariant <$> id') maybeIds :: [ Maybe Int32 ]
+      ids' = map checkId ids
+        where
+          checkId (Just id)
+            | id < (fromIntegral $ length buttons) = Just id
+            | otherwise = Nothing
+          checkId Nothing = Nothing
+      maybeStates = Map.lookup "state" <$> myNotiHints
+      states = join <$> map (\id' -> fromVariant <$> id') maybeStates :: [ Maybe Bool ]
+      comb = sequenceT <$> (zip
+                            (map
+                             (\id -> (!!) buttons <$> (fromIntegral <$> id))
+                             ids') states) :: [ Maybe (Button, Bool) ]
+  sequence $ map (\comb' -> sequence $
+                    (\(button, state) ->
+                           setButtonState button state) <$> comb') comb
+  atomically $ modifyTVar' tState
+    (\state -> state { stNotisForMe = [] })
+  return False
 
 hideNotiCenter tState = do
   state <- readTVarIO tState
@@ -216,6 +243,19 @@ showNotiCenter tState notiState = do
     (\state -> state {stCenterShown = newShown })
   return True
 
+updateNotisForMe :: TVar State -> IO()
+updateNotisForMe tState = do
+  state <- readTVarIO tState
+  notiState <- readTVarIO $ stNotiState state
+  atomically $ modifyTVar' (stNotiState state) (
+    \state -> state { notiForMeList = [] })
+  atomically $ modifyTVar' tState (
+    \state -> state { stNotisForMe = notiForMeList notiState
+                                     ++ stNotisForMe state})
+
+  addSource (parseNotisForMe tState)
+  return ()
+
 updateNotis :: TVar State -> IO()
 updateNotis tState = do
   state <- readTVarIO tState
@@ -233,12 +273,14 @@ updateNotis tState = do
       showNotification (stNotiBox state) newNoti
         (stNotiState state) $ removeNoti tState
     ) newNotis
+
   let delNotis = filter (\nd -> (find (\n -> dNotiId nd == notiId n)
                                 $ notiStList notiState) == Nothing)
                  $ stDisplayingNotiList state
   atomically $ modifyTVar' tState (
     \state -> state { stDisplayingNotiList =
-                      newNotis' ++ stDisplayingNotiList state})
+                      newNotis' ++ stDisplayingNotiList state
+                    })
   setDeleteAllState tState
   mapM (removeNoti tState) $ delNotis
   when (stCenterShown state) $
@@ -297,9 +339,13 @@ getConfig p =
     , configUserButtonHover = r' "rgba(0, 20, 20, 0.2)" p buttons "buttonHover"
     , configUserButtonBackground = r' "rgba(100, 120, 120, 0.2)" p buttons "buttonBackground"
     , configUserButtonTextSize = r' "12px" p buttons "buttonTextSize"
+    , configUserButtonActivated = r' "rgba(60, 80, 150, 0.4)" p buttons "buttonStatus1"
+    , configUserButtonActivatedColor = r' "#fff" p buttons "buttonStatus1Color"
 
     -- colors
     , configBackground = r' "rgba(10, 50, 50, 0.8)" p colors "background"
+    , configBackgroundNoti = r' "rgba(10, 50, 50, 0.8)" p colors "notiBackground"
+    , configNotiLabelColor = r' "#FFFFFF" p colors "notiColor"
     , configCritical = r' "rgba(255, 0, 0, 0.2)" p colors "critical"
     , configCriticalInCenter = r' "rgba(100, 50, 50, 0.8)" p colors "criticalInCenter"
     , configButtonColor = r' "#FFFFFF" p colors "buttonColor"
@@ -329,7 +375,11 @@ replaceColors config style =
   replace "replaceme0009" (configUserButtonColor config) $
   replace "replaceme0010" (configUserButtonHover config) $
   replace "replaceme0011" (configUserButtonBackground config) $
-  replace "replaceme0012" (configUserButtonTextSize config) style
+  replace "replaceme0012" (configUserButtonTextSize config) $
+  replace "replaceme0013" (configUserButtonActivated config) $
+  replace "replaceme0014" (configUserButtonActivatedColor config) $
+  replace "replaceme0015" (configBackgroundNoti config) $
+  replace "replaceme0016" (configNotiLabelColor config) style
 
 getInitialState = do
   newTVarIO $ State
@@ -345,7 +395,9 @@ main' = do
     (homeDir ++ "/.config/deadd/deadd.conf"))
 
   istate <- getInitialState
-  notiState <- startNotificationDaemon config $ updateNotis istate
+  notiState <- startNotificationDaemon config
+    (updateNotis istate) (updateNotisForMe istate)
+
   atomically $ modifyTVar' istate $
     \istate' -> istate' { stNotiState = notiState }
   createNotiCenter istate config

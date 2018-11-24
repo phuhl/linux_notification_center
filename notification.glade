@@ -67,6 +67,9 @@
                       <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 12"/>
                       <attribute name="weight" value="bold"/>
                     </attributes>
+                    <style>
+                      <class name="notification"/>
+                    </style>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -84,6 +87,9 @@
                     <attributes>
                       <attribute name="gravity" value="east"/>
                     </attributes>
+                    <style>
+                      <class name="notification"/>
+                    </style>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -101,6 +107,9 @@
                     <attributes>
                       <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 8"/>
                     </attributes>
+                    <style>
+                      <class name="notification"/>
+                    </style>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -121,6 +130,7 @@
     </child>
     <style>
       <class name="blurredBG"/>
+      <class name="notification"/>
     </style>
   </object>
 </interface>
