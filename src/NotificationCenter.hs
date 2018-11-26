@@ -36,6 +36,7 @@ import Control.Concurrent (forkIO, threadDelay, ThreadId(..))
 import Control.Concurrent.STM
   ( readTVarIO, modifyTVar', TVar(..), atomically, newTVarIO )
 
+import System.Process (runCommand)
 import System.Locale.Read
 import System.Posix.Signals (sigUSR1)
 import System.Posix.Daemonize (serviced, daemonize)
@@ -321,6 +322,7 @@ getConfig p =
     -- notification-center
       configBarHeight = r 0 p nCenter "marginTop"
     , configWidth = r 500 p nCenter "width"
+    , configStartupCommand = r' "" p nCenter "startupCommand"
 
     -- notification-center-notification-popup
     , configNotiDefaultTimeout = r 10000 p nPopup "notiDefaultTimeout"
@@ -421,6 +423,8 @@ main' = do
 
   unixSignalAdd PRIORITY_HIGH (fromIntegral sigUSR1)
     (showNotiCenter istate notiState)
+
+  runCommand $ configStartupCommand config
 
   GI.main
 
