@@ -332,26 +332,34 @@ getConfig p =
     -- buttons
     , configButtonsPerRow = r 5 p buttons "buttonsPerRow"
     , configButtonHeight = r 60 p buttons "buttonHeight"
-    , configButtonMargin = r 5 p buttons "buttonMargin"
+    , configButtonMargin = r 2 p buttons "buttonMargin"
     , configLabels = r' "" p buttons "labels"
     , configCommands = r' "" p buttons "commands"
-    , configUserButtonColor = r' "#004" p buttons "buttonColor"
+    , configUserButtonColor = r' "#fee" p buttons "buttonColor"
     , configUserButtonHover = r' "rgba(0, 20, 20, 0.2)" p buttons "buttonHover"
-    , configUserButtonBackground = r' "rgba(100, 120, 120, 0.2)" p buttons "buttonBackground"
+    , configUserButtonHoverColor = r' "#fee" p buttons "buttonHoverColor"
+    , configUserButtonBackground = r' "rgba(255, 255, 255, 0.15)" p buttons "buttonBackground"
     , configUserButtonTextSize = r' "12px" p buttons "buttonTextSize"
-    , configUserButtonActivated = r' "rgba(60, 80, 150, 0.4)" p buttons "buttonStatus1"
-    , configUserButtonActivatedColor = r' "#fff" p buttons "buttonStatus1Color"
+    , configUserButtonState1 = r' "rgba(255,255,255,0.5)" p buttons "buttonState1"
+    , configUserButtonState2 = r' "rgba(255,255,255,0.3)" p buttons "buttonState2"
+    , configUserButtonState1Color = r' "#fff" p buttons "buttonState1Color"
+    , configUserButtonState2Color = r' "#fff" p buttons "buttonState2Color"
+    , configUserButtonState1Hover = r' "rgba(0, 20, 20, 0.4)" p buttons "buttonState1Hover"
+    , configUserButtonState2Hover = r' "rgba(0, 20, 20, 0.3)" p buttons "buttonState2Hover"
+    , configUserButtonState1HoverColor = r' "#fee" p buttons "buttonState1HoverColor"
+    , configUserButtonState2HoverColor = r' "#fee" p buttons "buttonState2HoverColor"
 
     -- colors
-    , configBackground = r' "rgba(10, 50, 50, 0.8)" p colors "background"
-    , configBackgroundNoti = r' "rgba(10, 50, 50, 0.8)" p colors "notiBackground"
-    , configNotiLabelColor = r' "#FFFFFF" p colors "notiColor"
-    , configCritical = r' "rgba(255, 0, 0, 0.2)" p colors "critical"
-    , configCriticalInCenter = r' "rgba(100, 50, 50, 0.8)" p colors "criticalInCenter"
+    , configBackground = r' "rgba(29, 27, 20, 0.6)" p colors "background"
+    , configBackgroundNoti = r' "rgba(9, 0, 0, 0.5)" p colors "notiBackground"
+    , configNotiLabelColor = r' "#fef3f6" p colors "notiColor"
+    , configCritical = r' "rgba(255, 0, 0, 0.5)" p colors "critical"
+    , configCriticalInCenter = r' "rgba(155, 0, 20, 0.5)" p colors "criticalInCenter"
     , configButtonColor = r' "#FFFFFF" p colors "buttonColor"
-    , configButtonHover = r' "darker(rgba(52, 50, 0, 0.8))" p colors "buttonHover"
+    , configButtonHover = r' "rgba(0, 20, 20, 0.2)" p colors "buttonHover"
+    , configButtonHoverColor = r' "#fee" p colors "buttonHoverColor"
     , configButtonBackground = r' "transparent" p colors "buttonBackground"
-    , configLabelColor = r' "#FFFFFF" p colors "labelColor"
+    , configLabelColor = r' "#eae2e0" p colors "labelColor"
     , configCriticalColor = r' "#FFFFFF" p colors "criticalColor"
     , configCriticalInCenterColor = r' "#FFFFFF" p colors "criticalInCenterColor"
 }
@@ -368,18 +376,27 @@ replaceColors config style =
   replace "replaceme0002" (configCriticalInCenter config) $
   replace "replaceme0003" (configButtonColor config) $
   replace "replaceme0004" (configButtonHover config) $
-  replace "replaceme0005" (configButtonBackground config) $
-  replace "replaceme0006" (configLabelColor config) $
-  replace "replaceme0007" (configCriticalColor config) $
-  replace "replaceme0008" (configCriticalInCenterColor config) $
-  replace "replaceme0009" (configUserButtonColor config) $
-  replace "replaceme0010" (configUserButtonHover config) $
-  replace "replaceme0011" (configUserButtonBackground config) $
+  replace "replaceme0005" (configButtonHoverColor config) $
+  replace "replaceme0006" (configButtonBackground config) $
+  replace "replaceme0007" (configLabelColor config) $
+  replace "replaceme0008" (configCriticalColor config) $
+  replace "replaceme0009" (configCriticalInCenterColor config) $
+  replace "replaceme0010" (configBackgroundNoti config) $
+  replace "replaceme0011" (configNotiLabelColor config) $
   replace "replaceme0012" (configUserButtonTextSize config) $
-  replace "replaceme0013" (configUserButtonActivated config) $
-  replace "replaceme0014" (configUserButtonActivatedColor config) $
-  replace "replaceme0015" (configBackgroundNoti config) $
-  replace "replaceme0016" (configNotiLabelColor config) style
+  replace "replaceme0013" (configUserButtonBackground config) $
+  replace "replaceme0014" (configUserButtonColor config) $
+  replace "replaceme0015" (configUserButtonHover config) $
+  replace "replaceme0016" (configUserButtonHoverColor config) $
+  replace "replaceme0017" (configUserButtonState1 config) $
+  replace "replaceme0018" (configUserButtonState2 config) $
+  replace "replaceme0019" (configUserButtonState1Color config) $
+  replace "replaceme0020" (configUserButtonState2Color config) $
+  replace "replaceme0021" (configUserButtonState1Hover config) $
+  replace "replaceme0022" (configUserButtonState2Hover config) $
+  replace "replaceme0023" (configUserButtonState1HoverColor config) $
+  replace "replaceme0024" (configUserButtonState2HoverColor config) style
+
 
 getInitialState = do
   newTVarIO $ State

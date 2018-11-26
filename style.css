@@ -1,13 +1,12 @@
 .blurredBG, #main_window, .blurredBG.low, .blurredBG.normal {
-    /*    background: rgba(52, 50, 0, 0.6640625);*/
     background: replaceme0000;
 }
 
 .blurredBG.notification {
-    background: replaceme0015;
+    background: replaceme0010;
 }
 
-window.critical {
+.blurredBG.notification.critical {
     background: replaceme0001;
 }
 
@@ -22,7 +21,7 @@ window.critical {
 
 
 button {
-    background: replaceme0005;
+    background: replaceme0006;
     color: replaceme0003;
     border-radius: 0;
     border-width: 0;
@@ -31,18 +30,18 @@ button {
 }
 
 label {
-    color: replaceme0006;
+    color: replaceme0007;
 }
 
 label.notification {
-    color: replaceme0016;
+    color: replaceme0011;
 }
 
 label.critical {
-    color: replaceme0007;
+    color: replaceme0008;
 }
 .notificationInCenter label.critical {
-    color: replaceme0008;
+    color: replaceme0009;
 }
 
 button:hover {
@@ -51,25 +50,54 @@ button:hover {
     border-width: 0;
     border-top: transparent;
     border-color: #f00;
+    color: replaceme0005;
 }
 
 .userbutton {
-    background: replaceme0011;
-}
-
-.userbutton:hover {
-    background: replaceme0010;
-}
-
-.userbuttonlabel {
-    color: replaceme0009;
-    font-size: replaceme0012;
-}
-
-button.buttonState1 {
     background: replaceme0013;
 }
 
-.userbuttonlabel.buttonState1 {
+.userbutton:hover {
+    background: replaceme0015;
+}
+
+.userbuttonlabel {
     color: replaceme0014;
+    font-size: replaceme0012;
+}
+
+.userbuttonlabel:hover {
+    color: replaceme0016;
+}
+
+button.buttonState1 {
+    background: replaceme0017;
+}
+
+button.buttonState2 {
+    background: replaceme0018;
+}
+
+.userbuttonlabel.buttonState1 {
+    color: replaceme0019;
+}
+
+.userbuttonlabel.buttonState2 {
+    color: replaceme0020;
+}
+
+button.buttonState1:hover {
+    background: replaceme0021;
+}
+
+button.buttonState2:hover {
+    background: replaceme0022;
+}
+
+.userbuttonlabel.buttonState1:hover {
+    color: replaceme0023;
+}
+
+.userbuttonlabel.buttonState2:hover {
+    color: replaceme0024;
 }

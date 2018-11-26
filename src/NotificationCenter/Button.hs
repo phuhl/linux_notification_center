@@ -58,17 +58,29 @@ createButton config width height command description = do
   widgetSetHalign label AlignStart
   widgetSetValign label AlignEnd
   addClass label "userbuttonlabel"
+
+  let theButton = Button
+        { buttonButton = button
+        , buttonLabel = label
+        , buttonCommand = command }
   onButtonClicked button $ do
+    addSource $ do
+      setButtonState2 $ theButton
+      return False
     runCommand command
     return ()
   Gtk.containerAdd button label
-  return Button
-    { buttonButton = button
-    , buttonLabel = label
-    , buttonCommand = command }
+  return theButton
+
+setButtonState2 :: Button -> IO ()
+setButtonState2 button = do
+  addClass (buttonButton button) "buttonState2"
+  addClass (buttonLabel button) "buttonState2"
 
 setButtonState :: Button -> Bool -> IO ()
 setButtonState button state = do
+  removeClass (buttonButton button) "buttonState2"
+  removeClass (buttonLabel button) "buttonState2"
   if state then
     do
       addClass (buttonButton button) "buttonState1"

@@ -26,10 +26,17 @@ data Config = Config
   , configCommands :: String
   , configUserButtonColor :: String
   , configUserButtonHover :: String
+  , configUserButtonHoverColor :: String
   , configUserButtonBackground :: String
   , configUserButtonTextSize :: String
-  , configUserButtonActivated :: String
-  , configUserButtonActivatedColor :: String
+  , configUserButtonState1 :: String
+  , configUserButtonState2 :: String
+  , configUserButtonState1Color :: String
+  , configUserButtonState2Color :: String
+  , configUserButtonState1Hover :: String
+  , configUserButtonState2Hover :: String
+  , configUserButtonState1HoverColor :: String
+  , configUserButtonState2HoverColor :: String
 
   -- colors
   , configBackground :: String
@@ -39,6 +46,7 @@ data Config = Config
   , configCriticalInCenter :: String
   , configButtonColor :: String
   , configButtonHover :: String
+  , configButtonHoverColor :: String
   , configButtonBackground :: String
   , configLabelColor :: String
   , configCriticalColor :: String
