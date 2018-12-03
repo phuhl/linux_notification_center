@@ -18,6 +18,14 @@ The notification center can (optionally) show user-specified buttons
 in the bottom that can be in two states (highlighted/not highlighted)
 and that can run customable shell commands.
 
+** Screenshots
+
+Some applications, notification:
+[[file:README.org.img/org_20181125_131724_ZI9o09.jpg]]
+
+Notification Center opened:
+[[file:README.org.img/org_20181203_164608_WqFdmO.jpg]]
+
 ** Usage
 
 To start it:
@@ -128,8 +136,6 @@ buttonState2HoverColor = #fee
 Also take a look at my [[https://github.com/phuhl/notify-send.py][notify-send.py]] which imitates notify-send (libnotify) but also is able to replace notifications.
 
 * Todos
-
-** TODO Post to reddit (haskell/unixporn)
 
 ** TODO Image support
 
