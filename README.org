@@ -54,22 +54,20 @@ This snippet uses [[https://github.com/phuhl/notify-send.py][notify-send.py]], a
 
 ** Install
 
-Requires [[https://www.archlinux.org/packages/community/x86_64/stack/][stack]] on Arch and [[https://packages.ubuntu.com/search?keywords=haskell-stack&searchon=names&suite=all&section=all][haskell-stack]] on Ubuntu. Alternatively
-stack can be installed by curl-ing and installing it directly like
-this:  =curl -sSL https://get.haskellstack.org/ | sh=. More
-information on stack [[https://docs.haskellstack.org/en/stable/README/][here]].
+Install from the AUR for Arch: [[https://aur.archlinux.org/packages/deadd-notification-center/][deadd-notification-center]]
+
+*OR*
+
+Dependencies:
+- [[https://www.archlinux.org/packages/community/x86_64/stack/][stack]]
+- cairo
+- pango
+- gobject-introspection
+- gtk3
 
 #+BEGIN_SRC shell-script
 make
 sudo make install
-#+END_SRC
-
-*** Stack commands
-
-If you want to run stack yourself instead of using make:
-#+BEGIN_SRC sh
-stack setup
-stack build
 #+END_SRC
 
 ** Configuration
