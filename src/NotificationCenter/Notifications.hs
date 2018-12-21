@@ -121,7 +121,7 @@ notify tState appName replaceId icon summary body
         , notiTransient = parseTransient hints
         }
 
-  if Map.member (pack "linux-notification-center")
+  if Map.member (pack "deadd-notification-center")
     $ notiHints newNoti
     then
     do

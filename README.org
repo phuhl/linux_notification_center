@@ -30,13 +30,13 @@ Notification Center opened:
 
 To start it:
 #+BEGIN_SRC sh
-> linux-notification-center
+> deadd-notification-center
 #+END_SRC
 
 
 Toggle between hidden and shown state of the notification center:
 #+BEGIN_SRC sh
-kill -s USR1 $(pidof linux-notification-center)
+kill -s USR1 $(pidof deadd-notification-center)
 #+END_SRC
 
 
@@ -44,10 +44,10 @@ Set the state of a user defined button (in this example the first
 button, which has =id= 0):
 #+BEGIN_SRC sh
 # turn highlighting on
-notify-send.py a --hint boolean:linux-notification-center:true int:id:0 boolean:state:true
+notify-send.py a --hint boolean:deadd-notification-center:true int:id:0 boolean:state:true
 
 # turn highlighting off
-notify-send.py a --hint boolean:linux-notification-center:true int:id:0 boolean:state:true
+notify-send.py a --hint boolean:deadd-notification-center:true int:id:0 boolean:state:true
 #+END_SRC
 This snippet uses [[https://github.com/phuhl/notify-send.py][notify-send.py]], a improved version of libnotify
 (notify-send).
