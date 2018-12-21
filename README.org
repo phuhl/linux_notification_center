@@ -141,12 +141,14 @@ Also take a look at my [[https://github.com/phuhl/notify-send.py][notify-send.py
 
 ** DONE Color configurable
 
+- [X] done
+
 ** DONE Sizes configurable
 :LOGBOOK:
 CLOCK: [2018-11-22 Thu 20:48]--[2018-11-22 Thu 21:05] =>  0:17
 :END:
 
-- Window dimensions for all windows
+- [X] Window dimensions for all windows
 
 ** DONE Buttons at bottom
 :LOGBOOK:
@@ -169,7 +171,6 @@ CLOCK: [2018-11-23 Fri 18:46]--[2018-11-23 Fri 20:24] =>  1:38
 CLOCK: [2018-11-23 Fri 16:01]--[2018-11-23 Fri 18:01] =>  2:00
 :END:
 
-- [X] Problem: i don't know if multiple hints per noti possible are
-  - but are currently required
+- [X] Problem: i don't know if multiple hints per noti are possible... yes they are
 
 ** TODO Sort notis by time with newest on top
