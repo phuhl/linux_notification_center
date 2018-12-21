@@ -33,7 +33,7 @@ service:
 
 install-stack:
 	mkdir -p ${DESTDIR}${PREFIX}/bin
-	mk .out/linux-notification-center .out/deadd-notification-center
+	mv .out/linux-notification-center .out/deadd-notification-center
 	install -m755 .out/deadd-notification-center ${DESTDIR}${PREFIX}/bin
 	mkdir -p ${DESTDIR}${MANPREFIX}/man1
 	install -m644 docs/linux-notification-center.man ${DESTDIR}${MANPREFIX}/man1/deadd-notification-center.1
