@@ -33,10 +33,10 @@ service:
 
 install-stack:
 	mkdir -p ${DESTDIR}${PREFIX}/bin
-	mv .out/linux-notification-center .out/deadd-notification-center
 	install -m755 .out/deadd-notification-center ${DESTDIR}${PREFIX}/bin
 	mkdir -p ${DESTDIR}${MANPREFIX}/man1
 	install -m644 docs/linux-notification-center.man ${DESTDIR}${MANPREFIX}/man1/deadd-notification-center.1
+	install -Dm644 LICENSE ${DESTDIR}${PREFIX}/share/licenses/deadd-notification-center/LICENSE
 
 install-service: service
 	mkdir -p ${DESTDIR}${PREFIX}/share/dbus-1/services/
@@ -48,5 +48,6 @@ uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/deadd-notification-center
 	rm -f ${DESTDIR}${MANPREFIX}/man1/deadd-notification-center.1
 	rm -f ${DESTDIR}${PREFIX}/share/dbus-1/services/com.ph-uhl.deadd.notification.service
+	rm -f ${DESTDIR}${PREFIX}/share/licenses/deadd-notification-center/LICENSE
 
 .PHONY: all clean install uninstall

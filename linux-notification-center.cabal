@@ -55,7 +55,7 @@ library
                      , tuple
   default-language:    Haskell2010
 
-executable linux-notification-center
+executable deadd-notification-center
   hs-source-dirs:      app
   main-is:             Main.hs
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
