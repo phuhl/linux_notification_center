@@ -1,4 +1,4 @@
-# linux-notification-center - A notification center and notification daemon
+# deadd-notification-center - A notification center and notification daemon
 # See LICENSE file for copyright and license details.
 
 PREFIX ?= /usr
@@ -17,15 +17,12 @@ clean-stack:
 	rm -f com.ph-uhl.deadd.notification.service
 	rm -f deadd.notification.systemd.service
 
-clean-doc:
-#	rm -f docs/dunst.1
+clean: clean-stack
 
-clean: clean-stack clean-doc
+distclean: clean clean-config
 
-#distclean: clean clean-config
-
-#clean-config:
-#	rm -f config.h
+clean-config:
+	rm -f ${HOME}/.config/deadd/deadd.conf
 
 doc:
 	stack haddock
@@ -36,13 +33,10 @@ service:
 
 install-stack:
 	mkdir -p ${DESTDIR}${PREFIX}/bin
-	install -m755 .out/linux-notification-center ${DESTDIR}${PREFIX}/bin
+	mk .out/linux-notification-center .out/deadd-notification-center
+	install -m755 .out/deadd-notification-center ${DESTDIR}${PREFIX}/bin
 	mkdir -p ${DESTDIR}${MANPREFIX}/man1
-	install -m644 docs/linux-notification-center.man ${DESTDIR}${MANPREFIX}/man1/linux-notification-center.1
-
-#install-doc:
-#	mkdir -p ${DESTDIR}${PREFIX}/share/dunst
-#	install -m644 dunstrc ${DESTDIR}${PREFIX}/share/dunst
+	install -m644 docs/linux-notification-center.man ${DESTDIR}${MANPREFIX}/man1/deadd-notification-center.1
 
 install-service: service
 	mkdir -p ${DESTDIR}${PREFIX}/share/dbus-1/services/
@@ -51,8 +45,8 @@ install-service: service
 install: install-stack install-service
 
 uninstall:
-	rm -f ${DESTDIR}${PREFIX}/bin/linux-notification-center
-	rm -f ${DESTDIR}${MANPREFIX}/man1/linux-notification-center.1
+	rm -f ${DESTDIR}${PREFIX}/bin/deadd-notification-center
+	rm -f ${DESTDIR}${MANPREFIX}/man1/deadd-notification-center.1
 	rm -f ${DESTDIR}${PREFIX}/share/dbus-1/services/com.ph-uhl.deadd.notification.service
 
 .PHONY: all clean install uninstall
