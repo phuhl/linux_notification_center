@@ -12,6 +12,7 @@ module TransparentWindow
   , box
   , button
   , getObjs
+  , getScreenPos
   -- * General
   , getScreenProportions
   , runAfterDelay
@@ -59,7 +60,7 @@ import qualified GI.Gtk as Gtk
   , builderGetObject, builderAddFromString
   , builderNew, Builder(..), Label(..), Box(..), Button(..))
 import GI.Gtk.Constants
-import GI.Gdk (screenGetHeight, screenGetWidth, Screen (..))
+import GI.Gdk (getRectangleHeight, getRectangleWidth, getRectangleY, getRectangleX, Monitor, monitorGetGeometry, displayGetMonitor, screenGetDisplay, screenGetHeight, screenGetWidth, Screen (..))
 import GI.GObject.Objects (IsObject(..), Object(..))
 
 import GI.GLib (idleSourceNew, sourceSetCallback, sourceAttach
@@ -157,3 +158,16 @@ removeClass :: Gtk.IsWidget a => a -> Text.Text -> IO ()
 removeClass w clazz = do
   context <- widgetGetStyleContext w
   styleContextRemoveClass context clazz
+
+getScreenPos :: Gtk.Window -> GHC.Int.Int32 -> IO (GHC.Int.Int32, GHC.Int.Int32, GHC.Int.Int32)
+getScreenPos window number = do
+  screen <- window `get` #screen
+  display <- screenGetDisplay screen
+  monitor <- fromMaybe (error "Unknown screen")
+    <$> displayGetMonitor display number
+  monitorGeometry <- monitorGetGeometry monitor
+  monitorX <- getRectangleX monitorGeometry
+  monitorY <- getRectangleY monitorGeometry
+  monitorWidth <- getRectangleWidth monitorGeometry
+  monitorHeight <- getRectangleHeight monitorGeometry
+  return (monitorX + monitorWidth, monitorY, monitorHeight)

@@ -113,12 +113,15 @@ showNotificationWindow config noti dispNotis onClose = do
 
   height <- updateNoti' config onClose noti dNoti
 
+  --  (screenH, screenW) <- getScreenProportions mainWindow
+  (screenW, screenY, screenH) <- getScreenPos mainWindow
+    (fromIntegral $ configNotiMonitor config)
+
   hBefores <- sortOn fst <$> mapM
     (\n -> (,) (dNotiTop n) <$> (dNotiGetHeight n)) dispNotis
-  let hBefore = findBefore hBefores (fromIntegral distanceTop)
+  let hBefore = findBefore hBefores ((fromIntegral distanceTop) + screenY)
                 height (fromIntegral distanceBetween)
 
-  (screenH, screenW) <- getScreenProportions mainWindow
   windowMove mainWindow
     (screenW - fromIntegral
      (configWidthNoti config + configDistanceRight config))

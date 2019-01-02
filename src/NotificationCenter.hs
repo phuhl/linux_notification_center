@@ -180,15 +180,22 @@ createNotiCenter tState config = do
 
   startSetTimeThread tState
 
-  (screenH, screenW) <- getScreenProportions mainWindow
+
 
   onWidgetLeaveNotifyEvent mainWindow $ \(_) -> do
     hideNotiCenter tState
     return True
 
-                                 -- w   h
-  windowSetDefaultSize mainWindow (fromIntegral $ configWidth config) (screenH - barHeight)
-  windowMove mainWindow (screenW - (fromIntegral $ configWidth config)) barHeight
+  --  (screenH, screenW) <- getScreenProportions mainWindow
+  (screenW, screenY, screenH) <- getScreenPos mainWindow
+    (fromIntegral $ configNotiCenterMonitor config)
+
+  windowSetDefaultSize mainWindow
+    (fromIntegral $ configWidth config) -- w
+    (screenH - barHeight) -- h
+  windowMove mainWindow
+    (screenW - (fromIntegral $ configWidth config)) -- x
+    (screenY + barHeight)  -- y
   onWidgetDestroy mainWindow mainQuit
   return ()
     where barHeight = fromIntegral $ configBarHeight config
@@ -323,6 +330,7 @@ getConfig p =
       configBarHeight = r 0 p nCenter "marginTop"
     , configWidth = r 500 p nCenter "width"
     , configStartupCommand = r' "" p nCenter "startupCommand"
+    , configNotiCenterMonitor = r 0 p nCenter "monitor"
 
     -- notification-center-notification-popup
     , configNotiDefaultTimeout = r 10000 p nPopup "notiDefaultTimeout"
@@ -330,6 +338,7 @@ getConfig p =
     , configDistanceRight = r 50 p nPopup "distanceRight"
     , configDistanceBetween = r 20 p nPopup "distanceBetween"
     , configWidthNoti = r 300 p nPopup "width"
+    , configNotiMonitor = r 0 p nPopup "monitor"
 
     -- buttons
     , configButtonsPerRow = r 5 p buttons "buttonsPerRow"

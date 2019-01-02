@@ -11,6 +11,7 @@ data Config = Config
     configBarHeight :: Int
   , configWidth :: Int
   , configStartupCommand :: String
+  , configNotiCenterMonitor :: Int
 
   -- notification-center-notification-popup
   , configNotiDefaultTimeout :: Int
@@ -18,6 +19,7 @@ data Config = Config
   , configDistanceRight :: Int
   , configDistanceBetween :: Int
   , configWidthNoti :: Int
+  , configNotiMonitor :: Int
 
   -- buttons
   , configButtonsPerRow :: Int
