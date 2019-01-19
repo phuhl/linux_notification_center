@@ -26,10 +26,6 @@ import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , widgetGetPreferredHeightForWidth, onButtonClicked
               , widgetDestroy)
 import qualified GI.Gtk as Gtk
-  (builderGetObject, builderAddFromString , builderNew
-  , Builder(..), containerAdd
-  , Box(..), Label(..), Button(..))
-
 data DisplayingNotificaton = DisplayingNotificaton
   { dNotiId :: Int
   , dNotiDestroy :: IO ()
@@ -94,17 +90,16 @@ showNotification mainBox dNoti tNState closeNotification = do
                      , dContainer = container
                      }
 
-  updateNoti dNoti' tNState
+  Gtk.containerAdd mainBox container
+  updateNoti mainBox dNoti' tNState
 
   onButtonClicked buttonClose $ do
     closeNotification dNoti'
 
-  Gtk.containerAdd mainBox container
-
   widgetShowAll container
   return dNoti'
 
-updateNoti dNoti tNState = do
+updateNoti mainBox dNoti tNState = do
   addSource $ do
     nState <- readTVarIO tNState
     let (Just noti) = find (\n -> notiId n == dNotiId dNoti)
@@ -115,5 +110,6 @@ updateNoti dNoti tNState = do
     labelSetText (dLabelTime dNoti) $ notiTime noti
     labelSetXalign (dLabelTitel dNoti) 0
     labelSetXalign (dLabelBody dNoti) 0
+    Gtk.boxReorderChild mainBox (dContainer dNoti) 0
     return False
   return ()

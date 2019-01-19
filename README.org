@@ -175,7 +175,10 @@ CLOCK: [2018-11-23 Fri 16:01]--[2018-11-23 Fri 18:01] =>  2:00
 
 - [X] Problem: i don't know if multiple hints per noti are possible... yes they are
 
-** TODO Sort notis by time with newest on top
+** DONE Sort notis by time with newest on top
+:LOGBOOK:
+CLOCK: [2019-01-19 Sat 22:10]--[2019-01-19 Sat 22:34] =>  0:24
+:END:
 
 ** TODO Multiple Screen support
 :LOGBOOK:
