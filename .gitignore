@@ -17,3 +17,6 @@
 
 com.ph-uhl.deadd.notification.service
 deadd.notification.systemd.service
+
+pkg/
+!pkg/PKGBUILD
