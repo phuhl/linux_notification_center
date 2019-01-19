@@ -42,11 +42,11 @@ instance Eq DisplayingNotificaton where
   a == b = dNotiId a == dNotiId b
 
 
-showNotification :: Gtk.Box -> DisplayingNotificaton
+showNotification :: Bool -> Gtk.Box -> DisplayingNotificaton
                  -> TVar NotifyState
                  -> (DisplayingNotificaton -> IO ())
                  -> IO DisplayingNotificaton
-showNotification mainBox dNoti tNState closeNotification = do
+showNotification showFirst mainBox dNoti tNState closeNotification = do
   nState <- readTVarIO tNState
   let (Just noti) = find (\n -> notiId n == dNotiId dNoti)
         $ notiStList nState
@@ -91,7 +91,7 @@ showNotification mainBox dNoti tNState closeNotification = do
                      }
 
   Gtk.containerAdd mainBox container
-  updateNoti mainBox dNoti' tNState
+  updateNoti mainBox dNoti' tNState showFirst
 
   onButtonClicked buttonClose $ do
     closeNotification dNoti'
@@ -99,7 +99,7 @@ showNotification mainBox dNoti tNState closeNotification = do
   widgetShowAll container
   return dNoti'
 
-updateNoti mainBox dNoti tNState = do
+updateNoti mainBox dNoti tNState showFirst = do
   addSource $ do
     nState <- readTVarIO tNState
     let (Just noti) = find (\n -> notiId n == dNotiId dNoti)
@@ -110,6 +110,7 @@ updateNoti mainBox dNoti tNState = do
     labelSetText (dLabelTime dNoti) $ notiTime noti
     labelSetXalign (dLabelTitel dNoti) 0
     labelSetXalign (dLabelBody dNoti) 0
-    Gtk.boxReorderChild mainBox (dContainer dNoti) 0
+    when (showFirst)
+      (Gtk.boxReorderChild mainBox (dContainer dNoti) 0)
     return False
   return ()

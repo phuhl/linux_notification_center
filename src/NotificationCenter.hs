@@ -264,8 +264,8 @@ updateNotisForMe tState = do
   addSource (parseNotisForMe tState)
   return ()
 
-updateNotis :: TVar State -> IO()
-updateNotis tState = do
+updateNotis :: Config -> TVar State -> IO()
+updateNotis config tState = do
   state <- readTVarIO tState
   notiState <- readTVarIO $ stNotiState state
 
@@ -278,7 +278,8 @@ updateNotis tState = do
     \n -> do
       let newNoti = DisplayingNotificaton
                     { dNotiId = notiId n }
-      showNotification (stNotiBox state) newNoti
+      showNotification (configNotiCenterNewFirst config)
+        (stNotiBox state) newNoti
         (stNotiState state) $ removeNoti tState
     ) newNotis
 
@@ -331,6 +332,7 @@ getConfig p =
     , configWidth = r 500 p nCenter "width"
     , configStartupCommand = r' "" p nCenter "startupCommand"
     , configNotiCenterMonitor = r 0 p nCenter "monitor"
+    , configNotiCenterNewFirst = r'' True p nCenter "newFirst"
 
     -- notification-center-notification-popup
     , configNotiDefaultTimeout = r 10000 p nPopup "notiDefaultTimeout"
@@ -380,6 +382,7 @@ getConfig p =
         buttons = "buttons"
         r = readConfig
         r' = readConfig
+        r'' = readConfig
 
 replaceColors config style =
   replace "replaceme0000" (configBackground config) $
@@ -424,7 +427,7 @@ main' = do
 
   istate <- getInitialState
   notiState <- startNotificationDaemon config
-    (updateNotis istate) (updateNotisForMe istate)
+    (updateNotis config istate) (updateNotisForMe istate)
 
   atomically $ modifyTVar' istate $
     \istate' -> istate' { stNotiState = notiState }

@@ -88,6 +88,7 @@ width = 500
 monitor = 0
 # optional command to run at startup (e.g. to setup button states)
 startupCommand = "deadd-notification-center-startup"
+newFirst = true
 
 [notification-center-notification-popup]
 notiDefaultTimeout = 10000
@@ -177,6 +178,7 @@ CLOCK: [2018-11-23 Fri 16:01]--[2018-11-23 Fri 18:01] =>  2:00
 
 ** DONE Sort notis by time with newest on top
 :LOGBOOK:
+CLOCK: [2019-01-19 Sat 22:36]
 CLOCK: [2019-01-19 Sat 22:10]--[2019-01-19 Sat 22:34] =>  0:24
 :END:
 
