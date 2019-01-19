@@ -53,11 +53,13 @@ createButton config width height command description = do
   label <- labelNew $ Just $ Text.pack description
   widgetSetSizeRequest button (fromIntegral width) (fromIntegral height)
   addClass button "userbutton"
+  addClass button "deadd-noti-center"
   buttonSetRelief button ReliefStyleNone
   setWidgetMargin button $ fromIntegral $ configButtonMargin config
   widgetSetHalign label AlignStart
   widgetSetValign label AlignEnd
   addClass label "userbuttonlabel"
+  addClass label "deadd-noti-center"
 
   let theButton = Button
         { buttonButton = button

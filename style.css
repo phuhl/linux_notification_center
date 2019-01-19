@@ -101,3 +101,16 @@ button.buttonState2:hover {
 .userbuttonlabel.buttonState2:hover {
     color: replaceme0024;
 }
+
+.title {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.appname, .time {
+    font-size: 12px;
+}
+
+.noti-center.time {
+    font-size: 32px;
+}

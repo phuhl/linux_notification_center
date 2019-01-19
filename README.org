@@ -178,7 +178,7 @@ CLOCK: [2018-11-23 Fri 16:01]--[2018-11-23 Fri 18:01] =>  2:00
 
 ** DONE Sort notis by time with newest on top
 :LOGBOOK:
-CLOCK: [2019-01-19 Sat 22:36]
+CLOCK: [2019-01-19 Sat 22:36]--[2019-01-19 Sat 22:54] =>  0:18
 CLOCK: [2019-01-19 Sat 22:10]--[2019-01-19 Sat 22:34] =>  0:24
 :END:
 
@@ -186,3 +186,44 @@ CLOCK: [2019-01-19 Sat 22:10]--[2019-01-19 Sat 22:34] =>  0:24
 :LOGBOOK:
 CLOCK: [2019-01-02 Wed 02:04]--[2019-01-02 Wed 03:14] =>  1:10
 :END:
+** DONE More styling
+:LOGBOOK:
+CLOCK: [2019-01-19 Sat 23:02]--[2019-01-19 Sat 23:49] =>  0:47
+:END:
+
+In the file =.config/gtk-3.0/gtk.css= you can add styles that will
+effect the notification center.
+
+The following class-names for labels are defined:
+- Notifications:
+  - =label.deadd-noti-center.notification.appname=
+  - =label.deadd-noti-center.notification.body=
+  - =label.deadd-noti-center.notification.title=
+- Notifications in the notification center:
+  - =label.deadd-noti-center.in-center.appname=
+  - =label.deadd-noti-center.in-center.body=
+  - =label.deadd-noti-center.in-center.title=
+  - =label.deadd-noti-center.in-center.time=
+- Notification-center:
+  - =label.deadd-noti-center.noti-center.time=
+  - =label.deadd-noti-center.noti-center.date=
+
+_Examples:_
+
+#+CAPTION: Remove appname from notifications
+#+BEGIN_SRC css
+label.deadd-noti-center.notification.appname,
+label.deadd-noti-center.in-center.appname {
+    opacity: 0
+}
+#+END_SRC
+
+
+#+CAPTION: Change font
+#+BEGIN_SRC css
+.deadd-noti-center {
+    font-family: monospace;
+}
+#+END_SRC
+
+

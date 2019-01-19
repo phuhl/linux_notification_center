@@ -36,10 +36,11 @@
                 <property name="halign">start</property>
                 <property name="label" translatable="yes">Sample notification</property>
                 <property name="wrap">True</property>
-                <attributes>
-                  <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 12"/>
-                  <attribute name="weight" value="bold"/>
-                </attributes>
+                <style>
+                  <class name="title"/>
+                  <class name="deadd-noti-center"/>
+                  <class name="in-center"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -83,6 +84,11 @@
             <property name="valign">start</property>
             <property name="margin_right">10</property>
             <property name="wrap">True</property>
+            <style>
+              <class name="deadd-noti-center"/>
+              <class name="in-center"/>
+              <class name="body"/>
+            </style>
           </object>
           <packing>
             <property name="expand">True</property>
@@ -101,9 +107,11 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">23:49</property>
-                <attributes>
-                  <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 8"/>
-                </attributes>
+                <style>
+                  <class name="deadd-noti-center"/>
+                  <class name="in-center"/>
+                  <class name="time"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -117,9 +125,11 @@
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Thunderbird</property>
                 <property name="justify">right</property>
-                <attributes>
-                  <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 8"/>
-                </attributes>
+                <style>
+                  <class name="appname"/>
+                  <class name="deadd-noti-center"/>
+                  <class name="in-center"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">False</property>

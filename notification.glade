@@ -63,12 +63,10 @@
                     <property name="label" translatable="yes">Titel</property>
                     <property name="wrap">True</property>
                     <property name="wrap_mode">word-char</property>
-                    <attributes>
-                      <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 12"/>
-                      <attribute name="weight" value="bold"/>
-                    </attributes>
                     <style>
                       <class name="notification"/>
+                      <class name="title"/>
+                      <class name="deadd-noti-center"/>
                     </style>
                   </object>
                   <packing>
@@ -89,6 +87,8 @@
                     </attributes>
                     <style>
                       <class name="notification"/>
+                      <class name="body"/>
+                      <class name="deadd-noti-center"/>
                     </style>
                   </object>
                   <packing>
@@ -104,11 +104,10 @@
                     <property name="halign">end</property>
                     <property name="margin_bottom">8</property>
                     <property name="label" translatable="yes">Appname</property>
-                    <attributes>
-                      <attribute name="font-desc" value="&lt;Geben Sie den Wert ein&gt; 8"/>
-                    </attributes>
                     <style>
                       <class name="notification"/>
+                      <class name="appname"/>
+                      <class name="deadd-noti-center"/>
                     </style>
                   </object>
                   <packing>
