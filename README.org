@@ -179,5 +179,5 @@ CLOCK: [2018-11-23 Fri 16:01]--[2018-11-23 Fri 18:01] =>  2:00
 
 ** TODO Multiple Screen support
 :LOGBOOK:
-CLOCK: [2019-01-02 Wed 02:04]
+CLOCK: [2019-01-02 Wed 02:04]--[2019-01-02 Wed 03:14] =>  1:10
 :END:
