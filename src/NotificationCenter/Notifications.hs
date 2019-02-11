@@ -20,7 +20,8 @@ import NotificationCenter.Notifications.Data
 
 import Control.Concurrent (forkIO)
 import Control.Concurrent.STM
-  (readTVarIO, modifyTVar, modifyTVar', TVar(..), atomically, newTVarIO)
+  (readTVarIO, stateTVar, modifyTVar, modifyTVar', TVar(..),
+   atomically, newTVarIO)
 
 import DBus ( Variant (..), fromVariant )
 import DBus.Client
@@ -106,10 +107,12 @@ notify tState appName replaceId icon summary body
   actions hints timeout = do
   state <- readTVarIO tState
   time <- getTime
-  let newNoti = Notification
+  let newNotiWithoutId = Notification
         { notiAppName = appName
         , notiRepId = replaceId
-        , notiId = notiStNextId state
+        -- in order to not create a race condition this can not be
+        -- done, instead it is handled lower done
+        , notiId = 0
         , notiIcon = icon
         , notiSummary = summary
         , notiBody = body
@@ -122,35 +125,39 @@ notify tState appName replaceId icon summary body
         }
 
   if Map.member (pack "deadd-notification-center")
-    $ notiHints newNoti
+    $ notiHints newNotiWithoutId
     then
+    -- Noti is for messaging the noti-center
     do
       atomically $ modifyTVar' tState $ \state ->
-        state { notiForMeList = newNoti:(notiForMeList state) }
+        state { notiForMeList = newNotiWithoutId:(notiForMeList state) }
       notiStOnUpdateForMe state
       return $ fromIntegral 0
     else
+    -- Noti has to be displayed
     do
-      let notis = filter (\n -> dNotiId n ==
-                           fromIntegral (notiRepId newNoti))
-                  $ notiDisplayingList state
-      atomically $ modifyTVar' tState
-        $ \state ->
-            state { notiStList =
-                      updatedNotiList (notiStList state) newNoti
-                      (fromIntegral (notiRepId newNoti))
-                  , notiStNextId = notiStNextId state + 1}
-      if length notis == 0 then
-        insertNewNoti newNoti tState
+      let notisToBeReplaced = filter (\n -> dNotiId n ==
+                                       fromIntegral (notiRepId newNotiWithoutId))
+                              $ notiDisplayingList state
+      newId <- atomically $ stateTVar tState
+               $ \state -> (notiStNextId state + 1,
+                            state { notiStList =
+                                    updatedNotiList (notiStList state)
+                                    (newNotiWithoutId { notiId = notiStNextId state })
+                                    (fromIntegral (notiRepId newNotiWithoutId))
+                                  , notiStNextId = notiStNextId state + 1})
+      let newNotiWithId = newNotiWithoutId { notiId = newId }
+      if length notisToBeReplaced == 0 then
+        insertNewNoti newNotiWithId tState
         else
-        replaceNoti newNoti tState
-      return $ fromIntegral $ notiId newNoti
+        replaceNoti newNotiWithId tState
+      return $ fromIntegral $ notiId newNotiWithId
         where
           updatedNotiList :: [Notification] -> Notification
                           -> Int -> [Notification]
-          updatedNotiList notis newNoti repId =
+          updatedNotiList oldNotis newNoti repId =
             let notis' = map (\n -> if notiId n == repId then newNoti
-                                    else n) notis
+                                    else n) oldNotis
             in if (find ((==) newNoti) notis') /= Nothing then notis'
                else (newNoti:notis')
 

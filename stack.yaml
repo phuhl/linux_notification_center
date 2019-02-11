@@ -42,6 +42,8 @@ packages:
 extra-deps: [ ConfigFile-1.1.4
             , system-locale-0.3.0.0
             , dbus-0.10.15
+            , gtk3-0.15.0
+            , stm-2.5.0.0
             ]
 
 # Override default flag values for local packages and extra-deps

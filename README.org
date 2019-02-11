@@ -225,5 +225,15 @@ label.deadd-noti-center.in-center.appname {
     font-family: monospace;
 }
 #+END_SRC
+* Issues
+** TODO Aur does not build (#4)
+:LOGBOOK:
+CLOCK: [2019-01-24 Thu 14:31]--[2019-01-24 Thu 14:42] =>  0:11
+CLOCK: [2019-01-24 Thu 13:04]--[2019-01-24 Thu 14:04] =>  1:00
+:END:
 
-
+** DONE Notifications stuck (#5)
+:LOGBOOK:
+CLOCK: [2019-02-11 Mon 22:29]
+CLOCK: [2019-02-11 Mon 21:13]--[2019-02-11 Mon 22:29] =>  1:16
+:END:

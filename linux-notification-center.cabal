@@ -27,7 +27,7 @@ library
                      , TransparentWindow
                      , Helpers
   build-depends:       base >= 4.7 && < 5
-                     , gtk3             >= 0.14.2
+                     , gtk3             >= 0.15.0
                      , transformers
                      , cairo
                      , haskell-gi
@@ -47,7 +47,7 @@ library
                      , dbus >= 0.10.15 && < 1
                      , containers
                      , unix
-                     , stm
+                     , stm >= 2.5.0.0
                      , here
                      , hdaemonize
                      , directory
