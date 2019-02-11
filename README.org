@@ -232,8 +232,13 @@ CLOCK: [2019-01-24 Thu 14:31]--[2019-01-24 Thu 14:42] =>  0:11
 CLOCK: [2019-01-24 Thu 13:04]--[2019-01-24 Thu 14:04] =>  1:00
 :END:
 
-** DONE Notifications stuck (#5)
+** TODO Notifications stuck (#5)
 :LOGBOOK:
-CLOCK: [2019-02-11 Mon 22:29]
+CLOCK: [2019-02-11 Mon 22:54]
+CLOCK: [2019-02-11 Mon 22:29]--[2019-02-11 Mon 22:44] =>  0:15
 CLOCK: [2019-02-11 Mon 21:13]--[2019-02-11 Mon 22:29] =>  1:16
 :END:
+
+1. fixed race condition
+2. created new bug (replaceid does not work anymore)
+3. Easy fix (a + 1 to much)...

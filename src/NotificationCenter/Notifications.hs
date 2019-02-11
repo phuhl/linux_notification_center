@@ -110,6 +110,7 @@ notify tState appName replaceId icon summary body
   let newNotiWithoutId = Notification
         { notiAppName = appName
         , notiRepId = replaceId
+
         -- in order to not create a race condition this can not be
         -- done, instead it is handled lower done
         , notiId = 0
@@ -140,7 +141,7 @@ notify tState appName replaceId icon summary body
                                        fromIntegral (notiRepId newNotiWithoutId))
                               $ notiDisplayingList state
       newId <- atomically $ stateTVar tState
-               $ \state -> (notiStNextId state + 1,
+               $ \state -> (notiStNextId state,
                             state { notiStList =
                                     updatedNotiList (notiStList state)
                                     (newNotiWithoutId { notiId = notiStNextId state })
