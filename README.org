@@ -47,7 +47,7 @@ button, which has =id= 0):
 notify-send.py a --hint boolean:deadd-notification-center:true int:id:0 boolean:state:true
 
 # turn highlighting off
-notify-send.py a --hint boolean:deadd-notification-center:true int:id:0 boolean:state:true
+notify-send.py a --hint boolean:deadd-notification-center:true int:id:0 boolean:state:false
 #+END_SRC
 This snippet uses [[https://github.com/phuhl/notify-send.py][notify-send.py]], a improved version of libnotify
 (notify-send).
