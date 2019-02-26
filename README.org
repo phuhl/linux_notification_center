@@ -1,6 +1,6 @@
 * Linux Notification Center
 
-A haskell-written notification center for BSPWM and polybar users.
+A haskell-written notification center for users that like a desktop with style...
 
 ** Features
 
