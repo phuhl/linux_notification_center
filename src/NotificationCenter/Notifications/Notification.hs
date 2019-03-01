@@ -10,7 +10,7 @@ module NotificationCenter.Notifications.Notification
 
 import TransparentWindow
 import NotificationCenter.Notifications.Data
-  (Urgency(..), Config(..))
+  (Urgency(..), Config(..), Notification(..))
 import NotificationCenter.Notifications.Notification.Glade (glade)
 
 import Data.Text as Text
@@ -30,20 +30,7 @@ import qualified GI.Gtk as Gtk
   (IsWidget, Box(..), Label(..), Button(..), Window(..))
 
 import DBus ( Variant (..) )
-data Notification = Notification
-  { notiAppName :: Text -- ^ Application name
-  , notiRepId :: Word32 -- ^ Replaces id
-  , notiId :: Int -- ^ Id
-  , notiIcon :: Text -- ^ App icon
-  , notiSummary :: Text -- ^ Summary
-  , notiBody :: Text -- ^ Body
-  , notiActions :: [Text] -- ^ Actions
-  , notiHints :: Map.Map Text Variant -- ^ Hints
-  , notiUrgency :: Urgency
-  , notiTimeout :: Int32 -- ^ Expires timeout (milliseconds)
-  , notiTime :: Text
-  , notiTransient :: Bool
-  }
+
 
 instance Eq Notification where
   a == b = notiId a == notiId b

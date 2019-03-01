@@ -93,6 +93,11 @@ newFirst = true
 # notification will be persisted in the notifiction center anyways
 ignoreTransient = false
 
+# See section "Notification based scripting" for an explenation
+match = "title=Abc;body=abc":"app=notify-send"
+modify = "transient=false"
+run = "":"killall notify-send"
+
 [notification-center-notification-popup]
 notiDefaultTimeout = 10000
 distanceTop = 50
@@ -246,8 +251,63 @@ CLOCK: [2019-02-11 Mon 21:13]--[2019-02-11 Mon 22:29] =>  1:16
 2. created new bug (replaceid does not work anymore)
 3. Easy fix (a + 1 to much)...
 
-** TODO Transient Notifications (#6)
+** DONE Transient Notifications (#6)
 :LOGBOOK:
-CLOCK: [2019-03-01 Fri 19:27]
+CLOCK: [2019-03-01 Fri 19:27]--[2019-03-01 Fri 19:38] =>  0:11
 :END:
 
+- =ignoreTransient= configuration added
+
+If you want to send transient notifications (notifications that should
+not be stored in the notification center, but only showed once)
+yourself, you can do so with notify-send:
+
+#+BEGIN_SRC sh
+notify-send --hint=int:transient:1 "My Caption" "My Body..."
+#+END_SRC
+
+** TODO Notification based scripting (#3, #6)
+:LOGBOOK:
+CLOCK: [2019-03-01 Fri 22:59]
+CLOCK: [2019-03-01 Fri 19:39]--[2019-03-01 Fri 22:43] =>  3:04
+:END:
+
+You can modify notifications if they match certain criteria. 
+
+_Matching:_
+
+The criteria you can specify are equality for the following parameters:
+- title
+- body
+- app
+- time
+- icon
+
+You can test a parameter like this: =title=Abc=.
+If you want to test for more than one parameter (for all of them to be
+true) you can concatenate the criteria with =;= like this:
+=title=Abc;body=You can baz yourself=.
+
+_Modifying:_
+
+You can set the following parameters:
+- title
+- body
+- app
+- time
+- icon (does not do anything, currently)
+- transient (value has to be =true= or =false=)
+
+If you want to set more than one parameter you can concatenate them
+with =;= like this: =app=Crashmaster 2000;time=4:20=.
+
+_Running Commands:_
+
+Not implemented, yet.
+
+#+BEGIN_EXAMPLE
+[notification-center]
+match = "title=Abc;body=abc":"app=notify-send"
+modify = "transient=false"
+run = "":"killall notify-send"
+#+END_EXAMPLE

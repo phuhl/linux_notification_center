@@ -27,7 +27,7 @@ import DBus ( Variant (..), fromVariant )
 import DBus.Client
        ( connectSession, AutoMethod(..), autoMethod, requestName, export
        , nameAllowReplacement, nameReplaceExisting)
-import Data.Text ( Text, pack )
+import Data.Text (unpack,  Text, pack )
 import Data.Word ( Word, Word8, Word32 )
 import Data.Int ( Int32 )
 import Data.List
@@ -93,17 +93,18 @@ getTime = do
   return $ format "%H:%M"
 
 
-notify :: TVar NotifyState
-          -> Text -- ^ Application name
-          -> Word32 -- ^ Replaces id
-          -> Text -- ^ App icon
-          -> Text -- ^ Summary
-          -> Text -- ^ Body
-          -> [Text] -- ^ Actions
-          -> Map.Map Text Variant -- ^ Hints
-          -> Int32 -- ^ Expires timeout (milliseconds)
-          -> IO Word32
-notify tState appName replaceId icon summary body
+notify :: Config
+       -> TVar NotifyState
+       -> Text -- ^ Application name
+       -> Word32 -- ^ Replaces id
+       -> Text -- ^ App icon
+       -> Text -- ^ Summary
+       -> Text -- ^ Body
+       -> [Text] -- ^ Actions
+       -> Map.Map Text Variant -- ^ Hints
+       -> Int32 -- ^ Expires timeout (milliseconds)
+       -> IO Word32
+notify config tState appName replaceId icon summary body
   actions hints timeout = do
   state <- readTVarIO tState
   time <- getTime
@@ -137,17 +138,23 @@ notify tState appName replaceId icon summary body
     else
     -- Noti has to be displayed
     do
+      -- Apply modifications and run scripts for noti
+      let matchingRules = filter (\(match, rep, com) -> match newNotiWithoutId)
+            (configMatchingRules config)
+      let newNotiWoIdModified = foldl (\noti (_, mod, _) -> mod noti)
+            newNotiWithoutId matchingRules
+
       let notisToBeReplaced = filter (\n -> dNotiId n ==
-                                       fromIntegral (notiRepId newNotiWithoutId))
+                                       fromIntegral (notiRepId newNotiWoIdModified))
                               $ notiDisplayingList state
       newId <- atomically $ stateTVar tState
                $ \state -> (notiStNextId state,
                             state { notiStList =
                                     updatedNotiList (notiStList state)
-                                    (newNotiWithoutId { notiId = notiStNextId state })
-                                    (fromIntegral (notiRepId newNotiWithoutId))
+                                    (newNotiWoIdModified { notiId = notiStNextId state })
+                                    (fromIntegral (notiRepId newNotiWoIdModified))
                                   , notiStNextId = notiStNextId state + 1})
-      let newNotiWithId = newNotiWithoutId { notiId = newId }
+      let newNotiWithId = newNotiWoIdModified { notiId = newId }
       if length notisToBeReplaced == 0 then
         insertNewNoti newNotiWithId tState
         else
@@ -240,7 +247,7 @@ notificationDaemon onNote onCloseNote = do
 startNotificationDaemon :: Config -> IO () ->  IO () ->  IO (TVar NotifyState)
 startNotificationDaemon config onUpdate onUpdateForMe = do
   istate <- newTVarIO $ NotifyState [] [] 1 onUpdate onUpdateForMe config []
-  forkIO (notificationDaemon (notify istate)
+  forkIO (notificationDaemon (notify config istate)
            (removeNotiFromDistList' istate))
   return istate
 

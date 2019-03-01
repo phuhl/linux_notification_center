@@ -1,9 +1,33 @@
 module NotificationCenter.Notifications.Data
   ( Urgency(..)
   , Config (..)
+  , Notification(..)
   ) where
 
+import Data.Text as Text
+import Data.Word ( Word32 )
+import Data.Int ( Int32 )
+import qualified Data.Map as Map ( Map )
+import Data.List ( sortOn )
+import DBus ( Variant (..) )
+
+
 data Urgency = Normal | Low | High deriving Eq
+
+data Notification = Notification
+  { notiAppName :: Text -- ^ Application name
+  , notiRepId :: Word32 -- ^ Replaces id
+  , notiId :: Int -- ^ Id
+  , notiIcon :: Text -- ^ App icon
+  , notiSummary :: Text -- ^ Summary
+  , notiBody :: Text -- ^ Body
+  , notiActions :: [Text] -- ^ Actions
+  , notiHints :: Map.Map Text Variant -- ^ Hints
+  , notiUrgency :: Urgency
+  , notiTimeout :: Int32 -- ^ Expires timeout (milliseconds)
+  , notiTime :: Text
+  , notiTransient :: Bool
+  }
 
 data Config = Config
   {
@@ -14,6 +38,7 @@ data Config = Config
   , configNotiCenterMonitor :: Int
   , configNotiCenterNewFirst :: Bool
   , configIgnoreTransient :: Bool
+  , configMatchingRules :: [((Notification -> Bool), (Notification -> Notification), Maybe String)]
 
   -- notification-center-notification-popup
   , configNotiDefaultTimeout :: Int
@@ -56,5 +81,4 @@ data Config = Config
   , configLabelColor :: String
   , configCriticalColor :: String
   , configCriticalInCenterColor :: String
-  } deriving Show
-
+  }
