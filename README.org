@@ -89,6 +89,9 @@ monitor = 0
 # optional command to run at startup (e.g. to setup button states)
 startupCommand = "deadd-notification-center-startup"
 newFirst = true
+# If true, the transient field in notifications will be ignored and the
+# notification will be persisted in the notifiction center anyways
+ignoreTransient = false
 
 [notification-center-notification-popup]
 notiDefaultTimeout = 10000
@@ -232,9 +235,9 @@ CLOCK: [2019-01-24 Thu 14:31]--[2019-01-24 Thu 14:42] =>  0:11
 CLOCK: [2019-01-24 Thu 13:04]--[2019-01-24 Thu 14:04] =>  1:00
 :END:
 
-** TODO Notifications stuck (#5)
+** DONE Notifications stuck (#5, closed)
 :LOGBOOK:
-CLOCK: [2019-02-11 Mon 22:54]
+CLOCK: [2019-02-11 Mon 22:54]--[2019-02-11 Mon 23:05] =>  0:11
 CLOCK: [2019-02-11 Mon 22:29]--[2019-02-11 Mon 22:44] =>  0:15
 CLOCK: [2019-02-11 Mon 21:13]--[2019-02-11 Mon 22:29] =>  1:16
 :END:
@@ -242,3 +245,9 @@ CLOCK: [2019-02-11 Mon 21:13]--[2019-02-11 Mon 22:29] =>  1:16
 1. fixed race condition
 2. created new bug (replaceid does not work anymore)
 3. Easy fix (a + 1 to much)...
+
+** TODO Transient Notifications (#6)
+:LOGBOOK:
+CLOCK: [2019-03-01 Fri 19:27]
+:END:
+

@@ -273,7 +273,8 @@ updateNotis config tState = do
         \n -> (find (\nd -> dNotiId nd == notiId n )
                (stDisplayingNotiList state))
               == Nothing
-              && (not $ notiTransient n)) $ notiStList notiState
+              && ((configIgnoreTransient config) || (not $ notiTransient n)))
+                 $ notiStList notiState
   newNotis' <- mapM (
     \n -> do
       let newNoti = DisplayingNotificaton
@@ -333,6 +334,7 @@ getConfig p =
     , configStartupCommand = r' "" p nCenter "startupCommand"
     , configNotiCenterMonitor = r 0 p nCenter "monitor"
     , configNotiCenterNewFirst = r'' True p nCenter "newFirst"
+    , configIgnoreTransient = r'' False p nCenter "ignoreTransient"
 
     -- notification-center-notification-popup
     , configNotiDefaultTimeout = r 10000 p nPopup "notiDefaultTimeout"

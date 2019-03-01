@@ -13,6 +13,7 @@ data Config = Config
   , configStartupCommand :: String
   , configNotiCenterMonitor :: Int
   , configNotiCenterNewFirst :: Bool
+  , configIgnoreTransient :: Bool
 
   -- notification-center-notification-popup
   , configNotiDefaultTimeout :: Int
