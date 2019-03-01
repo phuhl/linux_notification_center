@@ -1,6 +1,6 @@
 * Linux Notification Center
 
-A haskell-written notification center for BSPWM and polybar users.
+A haskell-written notification center for users that like a desktop with style...
 
 ** Features
 
@@ -47,7 +47,7 @@ button, which has =id= 0):
 notify-send.py a --hint boolean:deadd-notification-center:true int:id:0 boolean:state:true
 
 # turn highlighting off
-notify-send.py a --hint boolean:deadd-notification-center:true int:id:0 boolean:state:true
+notify-send.py a --hint boolean:deadd-notification-center:true int:id:0 boolean:state:false
 #+END_SRC
 This snippet uses [[https://github.com/phuhl/notify-send.py][notify-send.py]], a improved version of libnotify
 (notify-send).
@@ -150,7 +150,7 @@ Also take a look at my [[https://github.com/phuhl/notify-send.py][notify-send.py
 
 ** TODO Image support
 
-** DONE Color configurable
+** DONE Color configurable (DONE)
 
 - [X] done
 
@@ -161,7 +161,7 @@ CLOCK: [2018-11-22 Thu 20:48]--[2018-11-22 Thu 21:05] =>  0:17
 
 - [X] Window dimensions for all windows
 
-** DONE Buttons at bottom
+** DONE Buttons at bottom (DONE)
 :LOGBOOK:
 CLOCK: [2018-11-23 Fri 14:27]--[2018-11-23 Fri 15:48] =>  1:21
 CLOCK: [2018-11-23 Fri 00:33]--[2018-11-23 Fri 02:30] =>  1:57
@@ -176,7 +176,7 @@ CLOCK: [2018-11-22 Thu 23:33]--[2018-11-23 Fri 00:11] =>  0:38
 - [X] Problem: all commands are executed simultaneously... solved
 - [X] Problem 2: to many buttons overlap to the right
 
-** DONE Buttons with info-updates
+** DONE Buttons with info-updates (DONE)
 :LOGBOOK:
 CLOCK: [2018-11-23 Fri 18:46]--[2018-11-23 Fri 20:24] =>  1:38
 CLOCK: [2018-11-23 Fri 16:01]--[2018-11-23 Fri 18:01] =>  2:00
@@ -184,7 +184,7 @@ CLOCK: [2018-11-23 Fri 16:01]--[2018-11-23 Fri 18:01] =>  2:00
 
 - [X] Problem: i don't know if multiple hints per noti are possible... yes they are
 
-** DONE Sort notis by time with newest on top
+** DONE Sort notis by time with newest on top (DONE)
 :LOGBOOK:
 CLOCK: [2019-01-19 Sat 22:36]--[2019-01-19 Sat 22:54] =>  0:18
 CLOCK: [2019-01-19 Sat 22:10]--[2019-01-19 Sat 22:34] =>  0:24
@@ -194,7 +194,7 @@ CLOCK: [2019-01-19 Sat 22:10]--[2019-01-19 Sat 22:34] =>  0:24
 :LOGBOOK:
 CLOCK: [2019-01-02 Wed 02:04]--[2019-01-02 Wed 03:14] =>  1:10
 :END:
-** DONE More styling
+** DONE More styling (DONE)
 :LOGBOOK:
 CLOCK: [2019-01-19 Sat 23:02]--[2019-01-19 Sat 23:49] =>  0:47
 :END:
@@ -240,7 +240,7 @@ CLOCK: [2019-01-24 Thu 14:31]--[2019-01-24 Thu 14:42] =>  0:11
 CLOCK: [2019-01-24 Thu 13:04]--[2019-01-24 Thu 14:04] =>  1:00
 :END:
 
-** DONE Notifications stuck (#5, closed)
+** DONE Notifications stuck (#5, CLOSED)
 :LOGBOOK:
 CLOCK: [2019-02-11 Mon 22:54]--[2019-02-11 Mon 23:05] =>  0:11
 CLOCK: [2019-02-11 Mon 22:29]--[2019-02-11 Mon 22:44] =>  0:15
