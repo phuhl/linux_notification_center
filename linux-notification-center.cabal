@@ -11,6 +11,10 @@ copyright:           2017 Philipp Uhl
 category:            Web
 build-type:          Simple
 extra-source-files:  README.org
+                   , notification_center.glade
+                   , notification.glade
+                   , notification_in_center.glade
+                   , style.css
 cabal-version:       >=1.10
 
 library
