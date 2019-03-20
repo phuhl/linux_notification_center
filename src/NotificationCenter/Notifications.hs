@@ -75,17 +75,19 @@ getCapabilities config = return ( [ "body"
                                     [ "body-markup"
                                     , "body-hyperlinks"] else [])
 
-emitNotificationClosed :: (Signal -> IO ()) -> Int -> CloseType -> IO ()
-emitNotificationClosed onClose id ctype = do
-  onClose $ (signal "/org/freedesktop/Notifications"
-              "org.freedesktop.Notifications"
-              "NotificationClosed")
+emitNotificationClosed :: Bool -> (Signal -> IO ()) -> Int -> CloseType -> IO ()
+emitNotificationClosed doSend onClose id ctype =
+  if doSend then
+    onClose $ (signal "/org/freedesktop/Notifications"
+               "org.freedesktop.Notifications"
+               "NotificationClosed")
     { signalBody = [ toVariant (fromIntegral id :: Word32)
                    , toVariant (case ctype of
                                    Timeout -> 1
                                    User -> 2
                                    CloseByCall -> 3
                                    _ -> 4 :: Word32)] }
+  else return ()
 
 emitAction :: (Signal -> IO ()) -> Int -> String -> IO ()
 emitAction onAction id key = do
@@ -153,6 +155,7 @@ notify config tState emit
         , notiTimeout = timeout
         , notiTime = time
         , notiTransient = parseTransient hints
+        , notiSendClosedMsg = (configSendNotiClosedDbusMessage config)
         }
 
   if Map.member (pack "deadd-notification-center")
@@ -186,17 +189,17 @@ notify config tState emit
               updatedNotiList (notiStList state)
               (newNoti
                { notiId = notiStNextId state
-               , notiOnClosed = emitNotificationClosed
-                                emit (notiStNextId state)
+               , notiOnClosed = emitNotificationClosed (notiSendClosedMsg newNoti)
+                 emit (notiStNextId state)
                , notiOnAction = emitAction
                                 emit (notiStNextId state) })
               (fromIntegral (notiRepId newNoti))
           })
-      let newNotiWithId = newNoti { notiId = newId
-                                  , notiOnClosed = emitNotificationClosed
-                                                   emit (notiStNextId state)
-                                  , notiOnAction = emitAction
-                                                   emit (notiStNextId state) }
+      let newNotiWithId = newNoti
+            { notiId = newId
+            , notiOnClosed = emitNotificationClosed (notiSendClosedMsg newNoti)
+                             emit newId
+            , notiOnAction = emitAction emit newId }
       if length notisToBeReplaced == 0 then
         insertNewNoti newNotiWithId tState
         else

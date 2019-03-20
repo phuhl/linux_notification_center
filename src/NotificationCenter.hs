@@ -338,6 +338,7 @@ getConfig p =
   , configIgnoreTransient = r'' False p nCenter "ignoreTransient"
   , configMatchingRules = zip3 match (modify ++ repeat id) $ run ++ repeat Nothing -- run
   , configNotiMarkup = r'' True p nCenter "useMarkup"
+  , configSendNotiClosedDbusMessage = r'' False p nCenter "configSendNotiClosedDbusMessage"
 
     -- notification-center-notification-popup
   , configNotiDefaultTimeout = r 10000 p nPopup "notiDefaultTimeout"
@@ -416,6 +417,7 @@ getConfig p =
                                 | k == "icon" = noti { notiIcon = Text.pack v }
                                 | k == "transient" && v == "true" = noti { notiTransient = True }
                                 | k == "transient" && v == "false" = noti { notiTransient = False }
+                                | k == "noClosedMsg" && v == "true" = noti { notiSendClosedMsg = False }
                                 | otherwise = noti
 
         run = [Nothing]

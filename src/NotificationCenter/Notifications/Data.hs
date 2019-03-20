@@ -29,6 +29,7 @@ data Notification = Notification
   , notiTimeout :: Int32 -- ^ Expires timeout (milliseconds)
   , notiTime :: Text
   , notiTransient :: Bool
+  , notiSendClosedMsg :: Bool -- ^ If notiOnClosed should be ignored
   , notiOnClosed :: CloseType -> IO ()
     -- ^ Should be called when the notification is closed, either by
     --   timeout or by user
@@ -47,6 +48,7 @@ data Config = Config
   , configIgnoreTransient :: Bool
   , configMatchingRules :: [((Notification -> Bool), (Notification -> Notification), Maybe String)]
   , configNotiMarkup :: Bool
+  , configSendNotiClosedDbusMessage :: Bool
 
   -- notification-center-notification-popup
   , configNotiDefaultTimeout :: Int
