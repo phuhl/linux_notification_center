@@ -29,6 +29,15 @@ Some applications, notification:
 Notification Center opened:
 [[file:README.org.img/org_20181203_164608_WqFdmO.jpg]]
 
+Markup support:
+[[file:README.org.img/org_20190320_221121_wUDPxO.jpg]]
+
+Link support:
+[[file:README.org.img/org_20190320_221421_VMMwYy.jpg]]
+
+Action support:
+[[file:README.org.img/org_20190320_221547_jT48UV.jpg]]
+
 ** Usage
 
 To start it:
@@ -148,51 +157,7 @@ buttonState2Hover = rgba(0, 20, 20, 0.3)
 buttonState2HoverColor = #fee
 #+END_EXAMPLE
 
-For more styling options see [[More styling (#2, CLOSED)]].
-
-For information on notification based scripting and modifications to
-notifications see [[Notification based scripting (#3, #6, CLOSED)]].
-
-** See also
-
-Also take a look at my [[https://github.com/phuhl/notify-send.py][notify-send.py]] which imitates notify-send (libnotify) but also is able to replace notifications.
-
-
-* Issues
-** DONE Sizes configurable (CLOSED)
-:LOGBOOK:
-CLOCK: [2018-11-22 Thu 20:48]--[2018-11-22 Thu 21:05] =>  0:17
-:END:
-
-- [X] Window dimensions for all windows
-
-** DONE Buttons with info-updates (CLOSED)
-:LOGBOOK:
-CLOCK: [2018-11-23 Fri 18:46]--[2018-11-23 Fri 20:24] =>  1:38
-CLOCK: [2018-11-23 Fri 16:01]--[2018-11-23 Fri 18:01] =>  2:00
-:END:
-
-- [X] Problem: i don't know if multiple hints per noti are possible... yes they are
-
-** DONE Buttons at bottom (CLOSED)
-:LOGBOOK:
-CLOCK: [2018-11-23 Fri 14:27]--[2018-11-23 Fri 15:48] =>  1:21
-CLOCK: [2018-11-23 Fri 00:33]--[2018-11-23 Fri 02:30] =>  1:57
-CLOCK: [2018-11-22 Thu 23:33]--[2018-11-23 Fri 00:11] =>  0:38
-:END:
-
-- In the configuration one could specify button-captions and
-  shell-commands
-- The buttons could be generated dynamically 
-
-
-- [X] Problem: all commands are executed simultaneously... solved
-- [X] Problem 2: to many buttons overlap to the right
-
-** DONE More styling (#2, CLOSED)
-:LOGBOOK:
-CLOCK: [2019-01-19 Sat 23:02]--[2019-01-19 Sat 23:49] =>  0:47
-:END:
+*** More styling
 
 In the file =.config/gtk-3.0/gtk.css= you can add styles that will
 effect the notification center.
@@ -228,58 +193,8 @@ label.deadd-noti-center.in-center.appname {
     font-family: monospace;
 }
 #+END_SRC
-** DONE Color configurable (CLOSED)
 
-- [X] done
-
-** TODO Multiple Screen support (#1)
-:LOGBOOK:
-CLOCK: [2019-01-02 Wed 02:04]--[2019-01-02 Wed 03:14] =>  1:10
-:END:
-** TODO Aur does not build (#4)
-:LOGBOOK:
-CLOCK: [2019-01-24 Thu 14:31]--[2019-01-24 Thu 14:42] =>  0:11
-CLOCK: [2019-01-24 Thu 13:04]--[2019-01-24 Thu 14:04] =>  1:00
-:END:
-
-** DONE Notifications stuck (#5, CLOSED)
-:LOGBOOK:
-CLOCK: [2019-02-11 Mon 22:54]--[2019-02-11 Mon 23:05] =>  0:11
-CLOCK: [2019-02-11 Mon 22:29]--[2019-02-11 Mon 22:44] =>  0:15
-CLOCK: [2019-02-11 Mon 21:13]--[2019-02-11 Mon 22:29] =>  1:16
-:END:
-
-1. fixed race condition
-2. created new bug (replaceid does not work anymore)
-3. Easy fix (a + 1 to much)...
-
-** DONE Transient Notifications (#6, CLOSED)
-:LOGBOOK:
-CLOCK: [2019-03-01 Fri 19:27]--[2019-03-01 Fri 19:38] =>  0:11
-:END:
-
-- =ignoreTransient= configuration added
-
-If you want to send transient notifications (notifications that should
-not be stored in the notification center, but only showed once)
-yourself, you can do so with notify-send:
-
-#+BEGIN_SRC sh
-notify-send --hint=int:transient:1 "My Caption" "My Body..."
-#+END_SRC
-
-** DONE Sort notis by time with newest on top (CLOSED)
-:LOGBOOK:
-CLOCK: [2019-01-19 Sat 22:36]--[2019-01-19 Sat 22:54] =>  0:18
-CLOCK: [2019-01-19 Sat 22:10]--[2019-01-19 Sat 22:34] =>  0:24
-:END:
-
-** DONE Notification based scripting (#3, #6, CLOSED)
-:LOGBOOK:
-CLOCK: [2019-03-05 Tue 14:59]--[2019-03-05 Tue 15:20] =>  0:21
-CLOCK: [2019-03-01 Fri 22:59]--[2019-03-01 Fri 23:55] =>  0:56
-CLOCK: [2019-03-01 Fri 19:39]--[2019-03-01 Fri 22:43] =>  3:04
-:END:
+*** Notification-based scripting
 
 You can modify notifications if they match certain criteria. 
 
@@ -325,45 +240,26 @@ modify = "transient=false"
 run = "":"killall notify-send"
 #+END_EXAMPLE
 
-** DONE Fixing build issue (CLOSED)
-:LOGBOOK:
-CLOCK: [2019-03-20 Wed 13:11]--[2019-03-20 Wed 13:14] =>  0:03
-:END:
+** Issues and goals
 
-** DONE Handling of XML tags (CLOSED)
-:LOGBOOK:
-CLOCK: [2019-03-20 Wed 13:19]--[2019-03-20 Wed 14:09] =>  0:50
-:END:
+See here: [[file:Worklog.org][Log of issues]]
 
-** DONE Signals (NotificationClosed) (CLOSED)
-:LOGBOOK:
-CLOCK: [2019-03-20 Wed 18:34]--[2019-03-20 Wed 19:03] =>  0:29
-CLOCK: [2019-03-20 Wed 14:10]--[2019-03-20 Wed 15:47] =>  1:37
-:END:
+** Contribute
 
-- Implemented but disabled by default
-  - WHY?: Because e.g. Spotify takes the =NotificationClosed= message
-    as a reason to not replace old notifications but to send a new
-    one. As the Notifications are stored in the center after being
-    closed though, they would accumulate.
-  - If you want the =NotificationClosed= message for some reason
-    anyways, you can script the =NotificationClosed= message for
-    certain notifications away by using the =noClosedMsg= option. For
-    more information on this, consult [[Notification based scripting (#3, #6, CLOSED)]].
-  - To enable the =NotificationClosed= message, set
-    =configSendNotiClosedDbusMessage= to =true= in the
-    =notification-center= section of your config file.
-  - Why is the default for =configSendNotiClosedDbusMessage= =false=?
-    Because, for a new user it is not obvious, that e.g. Spotify does
-    what it does how it does it and might be highly extremely annoyed
-    by that behaviour without knowing, it could be prevented. The need
-    for that =NotificationClosed= is not very apparent to me anyways.
-  - What a wast of time to implement this stupid
-    =NotificationClosed=, jeeeze.
+First of all: Contribution is obviously 100% optional.
 
-** DONE Actions (CLOSED)
-:LOGBOOK:
-CLOCK: [2019-03-20 Wed 15:47]--[2019-03-20 Wed 17:41] =>  1:54
-:END:
-** TODO Image support
+If you do want to contribute, feel free to send me an email (for the
+address, see on my profile).
+
+If you do not want to contribute with your time, you can buy me a beer
+;). Someone mentioned, she would be willing to donate, so here is my
+PayPal link: [[https://paypal.me/phuhl]]. Should you consider to donate,
+please be aware that this does not buy you the right to demand
+anything. This is a hobby. And will be. But if you just want to give
+me some motivation by showing me that someone appreciates my work,
+feel free to do so.
+
+** See also
+
+Also take a look at my [[https://github.com/phuhl/notify-send.py][notify-send.py]] which imitates notify-send (libnotify) but also is able to replace notifications.
 
