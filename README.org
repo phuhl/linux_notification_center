@@ -49,7 +49,7 @@ notify-send.py a --hint boolean:deadd-notification-center:true int:id:0 boolean:
 # turn highlighting off
 notify-send.py a --hint boolean:deadd-notification-center:true int:id:0 boolean:state:false
 #+END_SRC
-This snippet uses [[https://github.com/phuhl/notify-send.py][notify-send.py]], a improved version of libnotify
+This snippet uses [[https://github.com/phuhl/notify-send.py][notify-send.py]], an improved version of libnotify
 (notify-send).
 
 ** Install
