@@ -22,8 +22,8 @@ import Data.List ( sortOn )
 import Control.Monad
 
 import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
-              , labelSetText, widgetSetSizeRequest, labelSetXalign
-              , widgetGetPreferredHeightForWidth
+              , labelSetText, labelSetMarkup, widgetSetSizeRequest
+              , labelSetXalign, widgetGetPreferredHeightForWidth
               , onWidgetButtonPressEvent
               , setWidgetWidthRequest)
 import qualified GI.Gtk as Gtk
@@ -123,7 +123,10 @@ showNotificationWindow config noti dispNotis onClose = do
 
 updateNoti' config onClose noti dNoti  = do
   labelSetText (dLabelTitel dNoti) $ notiSummary noti
-  labelSetText (dLabelBody dNoti) $ notiBody noti
+  if (configNotiMarkup config) then do
+      labelSetMarkup (dLabelBody dNoti) $ notiBody noti
+      else do
+      labelSetText (dLabelBody dNoti) $ notiBody noti
   labelSetText (dLabelAppname dNoti) $ notiAppName noti
   labelSetXalign (dLabelTitel dNoti) 0
   labelSetXalign (dLabelBody dNoti) 0

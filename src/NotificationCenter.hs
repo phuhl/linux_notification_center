@@ -280,7 +280,7 @@ updateNotis config tState = do
     \n -> do
       let newNoti = DisplayingNotificaton
                     { dNotiId = notiId n }
-      showNotification (configNotiCenterNewFirst config)
+      showNotification config
         (stNotiBox state) newNoti
         (stNotiState state) $ removeNoti tState
     ) newNotis
@@ -337,6 +337,7 @@ getConfig p =
   , configNotiCenterNewFirst = r'' True p nCenter "newFirst"
   , configIgnoreTransient = r'' False p nCenter "ignoreTransient"
   , configMatchingRules = zip3 match (modify ++ repeat id) $ run ++ repeat Nothing -- run
+  , configNotiMarkup = r'' True p nCenter "useMarkup"
 
     -- notification-center-notification-popup
   , configNotiDefaultTimeout = r 10000 p nPopup "notiDefaultTimeout"

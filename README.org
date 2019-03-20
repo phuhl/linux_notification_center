@@ -92,6 +92,8 @@ newFirst = true
 # If true, the transient field in notifications will be ignored and the
 # notification will be persisted in the notifiction center anyways
 ignoreTransient = false
+# If true, markup (<u>, <i>, <b>, <a>) will be displayed properly
+useMarkup = true
 
 # See section "Notification based scripting" for an explenation
 match = "title=Abc;body=abc":"app=notify-send"
@@ -316,4 +318,9 @@ run = "":"killall notify-send"
 ** DONE Fixing build issue
 :LOGBOOK:
 CLOCK: [2019-03-20 Wed 13:11]--[2019-03-20 Wed 13:14] =>  0:03
+:END:
+
+** DONE Handling of XML tags
+:LOGBOOK:
+CLOCK: [2019-03-20 Wed 13:19]--[2019-03-20 Wed 14:09] =>  0:50
 :END:

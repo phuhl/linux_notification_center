@@ -11,7 +11,7 @@ import TransparentWindow
 import NotificationCenter.Notification.Glade (glade)
 import NotificationCenter.Notifications
   (NotifyState(..), Notification(..))
-import NotificationCenter.Notifications.Data (Urgency(..))
+import NotificationCenter.Notifications.Data (Urgency(..), Config(..))
 
 import Data.List
 import qualified Data.Text as Text
@@ -22,9 +22,9 @@ import Control.Concurrent.STM
 
 
 import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
-              , labelSetText, widgetSetSizeRequest, labelSetXalign
-              , widgetGetPreferredHeightForWidth, onButtonClicked
-              , widgetDestroy)
+              , labelSetText, labelSetMarkup, widgetSetSizeRequest
+              , labelSetXalign , widgetGetPreferredHeightForWidth
+              , onButtonClicked, widgetDestroy)
 import qualified GI.Gtk as Gtk
 data DisplayingNotificaton = DisplayingNotificaton
   { dNotiId :: Int
@@ -42,11 +42,11 @@ instance Eq DisplayingNotificaton where
   a == b = dNotiId a == dNotiId b
 
 
-showNotification :: Bool -> Gtk.Box -> DisplayingNotificaton
+showNotification :: Config -> Gtk.Box -> DisplayingNotificaton
                  -> TVar NotifyState
                  -> (DisplayingNotificaton -> IO ())
                  -> IO DisplayingNotificaton
-showNotification showFirst mainBox dNoti tNState closeNotification = do
+showNotification config mainBox dNoti tNState closeNotification = do
   nState <- readTVarIO tNState
   let (Just noti) = find (\n -> notiId n == dNotiId dNoti)
         $ notiStList nState
@@ -91,7 +91,7 @@ showNotification showFirst mainBox dNoti tNState closeNotification = do
                      }
 
   Gtk.containerAdd mainBox container
-  updateNoti mainBox dNoti' tNState showFirst
+  updateNoti config mainBox dNoti' tNState
 
   onButtonClicked buttonClose $ do
     closeNotification dNoti'
@@ -99,18 +99,21 @@ showNotification showFirst mainBox dNoti tNState closeNotification = do
   widgetShowAll container
   return dNoti'
 
-updateNoti mainBox dNoti tNState showFirst = do
+updateNoti config mainBox dNoti tNState = do
   addSource $ do
     nState <- readTVarIO tNState
     let (Just noti) = find (\n -> notiId n == dNotiId dNoti)
           $ notiStList nState
     labelSetText (dLabelTitel dNoti) $ notiSummary noti
-    labelSetText (dLabelBody dNoti) $ notiBody noti
+    if (configNotiMarkup config) then do
+      labelSetMarkup (dLabelBody dNoti) $ notiBody noti
+      else do
+      labelSetText (dLabelBody dNoti) $ notiBody noti
     labelSetText (dLabelAppname dNoti) $ notiAppName noti
     labelSetText (dLabelTime dNoti) $ notiTime noti
     labelSetXalign (dLabelTitel dNoti) 0
     labelSetXalign (dLabelBody dNoti) 0
-    when (showFirst)
+    when (configNotiCenterNewFirst config)
       (Gtk.boxReorderChild mainBox (dContainer dNoti) 0)
     return False
   return ()

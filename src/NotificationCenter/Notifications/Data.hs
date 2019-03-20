@@ -39,6 +39,7 @@ data Config = Config
   , configNotiCenterNewFirst :: Bool
   , configIgnoreTransient :: Bool
   , configMatchingRules :: [((Notification -> Bool), (Notification -> Notification), Maybe String)]
+  , configNotiMarkup :: Bool
 
   -- notification-center-notification-popup
   , configNotiDefaultTimeout :: Int

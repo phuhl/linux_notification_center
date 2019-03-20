@@ -80,11 +80,9 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="halign">start</property>
-                    <property name="label" translatable="yes">Es könnten Daten auf die Festplatte geschrieben werden... Dieser Text ist zu lang für eine Zeile</property>
+                    <property name="label" translatable="yes">Es könnten Daten auf die Festplatte geschrieben werden... Dieser Text ist zu lang für eine &lt;b&gt;Zeile&lt;/b&gt;</property>
+                    <property name="use_markup">True</property>
                     <property name="wrap">True</property>
-                    <attributes>
-                      <attribute name="gravity" value="east"/>
-                    </attributes>
                     <style>
                       <class name="notification"/>
                       <class name="body"/>

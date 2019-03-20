@@ -35,6 +35,8 @@ import qualified Data.Map as Map
 import Data.Time
 import Data.Time.LocalTime
 
+import Text.XML.Light.Input (parseXML)
+
 import System.Locale.Read
 
 
@@ -66,7 +68,8 @@ getServerInformation =
           "1.0")
 
 getCapabilities :: IO [Text]
-getCapabilities = return ["body", "body-markup", "hints", "persistence"]
+getCapabilities = return ["body", "body-markup", "hints", "persistence"
+                         , "body-hyperlinks"]
 
 parseUrgency hints =
   let urgency = (do v <- Map.lookup "urgency" hints
@@ -144,17 +147,22 @@ notify config tState appName replaceId icon summary body
       let newNotiWoIdModified = foldl (\noti (_, mod, _) -> mod noti)
             newNotiWithoutId matchingRules
 
+      -- Handle XML
+      let newNotiXMLHandled = parseXML 
+
+      let newNoti = newNotiWoIdModified
+
       let notisToBeReplaced = filter (\n -> dNotiId n ==
-                                       fromIntegral (notiRepId newNotiWoIdModified))
+                                       fromIntegral (notiRepId newNoti))
                               $ notiDisplayingList state
       newId <- atomically $ stateTVar tState
                $ \state -> (notiStNextId state,
                             state { notiStList =
                                     updatedNotiList (notiStList state)
-                                    (newNotiWoIdModified { notiId = notiStNextId state })
-                                    (fromIntegral (notiRepId newNotiWoIdModified))
+                                    (newNoti { notiId = notiStNextId state })
+                                    (fromIntegral (notiRepId newNoti))
                                   , notiStNextId = notiStNextId state + 1})
-      let newNotiWithId = newNotiWoIdModified { notiId = newId }
+      let newNotiWithId = newNoti { notiId = newId }
       if length notisToBeReplaced == 0 then
         insertNewNoti newNotiWithId tState
         else
