@@ -10,7 +10,7 @@ module NotificationCenter.Notifications.Notification
 
 import TransparentWindow
 import NotificationCenter.Notifications.Data
-  (Urgency(..), Config(..), Notification(..))
+  (Urgency(..), CloseType(..), Config(..), Notification(..))
 import NotificationCenter.Notifications.Notification.Glade (glade)
 
 import Data.Text as Text
@@ -115,6 +115,7 @@ showNotificationWindow config noti dispNotis onClose = do
     hBefore
 
   onWidgetButtonPressEvent mainWindow $ \(_) -> do
+    notiOnClosed noti $ User
     onClose
     return False
   widgetShowAll mainWindow
@@ -134,7 +135,10 @@ updateNoti' config onClose noti dNoti  = do
   widgetSetSizeRequest (dLabelBG dNoti) (-1) height
   let notiDefaultTimeout = configNotiDefaultTimeout config
   startTimeoutThread notiDefaultTimeout
-    (fromIntegral $ notiTimeout noti) onClose
+    (fromIntegral $ notiTimeout noti) (
+    do addSource $ do notiOnClosed noti $ Timeout
+                      return False
+       onClose)
   return height
 
 updateNoti config onClose noti dNoti  = do

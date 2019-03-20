@@ -1,5 +1,6 @@
 module NotificationCenter.Notifications.Data
   ( Urgency(..)
+  , CloseType (..)
   , Config (..)
   , Notification(..)
   ) where
@@ -9,10 +10,11 @@ import Data.Word ( Word32 )
 import Data.Int ( Int32 )
 import qualified Data.Map as Map ( Map )
 import Data.List ( sortOn )
-import DBus ( Variant (..) )
+import DBus ( Variant (..), Signal )
 
 
 data Urgency = Normal | Low | High deriving Eq
+data CloseType = Timeout | User | CloseByCall | Other deriving Eq
 
 data Notification = Notification
   { notiAppName :: Text -- ^ Application name
@@ -27,6 +29,9 @@ data Notification = Notification
   , notiTimeout :: Int32 -- ^ Expires timeout (milliseconds)
   , notiTime :: Text
   , notiTransient :: Bool
+  , notiOnClosed :: CloseType -> IO ()
+    -- ^ Should be called when the notification is closed, either by
+    --   timeout or by user
   }
 
 data Config = Config

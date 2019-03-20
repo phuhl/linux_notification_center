@@ -324,3 +324,8 @@ CLOCK: [2019-03-20 Wed 13:11]--[2019-03-20 Wed 13:14] =>  0:03
 :LOGBOOK:
 CLOCK: [2019-03-20 Wed 13:19]--[2019-03-20 Wed 14:09] =>  0:50
 :END:
+
+** DONE Signals (NotificationClosed)
+:LOGBOOK:
+CLOCK: [2019-03-20 Wed 14:10]--[2019-03-20 Wed 15:47] =>  1:37
+:END:

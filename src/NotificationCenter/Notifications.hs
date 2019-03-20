@@ -23,10 +23,11 @@ import Control.Concurrent.STM
   (readTVarIO, stateTVar, modifyTVar, modifyTVar', TVar(..),
    atomically, newTVarIO)
 
-import DBus ( Variant (..), fromVariant )
+import DBus (Variant(..), fromVariant, signal, toVariant)
+import DBus.Internal.Message (Signal(..))
 import DBus.Client
        ( connectSession, AutoMethod(..), autoMethod, requestName, export
-       , nameAllowReplacement, nameReplaceExisting)
+       , nameAllowReplacement, nameReplaceExisting, emit)
 import Data.Text (unpack,  Text, pack )
 import Data.Word ( Word, Word8, Word32 )
 import Data.Int ( Int32 )
@@ -49,7 +50,7 @@ data NotifyState = NotifyState
     -- ^ Update-function for the NotificationCenter
   , notiStOnUpdateForMe :: IO ()
     -- ^ Update-function for the NotificationCenter for notifications
-    -- for internal use
+    --   for internal use
   , notiConfig :: Config
     -- ^ Configuration
   , notiForMeList :: [ Notification ]
@@ -72,6 +73,19 @@ getCapabilities config = return ( [ "body"
                                   ++ if (configNotiMarkup config) then
                                     [ "body-markup"
                                     , "body-hyperlinks"] else [])
+
+emitNotificationClosed :: (Signal -> IO ()) -> Int -> CloseType -> IO ()
+emitNotificationClosed onClose id ctype = do
+  onClose ( (signal "/org/freedesktop/Notifications"
+              "org.freedesktop.Notifications"
+              "NotificationClosed") {
+              signalBody = [ toVariant (fromIntegral id :: Word32)
+                           , toVariant (case ctype of
+                                          Timeout -> 1
+                                          User -> 2
+                                          CloseByCall -> 3
+                                          _ -> 4 :: Word32)]
+              })
 
 parseUrgency hints =
   let urgency = (do v <- Map.lookup "urgency" hints
@@ -100,6 +114,7 @@ getTime = do
 
 notify :: Config
        -> TVar NotifyState
+       -> (Signal -> IO ())
        -> Text -- ^ Application name
        -> Word32 -- ^ Replaces id
        -> Text -- ^ App icon
@@ -109,8 +124,8 @@ notify :: Config
        -> Map.Map Text Variant -- ^ Hints
        -> Int32 -- ^ Expires timeout (milliseconds)
        -> IO Word32
-notify config tState appName replaceId icon summary body
-  actions hints timeout = do
+notify config tState onClosed
+  appName replaceId icon summary body actions hints timeout = do
   state <- readTVarIO tState
   time <- getTime
   let newNotiWithoutId = Notification
@@ -155,13 +170,22 @@ notify config tState appName replaceId icon summary body
                                        fromIntegral (notiRepId newNoti))
                               $ notiDisplayingList state
       newId <- atomically $ stateTVar tState
-               $ \state -> (notiStNextId state,
-                            state { notiStList =
-                                    updatedNotiList (notiStList state)
-                                    (newNoti { notiId = notiStNextId state })
-                                    (fromIntegral (notiRepId newNoti))
-                                  , notiStNextId = notiStNextId state + 1})
-      let newNotiWithId = newNoti { notiId = newId }
+               $ \state -> (
+        notiStNextId state, state
+          { notiStNextId = notiStNextId state + 1
+          , notiStList =
+              updatedNotiList (notiStList state)
+              (newNoti
+               { notiId = notiStNextId state
+               , notiOnClosed = emitNotificationClosed
+                                onClosed (notiStNextId state)
+               })
+              (fromIntegral (notiRepId newNoti))
+          })
+      let newNotiWithId = newNoti { notiId = newId
+                                  , notiOnClosed = emitNotificationClosed
+                                                   onClosed (notiStNextId state)
+                                  }
       if length notisToBeReplaced == 0 then
         insertNewNoti newNotiWithId tState
         else
@@ -233,8 +257,16 @@ hideAllNotis tState = do
     $ notiDisplayingList state
   return ()
 
+closeNotification tState id = do
+  state <- readTVarIO tState
+  let notis = filter (\n -> (notiId n) /= fromIntegral id) (notiStList state)
+  sequence $ (\noti -> addSource $ do notiOnClosed noti $ CloseByCall
+                                      return False) <$> notis
+  removeNotiFromDistList' tState id
+
+
 notificationDaemon :: (AutoMethod f1, AutoMethod f2) =>
-                      Config -> f1 -> f2 -> IO ()
+                      Config -> ((Signal -> IO ()) -> f1) -> f2 -> IO ()
 notificationDaemon config onNote onCloseNote = do
   putStrLn "notificationDaemon started"
   client <- connectSession
@@ -248,13 +280,13 @@ notificationDaemon config onNote onCloseNote = do
     , autoMethod "org.freedesktop.Notifications"
       "CloseNotification" onCloseNote
     , autoMethod "org.freedesktop.Notifications"
-      "Notify" onNote
+      "Notify" (onNote (emit client))
     ]
 
 startNotificationDaemon :: Config -> IO () ->  IO () ->  IO (TVar NotifyState)
 startNotificationDaemon config onUpdate onUpdateForMe = do
   istate <- newTVarIO $ NotifyState [] [] 1 onUpdate onUpdateForMe config []
   forkIO (notificationDaemon config (notify config istate)
-           (removeNotiFromDistList' istate))
+          (closeNotification istate))
   return istate
 
