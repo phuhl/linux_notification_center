@@ -29,14 +29,8 @@ Some applications, notification:
 Notification Center opened:
 [[file:README.org.img/org_20181203_164608_WqFdmO.jpg]]
 
-Markup support:
-[[file:README.org.img/org_20190320_221121_wUDPxO.jpg]]
-
-Link support:
-[[file:README.org.img/org_20190320_221421_VMMwYy.jpg]]
-
-Action support:
-[[file:README.org.img/org_20190320_221547_jT48UV.jpg]]
+Link, Markup and Action support:
+[[file:./README.org.img/more notifications.png]]
 
 ** Usage
 
