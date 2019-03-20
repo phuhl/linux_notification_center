@@ -35,8 +35,6 @@ import qualified Data.Map as Map
 import Data.Time
 import Data.Time.LocalTime
 
-import Text.XML.Light.Input (parseXML)
-
 import System.Locale.Read
 
 
@@ -67,9 +65,13 @@ getServerInformation =
           "0.0.1",
           "1.0")
 
-getCapabilities :: IO [Text]
-getCapabilities = return ["body", "body-markup", "hints", "persistence"
-                         , "body-hyperlinks"]
+getCapabilities :: Config -> IO [Text]
+getCapabilities config = return ( [ "body"
+                                , "hints"
+                                , "persistence"]
+                                  ++ if (configNotiMarkup config) then
+                                    [ "body-markup"
+                                    , "body-hyperlinks"] else [])
 
 parseUrgency hints =
   let urgency = (do v <- Map.lookup "urgency" hints
@@ -146,9 +148,6 @@ notify config tState appName replaceId icon summary body
             (configMatchingRules config)
       let newNotiWoIdModified = foldl (\noti (_, mod, _) -> mod noti)
             newNotiWithoutId matchingRules
-
-      -- Handle XML
-      let newNotiXMLHandled = parseXML 
 
       let newNoti = newNotiWoIdModified
 
@@ -235,8 +234,8 @@ hideAllNotis tState = do
   return ()
 
 notificationDaemon :: (AutoMethod f1, AutoMethod f2) =>
-                      f1 -> f2 -> IO ()
-notificationDaemon onNote onCloseNote = do
+                      Config -> f1 -> f2 -> IO ()
+notificationDaemon config onNote onCloseNote = do
   putStrLn "notificationDaemon started"
   client <- connectSession
   _ <- requestName client "org.freedesktop.Notifications"
@@ -245,7 +244,7 @@ notificationDaemon onNote onCloseNote = do
     [ autoMethod "org.freedesktop.Notifications"
       "GetServerInformation" getServerInformation
     , autoMethod "org.freedesktop.Notifications"
-      "GetCapabilities" getCapabilities
+      "GetCapabilities" (getCapabilities config)
     , autoMethod "org.freedesktop.Notifications"
       "CloseNotification" onCloseNote
     , autoMethod "org.freedesktop.Notifications"
@@ -255,7 +254,7 @@ notificationDaemon onNote onCloseNote = do
 startNotificationDaemon :: Config -> IO () ->  IO () ->  IO (TVar NotifyState)
 startNotificationDaemon config onUpdate onUpdateForMe = do
   istate <- newTVarIO $ NotifyState [] [] 1 onUpdate onUpdateForMe config []
-  forkIO (notificationDaemon (notify config istate)
+  forkIO (notificationDaemon config (notify config istate)
            (removeNotiFromDistList' istate))
   return istate
 
