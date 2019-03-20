@@ -66,7 +66,7 @@ import GI.GObject.Objects (IsObject(..), Object(..))
 import GI.GLib (idleSourceNew, sourceSetCallback, sourceAttach
                , sourceUnref, idleAdd, )
 import GI.GLib.Constants
-import GI.Cairo
+import GI.Cairo ()
 import Graphics.Rendering.Cairo
        (fill, restore, save, stroke, arc, setDash, setLineWidth, rotate
        , rectangle, setSourceRGBA, setSourceRGB, newPath, scale, translate

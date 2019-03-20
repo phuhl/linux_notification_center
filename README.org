@@ -266,9 +266,10 @@ yourself, you can do so with notify-send:
 notify-send --hint=int:transient:1 "My Caption" "My Body..."
 #+END_SRC
 
-** TODO Notification based scripting (#3, #6)
+** DONE Notification based scripting (#3, #6)
 :LOGBOOK:
-CLOCK: [2019-03-01 Fri 22:59]
+CLOCK: [2019-03-05 Tue 14:59]--[2019-03-05 Tue 15:20] =>  0:21
+CLOCK: [2019-03-01 Fri 22:59]--[2019-03-01 Fri 23:55] =>  0:56
 CLOCK: [2019-03-01 Fri 19:39]--[2019-03-01 Fri 22:43] =>  3:04
 :END:
 
@@ -311,3 +312,8 @@ match = "title=Abc;body=abc":"app=notify-send"
 modify = "transient=false"
 run = "":"killall notify-send"
 #+END_EXAMPLE
+
+** DONE Fixing build issue
+:LOGBOOK:
+CLOCK: [2019-03-20 Wed 13:11]--[2019-03-20 Wed 13:14] =>  0:03
+:END:
