@@ -32,6 +32,8 @@ data Notification = Notification
   , notiOnClosed :: CloseType -> IO ()
     -- ^ Should be called when the notification is closed, either by
     --   timeout or by user
+  , notiOnAction :: String -> IO ()
+    -- ^ Should be called when an action is used
   }
 
 data Config = Config

@@ -1,5 +1,5 @@
 name:                linux-notification-center
-version:             1.4.0
+version:             1.5.0
 -- synopsis:
 -- description:
 homepage:            https://github.com/phuhl/linux-notification-center#readme
@@ -21,6 +21,7 @@ library
                      , NotificationCenter.Notification.Glade
                      , NotificationCenter.Notifications
                      , NotificationCenter.Notifications.Data
+                     , NotificationCenter.Notifications.Action
                      , NotificationCenter.Notifications.Notification
                      , NotificationCenter.Notifications.Notification.Glade
                      , NotificationCenter.Glade

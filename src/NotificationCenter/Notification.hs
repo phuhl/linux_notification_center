@@ -12,6 +12,8 @@ import NotificationCenter.Notification.Glade (glade)
 import NotificationCenter.Notifications
   (NotifyState(..), Notification(..))
 import NotificationCenter.Notifications.Data (Urgency(..), Config(..))
+import NotificationCenter.Notifications.Action
+  (Action(..), createAction)
 
 import Data.List
 import qualified Data.Text as Text
@@ -35,6 +37,7 @@ data DisplayingNotificaton = DisplayingNotificaton
   , dLabelTime :: Gtk.Label
   , dButtonClose :: Gtk.Button
   , dContainer :: Gtk.Box
+  , dActions :: Gtk.Box
   }
 
 
@@ -60,7 +63,8 @@ showNotification config mainBox dNoti tNState closeNotification = do
     , "label_appname"
     , "label_time"
     , "img_icon"
-    , "button_close"]
+    , "button_close"
+    , "box_actions" ]
 
   labelTitel <- label objs "label_titel"
   labelBody <- label objs "label_body"
@@ -68,6 +72,7 @@ showNotification config mainBox dNoti tNState closeNotification = do
   labelTime <- label objs "label_time"
   buttonClose <- button objs "button_close"
   container <- box objs "box_container"
+  actions <- box objs "box_actions"
 
   let elemsLabel = [labelTitel, labelBody, labelAppname, labelTime]
   case (notiUrgency noti) of
@@ -88,6 +93,7 @@ showNotification config mainBox dNoti tNState closeNotification = do
                      , dLabelTime = labelTime
                      , dButtonClose = buttonClose
                      , dContainer = container
+                     , dActions = actions
                      }
 
   Gtk.containerAdd mainBox container
@@ -113,6 +119,16 @@ updateNoti config mainBox dNoti tNState = do
     labelSetText (dLabelTime dNoti) $ notiTime noti
     labelSetXalign (dLabelTitel dNoti) 0
     labelSetXalign (dLabelBody dNoti) 0
+    let takeTwo (a:b:cs) = (a,b):(takeTwo cs)
+        takeTwo _ = []
+    actionButtons <- sequence $ (
+      \(a, b) -> createAction config (notiOnAction noti) 20 20 a b)
+                     <$> takeTwo (Text.unpack <$> notiActions noti)
+    currentButtons <- Gtk.containerGetChildren (dActions dNoti)
+    sequence $ Gtk.containerRemove (dActions dNoti) <$> currentButtons
+    sequence $ Gtk.containerAdd (dActions dNoti) <$> actionButton <$> actionButtons
+    widgetShowAll (dActions dNoti)
+
     when (configNotiCenterNewFirst config)
       (Gtk.boxReorderChild mainBox (dContainer dNoti) 0)
     return False

@@ -12,6 +12,8 @@ import TransparentWindow
 import NotificationCenter.Notifications.Data
   (Urgency(..), CloseType(..), Config(..), Notification(..))
 import NotificationCenter.Notifications.Notification.Glade (glade)
+import NotificationCenter.Notifications.Action
+  (Action(..), createAction)
 
 import Data.Text as Text
 import Data.Word ( Word32 )
@@ -27,7 +29,8 @@ import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , onWidgetButtonPressEvent
               , setWidgetWidthRequest)
 import qualified GI.Gtk as Gtk
-  (IsWidget, Box(..), Label(..), Button(..), Window(..))
+  (IsWidget, Box(..), Label(..), Button(..), Window(..)
+  , containerAdd, containerRemove, containerGetChildren)
 
 import DBus ( Variant (..) )
 
@@ -47,6 +50,7 @@ data DisplayingNotificaton = DisplayingNotificaton
   , dLabelAppname :: Gtk.Label
   , dLabelBG :: Gtk.Label
   , dContainer :: Gtk.Box
+  , dActions :: Gtk.Box
   }
 
 showNotificationWindow :: Config -> Notification
@@ -62,7 +66,8 @@ showNotificationWindow config noti dispNotis onClose = do
     , "label_titel"
     , "label_body"
     , "label_appname"
-    , "label_background"]
+    , "label_background"
+    , "action_box" ]
     Nothing
 
   mainWindow <- window objs "main_window"
@@ -72,6 +77,7 @@ showNotificationWindow config noti dispNotis onClose = do
   labelAppname <- label objs "label_appname"
   labelBG <- label objs "label_background"
   container <- box objs "container_box"
+  actions <- box objs "action_box"
 
   setWidgetWidthRequest mainWindow $ fromIntegral $ configWidthNoti config
   let elemsLabel = [labelTitel, labelBody, labelAppname]
@@ -96,6 +102,7 @@ showNotificationWindow config noti dispNotis onClose = do
         , dLabelAppname = labelAppname
         , dLabelBG = labelBG
         , dContainer = container
+        , dActions = actions
         }
 
   height <- updateNoti' config onClose noti dNoti
@@ -131,6 +138,15 @@ updateNoti' config onClose noti dNoti  = do
   labelSetText (dLabelAppname dNoti) $ notiAppName noti
   labelSetXalign (dLabelTitel dNoti) 0
   labelSetXalign (dLabelBody dNoti) 0
+  let takeTwo (a:b:cs) = (a,b):(takeTwo cs)
+      takeTwo _ = []
+  actionButtons <- sequence $ (
+    \(a, b) -> createAction config (notiOnAction noti) 20 20 a b)
+                   <$> takeTwo (unpack <$> notiActions noti)
+  currentButtons <- Gtk.containerGetChildren (dActions dNoti)
+  sequence $ Gtk.containerRemove (dActions dNoti) <$> currentButtons
+  sequence $ Gtk.containerAdd (dActions dNoti) <$> actionButton <$> actionButtons
+  widgetShowAll (dActions dNoti)
   height <- getHeight (dContainer dNoti) config
   widgetSetSizeRequest (dLabelBG dNoti) (-1) height
   let notiDefaultTimeout = configNotiDefaultTimeout config

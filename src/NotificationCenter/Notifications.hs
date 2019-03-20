@@ -69,6 +69,7 @@ getServerInformation =
 getCapabilities :: Config -> IO [Text]
 getCapabilities config = return ( [ "body"
                                 , "hints"
+                                , "actions"
                                 , "persistence"]
                                   ++ if (configNotiMarkup config) then
                                     [ "body-markup"
@@ -76,16 +77,24 @@ getCapabilities config = return ( [ "body"
 
 emitNotificationClosed :: (Signal -> IO ()) -> Int -> CloseType -> IO ()
 emitNotificationClosed onClose id ctype = do
-  onClose ( (signal "/org/freedesktop/Notifications"
+  onClose $ (signal "/org/freedesktop/Notifications"
               "org.freedesktop.Notifications"
-              "NotificationClosed") {
-              signalBody = [ toVariant (fromIntegral id :: Word32)
-                           , toVariant (case ctype of
-                                          Timeout -> 1
-                                          User -> 2
-                                          CloseByCall -> 3
-                                          _ -> 4 :: Word32)]
-              })
+              "NotificationClosed")
+    { signalBody = [ toVariant (fromIntegral id :: Word32)
+                   , toVariant (case ctype of
+                                   Timeout -> 1
+                                   User -> 2
+                                   CloseByCall -> 3
+                                   _ -> 4 :: Word32)] }
+
+emitAction :: (Signal -> IO ()) -> Int -> String -> IO ()
+emitAction onAction id key = do
+  onAction $ (signal "/org/freedesktop/Notifications"
+               "org.freedesktop.Notifications"
+               "ActionInvoked")
+    { signalBody = [ toVariant (fromIntegral id :: Word32)
+                   , toVariant key] }
+
 
 parseUrgency hints =
   let urgency = (do v <- Map.lookup "urgency" hints
@@ -124,7 +133,7 @@ notify :: Config
        -> Map.Map Text Variant -- ^ Hints
        -> Int32 -- ^ Expires timeout (milliseconds)
        -> IO Word32
-notify config tState onClosed
+notify config tState emit
   appName replaceId icon summary body actions hints timeout = do
   state <- readTVarIO tState
   time <- getTime
@@ -178,14 +187,16 @@ notify config tState onClosed
               (newNoti
                { notiId = notiStNextId state
                , notiOnClosed = emitNotificationClosed
-                                onClosed (notiStNextId state)
-               })
+                                emit (notiStNextId state)
+               , notiOnAction = emitAction
+                                emit (notiStNextId state) })
               (fromIntegral (notiRepId newNoti))
           })
       let newNotiWithId = newNoti { notiId = newId
                                   , notiOnClosed = emitNotificationClosed
-                                                   onClosed (notiStNextId state)
-                                  }
+                                                   emit (notiStNextId state)
+                                  , notiOnAction = emitAction
+                                                   emit (notiStNextId state) }
       if length notisToBeReplaced == 0 then
         insertNewNoti newNotiWithId tState
         else
