@@ -30,7 +30,7 @@ Notification Center opened:
 [[file:README.org.img/org_20181203_164608_WqFdmO.jpg]]
 
 Link, Markup and Action support:
-[[file:./README.org.img/more notifications.png]]
+[[file:README.org.img/more notifications.png]]
 
 ** Usage
 
