@@ -128,4 +128,11 @@ CLOCK: [2019-03-20 Wed 14:10]--[2019-03-20 Wed 15:47] =>  1:37
 CLOCK: [2019-03-20 Wed 15:47]--[2019-03-20 Wed 17:41] =>  1:54
 :END:
 ** TODO Image support
+** TODO Bin-Package
+:LOGBOOK:
+CLOCK: [2019-03-25 Mon 12:32]
+:END:
+
+- No build time
+- No compilation issues
 
