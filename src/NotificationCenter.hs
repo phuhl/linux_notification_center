@@ -17,6 +17,10 @@ import NotificationCenter.Notifications.Data
 
 import Prelude
 
+import Text.I18N.GetText
+import System.Locale.SetLocale
+import System.IO.Unsafe
+
 import Data.Int (Int32(..))
 import Data.Tuple.Sequence (sequenceT)
 import Data.Maybe
@@ -46,7 +50,7 @@ import System.Directory (getHomeDirectory)
 import DBus ( fromVariant )
 
 import GI.Gtk
-       (widgetSetHalign, widgetSetHexpand, buttonNew, setWidgetMargin, buttonSetRelief, widgetSetSizeRequest, widgetShowAll, widgetShow, widgetHide, onWidgetDestroy
+       (buttonSetLabel, widgetSetHalign, widgetSetHexpand, buttonNew, setWidgetMargin, buttonSetRelief, widgetSetSizeRequest, widgetShowAll, widgetShow, widgetHide, onWidgetDestroy
        , windowSetDefaultSize, setWindowTitle, boxPackStart, boxNew
        , setWindowWindowPosition, WindowPosition(..), windowMove
        , frameSetShadowType, aspectFrameNew
@@ -144,7 +148,7 @@ createNotiCenter tState config = do
     displayList <- stDisplayingNotiList <$> readTVarIO tState
     mapM (removeNoti tState) displayList
     return ()
-
+  buttonSetLabel deleteButton $ Text.pack $ translate "Delete all"
 
   let buttons = zip
         (split $ removeOuterLetters $ configLabels config)
@@ -462,6 +466,8 @@ main' = do
   homeDir <- getHomeDirectory
   config <- getConfig <$> (readConfigFile
     (homeDir ++ "/.config/deadd/deadd.conf"))
+
+  initI18n
 
   istate <- getInitialState
   notiState <- startNotificationDaemon config

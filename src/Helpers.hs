@@ -7,6 +7,26 @@ import Data.Maybe (fromMaybe)
 import Data.Functor (fmap)
 --import Data.Sequence (drop)
 
+import Text.I18N.GetText (textDomain, bindTextDomain, getText)
+import System.Locale.SetLocale (setLocale, Category(LC_ALL))
+import System.IO.Unsafe (unsafePerformIO)
+import System.Environment (getExecutablePath)
+
+initI18n = do
+  setLocale LC_ALL (Just "")
+  mypath <- getExecutablePath
+  bindTextDomain "deadd-notification-center"
+    (Just ((reverse $ removeFromLastSlash (reverse mypath))
+            ++ "/../share/locale/"))
+  textDomain (Just "deadd-notification-center")
+
+removeFromLastSlash :: String -> String
+removeFromLastSlash ('/':as) = as
+removeFromLastSlash (a:as) = removeFromLastSlash as
+
+translate :: String -> String
+translate = unsafePerformIO . getText
+
 readConfig :: CF.Get_C a => a -> CF.ConfigParser -> String -> String -> a
 readConfig defaultVal conf sec opt = fromEither defaultVal
   $ fromEither (Right defaultVal) $ Error.runErrorT $ CF.get conf sec opt
