@@ -34,7 +34,8 @@ import Control.Monad.IO.Class (MonadIO(..))
 import Control.Concurrent (forkIO, threadDelay, ThreadId(..), killThread)
 
 import GI.Gtk
-       (styleContextRemoveClass, widgetShowAll, widgetHide, onWidgetDestroy, windowSetDefaultSize
+       (styleContextRemoveClass, widgetShowAll, widgetHide
+       , onWidgetDestroy, windowSetDefaultSize
        , setWindowTitle, boxPackStart, boxNew, setWindowWindowPosition
        , WindowPosition(..), windowMove
        , frameSetShadowType, aspectFrameNew
@@ -54,7 +55,7 @@ import GI.Gtk
        , onWidgetFocusOutEvent, onWidgetKeyReleaseEvent, widgetGetParentWindow
        , onWidgetRealize, styleContextAddProviderForScreen
        , cssProviderLoadFromData, cssProviderNew, styleContextAddClass
-       , widgetGetStyleContext)
+       , widgetGetStyleContext, CssProvider(..))
 import qualified GI.Gtk as Gtk
   (DrawingArea(..), unsafeCastTo, Window(..), IsWidget(..)
   , builderGetObject, builderAddFromString
