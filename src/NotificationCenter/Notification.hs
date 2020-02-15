@@ -7,6 +7,7 @@ module NotificationCenter.Notification
   , DisplayingNotificaton(..)
   ) where
 
+import Helpers (markupify)
 import TransparentWindow
 import NotificationCenter.Notification.Glade (glade)
 import NotificationCenter.Notifications
@@ -105,6 +106,7 @@ showNotification config mainBox dNoti tNState closeNotification = do
   widgetShowAll container
   return dNoti'
 
+
 updateNoti config mainBox dNoti tNState = do
   addSource $ do
     nState <- readTVarIO tNState
@@ -112,7 +114,7 @@ updateNoti config mainBox dNoti tNState = do
           $ notiStList nState
     labelSetText (dLabelTitel dNoti) $ notiSummary noti
     if (configNotiMarkup config) then do
-      labelSetMarkup (dLabelBody dNoti) $ notiBody noti
+      labelSetMarkup (dLabelBody dNoti) $ markupify $ notiBody noti
       else do
       labelSetText (dLabelBody dNoti) $ notiBody noti
     labelSetText (dLabelAppname dNoti) $ notiAppName noti
