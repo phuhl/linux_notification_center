@@ -8,6 +8,7 @@ module NotificationCenter.Notifications.Notification
   , DisplayingNotificaton(..)
   ) where
 
+import Helpers (markupify)
 import TransparentWindow
 import NotificationCenter.Notifications.Data
   (Urgency(..), CloseType(..), Config(..), Notification(..))
@@ -132,7 +133,7 @@ showNotificationWindow config noti dispNotis onClose = do
 updateNoti' config onClose noti dNoti  = do
   labelSetText (dLabelTitel dNoti) $ notiSummary noti
   if (configNotiMarkup config) then do
-      labelSetMarkup (dLabelBody dNoti) $ notiBody noti
+      labelSetMarkup (dLabelBody dNoti) $ markupify $ notiBody noti
       else do
       labelSetText (dLabelBody dNoti) $ notiBody noti
   labelSetText (dLabelAppname dNoti) $ notiAppName noti

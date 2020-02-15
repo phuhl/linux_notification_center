@@ -7,6 +7,7 @@ import Data.Maybe (fromMaybe)
 import Data.Functor (fmap)
 --import Data.Sequence (drop)
 
+import qualified Data.Text as Text
 import Text.I18N.GetText (textDomain, bindTextDomain, getText)
 import System.Locale.SetLocale (setLocale, Category(LC_ALL))
 import System.IO.Unsafe (unsafePerformIO)
@@ -73,3 +74,8 @@ splitEvery n as = (take n as) : (splitEvery n $ tailAt n as)
     tailAt n (a:as) = tailAt (n - 1) as
     tailAt _ [] = []
 
+markupify a = Text.pack $ markupify' $ Text.unpack a
+markupify' :: String -> String
+markupify' ('&':ls) = "&amp;" ++ (markupify' ls)
+markupify' (l:ls) = l:(markupify' ls)
+markupify' [] = []
