@@ -96,65 +96,214 @@ The configuration file must be located at
 
 #+BEGIN_EXAMPLE
 [notification-center]
+
+# Margin at the top of the notification center in pixels.  This can be
+# used to avoid overlap between the notification center and bars such
+# as polybar or i3blocks.
 marginTop = 0
+
+# Width of the notification center in pixels. 
 width = 500
+
+# Monitor on which the notification center will be printed.
 monitor = 0
-# optional command to run at startup (e.g. to setup button states)
-startupCommand = "deadd-notification-center-startup"
+
+# (Optional) Command to run at startup.  This can be used to setup
+# button states.
+# startupCommand = "deadd-notification-center-startup"
+
+# If newFirst is set to true, newest notifications appear on the top
+# of the notification center. Else, notifications stack, from top to
+# bottom.
 newFirst = true
-# If true, the transient field in notifications will be ignored and the
-# notification will be persisted in the notifiction center anyways
+
+# If true, the transient field in notifications will be ignored and
+# the notification will be persisted in the notifiction center anyways
 ignoreTransient = false
+
 # If true, markup (<u>, <i>, <b>, <a>) will be displayed properly
 useMarkup = true
+
+# If set to true, the parameter noClosedMsg can be set on
+# notifications. If noClosedMsg is set to true on a notification,
+# DBUS NotificationClosed messages will not be send for this
+# notification.
 configSendNotiClosedDbusMessage = false
 
 # See section "Notification based scripting" for an explenation
-match = "title=Abc;body=abc":"app=notify-send"
-modify = "transient=false"
-run = "":"killall notify-send"
+#match = "title=Abc;body=abc":"app=notify-send"
+#modify = "transient=false"
+#run = "":"killall notify-send"
 
 [notification-center-notification-popup]
+
+# Default timeout used for notifications in milli-seconds.  This can
+# be overwritten with the "-t" option (or "--expire-time") of the
+# notify-send command.
 notiDefaultTimeout = 10000
+
+# Margin above notifications (in pixels). This can be used to avoid
+# overlap between notifications and a bar such as polybar or i3blocks.
 distanceTop = 50
+
+# Margin on the right of the notification (in pixels).
 distanceRight = 50
+
+# Vertical distance between 2 notifications (in pixels).
 distanceBetween = 20
+
+# Width of the notifications.
 width = 300
+
+# Monitor on which the notification will be printed.
 monitor = 0
 
 [colors]
+# Note about colors: Colors can be represented in (at least, I mean,
+# who knows...) three different ways:
+#   1. #RGB with "R", "G" and "B" hexadecimal numbers (0-9, A-F or
+#      a-f).
+#   2. #RRGGBB with each occurence of "R", "G" and "B" are hexadecimal
+#      numbers (0-9, A-F or a-f).
+#   3. rgba(R, G, B, A) where "R", "G" and "B" are between 0 and 255
+#      and A is a floating point number between 0 and 1 representing
+#      the alpha channel (transparency).
+
+
+# Background color for the notification center.
 background = rgba(29, 27, 20, 0.6)
+
+# Background color for the notification popups.
 notiBackground = rgba(9, 0, 0, 0.5)
+
+# Color for the text (summary, body and application name) in
+# notification popups.
 notiColor = #fef3f6
+
+# Background color for "critical" notification popups.
 critical = rgba(255, 0, 50, 0.5)
+
+# Color for the text (summary, body and application name) in
+# "critical" notification popups.
 criticalColor = #FFF
+
+# Background color for "critical" notifications in notification
+# center.
 criticalInCenter = rgba(155, 0, 20, 0.5)
+
+# Color for the text (summary, body and application name) in
+# "critical" notification in notification center.
 criticalInCenterColor = #FFF
-buttonColor = #eae2e0
-buttonHover = rgba(0, 20, 20, 0.2)
-buttonHoverColor = #fee
-buttonBackground = transparent
+
+
+# Global text color
 labelColor = #eae2e0
 
-[buttons]
-buttonsPerRow = 5
-buttonHeight = 60
-buttonMargin = 2
-labels = "VPN":"Bluetooth":"Wifi":"Screensaver"
-commands = "sudo vpnToggle":"bluetoothToggle":"wifiToggle":"screensaverToggle"
-buttonColor = #fee
-buttonBackground = rgba(255, 255, 255, 0.15)
+### These button configurations are applied globaly (except they
+### get overwritten in the [buttons] section. The buttons section
+### only applies to the configurable buttons within the notification
+### center, while these configs also apply to the buttons within
+### notifications.)
+# Color for the text in the buttons.
+buttonColor = #eae2e0
+
+# Background color of button in hover state (mouse over)
 buttonHover = rgba(0, 20, 20, 0.2)
+
+# Text color of button in hover state (mouse over)
 buttonHoverColor = #fee
+
+# Background color of button
+buttonBackground = transparent
+
+[buttons]
+### This section describes the configurable buttons within the
+### notification center and NOT the buttons that appear in the
+### notifications
+
+# Note: If you want your buttons in the notification center to be
+#       squares you should verify that the following equality holds:
+#       [notification-center]::width
+#          == [buttons]::buttonsPerRow * [buttons]::buttonHeight
+#             + ([buttons]::buttonsPerRow + 1) * [buttons]::buttonMargin
+
+# Numbers of buttons that can be drawn on a row of the notification
+# center.
+buttonsPerRow = 5
+
+# Height of buttons in the notification center (in pixels).
+buttonHeight = 60
+
+# Horizontal and vertical margin between each button in the 
+# notification center (in pixels).
+buttonMargin = 2
+
+# Labels written on the buttons in the notification center.  Labels
+# should be written between quotes and separated by a colon. For
+# example:
+# labels = "VPN":"Bluetooth":"Wifi":"Screensaver"
+
+# Each label is represented as a clickable button in the notification
+# center. The commands variable below define the commands that should
+# be launched when the user clicks on the associated button.  There
+# should be the same number of entries in `commands` and in `labels`
+# commands = "sudo vpnToggle":"bluetoothToggle":"wifiToggle":"screensaverToggle"
+
+# Color of the labels of the custom buttons in the notification
+# center.
+buttonColor = #fee
+
+# Color of the custom buttons' background in the notification center.
+buttonBackground = rgba(255, 255, 255, 0.15)
+
+# Color of the custom buttons' background in the notification center
+# when hovered.
+buttonHover = rgba(0, 20, 20, 0.2)
+
+# Color of the labels of the custom buttons in the notification center
+# when hovered.
+buttonHoverColor = #fee
+
+# Text size of the custom buttons in the notification center.
 buttonTextSize = 12px;
 
+# Color of the custom buttons' background in the notification center
+# when its state is set to true as described in the Section Usage
 buttonState1 = rgba(255,255,255,0.5)
+
+# Color of the custom buttons' text in the notification center
+# when its state is set to true as described in the Section Usage
 buttonState1Color = #fff
+
+# Color of the custom buttons' background, hovering, in the
+# notification center when its state is set to true as described in
+# the Section Usage
 buttonState1Hover = rgba(0, 20, 20, 0.4)
+
+# Color of the custom buttons' text, hovering, in the
+# notification center when its state is set to true as described in
+# the Section Usage
 buttonState1HoverColor = #fee
+
+# Color of the custom buttons' background, in the notification center
+# when the button is clicked and not yet set to a new value via the
+# method as described in Section Usage
 buttonState2 = rgba(255,255,255,0.3)
+
+# Color of the custom buttons' text, in the notification center
+# when the button is clicked and not yet set to a new value via the
+# method as described in Section Usage
 buttonState2Color = #fff
+
+# Color of the custom buttons' background,
+# hovering, in the notification center when the button is clicked and
+# not yet set to a new value via the method as described in Section
+# Usage
 buttonState2Hover = rgba(0, 20, 20, 0.3)
+
+# Color of the custom buttons' text, hovering, in the notification
+# center when the button is clicked and not yet set to a new value via
+# the method as described in Section Usage
 buttonState2HoverColor = #fee
 #+END_EXAMPLE
 
