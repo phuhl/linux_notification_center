@@ -191,7 +191,12 @@ createNotiCenter tState config = do
     hideNotiCenter tState
     return True
 
-  --  (screenH, screenW) <- getScreenProportions mainWindow
+  setNotificationCenterPosition mainWindow config
+
+  onWidgetDestroy mainWindow mainQuit
+  return ()
+
+setNotificationCenterPosition mainWindow config = do
   (screenW, screenY, screenH) <- getScreenPos mainWindow
     (fromIntegral $ configNotiCenterMonitor config)
 
@@ -201,7 +206,6 @@ createNotiCenter tState config = do
   windowMove mainWindow
     (screenW - (fromIntegral $ configWidth config)) -- x
     (screenY + barHeight)  -- y
-  onWidgetDestroy mainWindow mainQuit
   return ()
     where barHeight = fromIntegral $ configBarHeight config
 
@@ -240,9 +244,10 @@ hideNotiCenter tState = do
     (\state -> state { stCenterShown = False })
 
 
-showNotiCenter tState notiState = do
+showNotiCenter tState notiState config = do
   state <- readTVarIO tState
   mainWindow <- stMainWindow <$> readTVarIO tState
+  setNotificationCenterPosition mainWindow config
   newShown <- if stCenterShown state then
     do
       widgetHide mainWindow
@@ -478,7 +483,7 @@ main' = do
   createNotiCenter istate config
 
   unixSignalAdd PRIORITY_HIGH (fromIntegral sigUSR1)
-    (showNotiCenter istate notiState)
+    (showNotiCenter istate notiState config)
 
   runCommand $ configStartupCommand config
 
