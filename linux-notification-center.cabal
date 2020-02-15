@@ -32,7 +32,7 @@ library
                      , TransparentWindow
                      , Helpers
   build-depends:       base >= 4.7 && < 5
-                     , gtk3             >= 0.15.0
+                     , gtk3 >= 0.15.4
                      , transformers
                      , cairo
                      , haskell-gi
