@@ -97,10 +97,17 @@ The configuration file must be located at
 #+BEGIN_EXAMPLE
 [notification-center]
 
-# Margin at the top of the notification center in pixels.  This can be
+# Margin at the top of the notification center in pixels. This can be
 # used to avoid overlap between the notification center and bars such
 # as polybar or i3blocks.
 marginTop = 0
+
+# Margin at the bottom of the notification center in pixels.
+marginBottom = 0
+
+# Margin to the right of the notification center in pixels.
+marginRight = 0
+
 
 # Width of the notification center in pixels. 
 width = 500

@@ -16,6 +16,7 @@ import NotificationCenter.Notifications.Notification
 import NotificationCenter.Notifications.Data
   (Urgency(..))
 import TransparentWindow
+import Config (Config(..))
 import NotificationCenter.Notifications.Data
 
 import Control.Concurrent (forkIO)
