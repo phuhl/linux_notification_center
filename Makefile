@@ -42,12 +42,18 @@ install-service: service
 	mkdir -p ${DESTDIR}${PREFIX}/share/dbus-1/services/
 	install -m644 com.ph-uhl.deadd.notification.service ${DESTDIR}${PREFIX}/share/dbus-1/services
 
-install: install-stack install-service
+install-lang:
+	mkdir -p ${DESTDIR}${PREFIX}/share/locale/{de,en}/LC_MESSAGES
+	install -m644 translation/de/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/de/LC_MESSAGES/deadd-notification-center.mo
+	install -m644 translation/en/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/en/LC_MESSAGES/deadd-notification-center.mo
+
+install: install-stack install-service install-lang
 
 uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/deadd-notification-center
 	rm -f ${DESTDIR}${MANPREFIX}/man1/deadd-notification-center.1
 	rm -f ${DESTDIR}${PREFIX}/share/dbus-1/services/com.ph-uhl.deadd.notification.service
 	rm -f ${DESTDIR}${PREFIX}/share/licenses/deadd-notification-center/LICENSE
+	rm -f ${DESTDIR}${PREFIX}/share/locale/{de,en}/LC_MESSAGES/deadd-notification-center.mo
 
 .PHONY: all clean install uninstall
