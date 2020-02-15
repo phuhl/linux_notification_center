@@ -12,7 +12,8 @@ import TransparentWindow
 import NotificationCenter.Notification.Glade (glade)
 import NotificationCenter.Notifications
   (NotifyState(..), Notification(..))
-import NotificationCenter.Notifications.Data (Urgency(..), Config(..))
+import Config (Config(..))
+import NotificationCenter.Notifications.Data (Urgency(..))
 import NotificationCenter.Notifications.Action
   (Action(..), createAction)
 

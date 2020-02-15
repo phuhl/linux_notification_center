@@ -6,7 +6,7 @@ module NotificationCenter.Button
   , Button(..)
   ) where
 
-import NotificationCenter.Notifications.Data
+import Config (Config(..))
 import TransparentWindow
 
 import GI.Gtk

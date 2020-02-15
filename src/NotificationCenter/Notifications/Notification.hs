@@ -10,8 +10,9 @@ module NotificationCenter.Notifications.Notification
 
 import Helpers (markupify)
 import TransparentWindow
+import Config (Config(..))
 import NotificationCenter.Notifications.Data
-  (Urgency(..), CloseType(..), Config(..), Notification(..))
+  (Urgency(..), CloseType(..), Notification(..))
 import NotificationCenter.Notifications.Notification.Glade (glade)
 import NotificationCenter.Notifications.Action
   (Action(..), createAction)
