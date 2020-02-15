@@ -46,7 +46,7 @@ import System.Process (runCommand)
 import System.Locale.Read
 import System.Posix.Signals (sigUSR1)
 import System.Posix.Daemonize (serviced, daemonize)
-import System.Directory (getHomeDirectory)
+import System.Directory (getXdgDirectory, XdgDirectory(..))
 
 import DBus ( fromVariant )
 
@@ -349,9 +349,9 @@ main' :: IO ()
 main' = do
   GI.init Nothing
 
-  homeDir <- getHomeDirectory
+  homeDir <- getXdgDirectory XdgConfig ""
   config <- getConfig <$> (readConfigFile
-    (homeDir ++ "/.config/deadd/deadd.conf"))
+                            (homeDir ++ "/deadd/deadd.conf"))
 
   initI18n
 
