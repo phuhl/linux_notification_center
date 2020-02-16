@@ -30,27 +30,16 @@
           </packing>
         </child>
         <child type="overlay">
-          <object class="GtkBox" id="container_box">
+          <object class="GtkBox" id="box_container">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="vexpand">True</property>
-            <child>
-              <object class="GtkImage">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
             <child>
               <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="valign">baseline</property>
-                <property name="margin_left">10</property>
+                <property name="margin_left">15</property>
                 <property name="margin_right">10</property>
                 <property name="vexpand">True</property>
                 <property name="orientation">vertical</property>
@@ -97,7 +86,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox" id="action_box">
+                  <object class="GtkBox" id="box_actions">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="halign">center</property>
@@ -119,22 +108,51 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="label_appname">
+                  <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="halign">end</property>
                     <property name="margin_bottom">8</property>
-                    <property name="label" translatable="yes">Appname</property>
-                    <style>
-                      <class name="notification"/>
-                      <class name="appname"/>
-                      <class name="deadd-noti-center"/>
-                    </style>
+                    <child>
+                      <object class="GtkImage" id="img_icon">
+                        <property name="width_request">10</property>
+                        <property name="height_request">10</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">end</property>
+                        <property name="valign">end</property>
+                        <property name="margin_right">10</property>
+                        <property name="icon_size">6</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="label_appname">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">end</property>
+                        <property name="label" translatable="yes">Appname</property>
+                        <style>
+                          <class name="notification"/>
+                          <class name="appname"/>
+                          <class name="deadd-noti-center"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">3</property>
+                    <property name="fill">False</property>
+                    <property name="position">4</property>
                   </packing>
                 </child>
               </object>

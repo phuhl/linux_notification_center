@@ -15,6 +15,9 @@ import DBus ( Variant (..), Signal )
 data Urgency = Normal | Low | High deriving Eq
 data CloseType = Timeout | User | CloseByCall | Other deriving Eq
 
+instance Eq Notification where
+  a == b = notiId a == notiId b
+
 data Notification = Notification
   { notiAppName :: Text -- ^ Application name
   , notiRepId :: Word32 -- ^ Replaces id

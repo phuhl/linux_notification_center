@@ -21,13 +21,14 @@ library
   hs-source-dirs:      src
   exposed-modules:     NotificationCenter
                      , Config
-                     , NotificationCenter.Notification
+                     , NotificationCenter.NotificationInCenter
                      , NotificationCenter.Button
                      , NotificationCenter.Notification.Glade
                      , NotificationCenter.Notifications
                      , NotificationCenter.Notifications.Data
                      , NotificationCenter.Notifications.Action
-                     , NotificationCenter.Notifications.Notification
+                     , NotificationCenter.Notifications.AbstractNotification
+                     , NotificationCenter.Notifications.NotificationPopup
                      , NotificationCenter.Notifications.Notification.Glade
                      , NotificationCenter.Glade
                      , TransparentWindow
@@ -62,6 +63,7 @@ library
                      , split
                      , setlocale
                      , hgettext >= 0.1.5
+                     , lens
   default-language:    Haskell2010
 
 executable deadd-notification-center

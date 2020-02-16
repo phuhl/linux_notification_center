@@ -3,18 +3,16 @@
 module NotificationCenter.Notifications
   ( startNotificationDaemon
   , NotifyState(..)
-  , Notification(..)
   , hideAllNotis
   ) where
 
-import NotificationCenter.Notifications.Notification
+import NotificationCenter.Notifications.NotificationPopup
   ( showNotificationWindow
   , updateNoti
-  , Notification(..)
-  , DisplayingNotificaton(..)
+  , DisplayingNotificationPopup(..)
   )
 import NotificationCenter.Notifications.Data
-  (Urgency(..))
+  (Urgency(..), Notification(..))
 import TransparentWindow
 import Config (Config(..))
 import NotificationCenter.Notifications.Data
@@ -43,7 +41,7 @@ import System.Locale.Read
 data NotifyState = NotifyState
   { notiStList :: [ Notification ]
     -- ^ List of all notis
-  , notiDisplayingList :: [ DisplayingNotificaton ]
+  , notiDisplayingList :: [ DisplayingNotificationPopup ]
     -- ^ List of all notis getting displayed as popup
   , notiStNextId :: Int
     -- ^ Id for the next noti
@@ -179,7 +177,7 @@ notify config tState emit
 
       let newNoti = newNotiWoIdModified
 
-      let notisToBeReplaced = filter (\n -> dNotiId n ==
+      let notisToBeReplaced = filter (\n -> _dNotiId n ==
                                        fromIntegral (notiRepId newNoti))
                               $ notiDisplayingList state
       newId <- atomically $ stateTVar tState
@@ -220,11 +218,11 @@ replaceNoti newNoti tState = do
   addSource $ do
     atomically $ modifyTVar tState $ \state ->
       state { notiDisplayingList = map
-              (\n -> if dNotiId n /= repId then n
-                     else n { dNotiId = notiId newNoti } )
+              (\n -> if _dNotiId n /= repId then n
+                     else n { _dNotiId = notiId newNoti } )
               $ notiDisplayingList state}
     state <- readTVarIO tState
-    let notis = filter (\n -> dNotiId n == notiId newNoti)
+    let notis = filter (\n -> _dNotiId n == notiId newNoti)
                 $ notiDisplayingList state
     mapM (updateNoti (notiConfig state)
            (removeNotiFromDistList tState $ notiId newNoti)
@@ -258,17 +256,17 @@ removeNotiFromDistList tState id = do
   state <- readTVarIO tState
   atomically $ modifyTVar' tState $ \state ->
     state { notiDisplayingList =
-              filter (\n -> (dNotiId n) /= id)
+              filter (\n -> (_dNotiId n) /= id)
               (notiDisplayingList state)}
   addSource $ do
-    let mDn = find (\n -> dNotiId n == id) $ notiDisplayingList state
-    maybe (return ()) dNotiDestroy mDn
+    let mDn = find (\n -> _dNotiId n == id) $ notiDisplayingList state
+    maybe (return ()) _dNotiDestroy mDn
     return False
   return ()
 
 hideAllNotis tState = do
   state <- readTVarIO tState
-  mapM (removeNotiFromDistList tState . dNotiId)
+  mapM (removeNotiFromDistList tState . _dNotiId)
     $ notiDisplayingList state
   return ()
 
