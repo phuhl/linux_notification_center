@@ -15,7 +15,7 @@
 .stack-work/
 
 com.ph-uhl.deadd.notification.service
-deadd.notification.systemd.service
+deadd-notification-center.service
 
 pkg/
 !pkg/PKGBUILD
