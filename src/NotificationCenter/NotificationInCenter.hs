@@ -30,7 +30,8 @@ import Control.Concurrent.STM
 
 
 import qualified GI.Gtk as Gtk
-  (widgetShowAll, onButtonClicked, boxReorderChild, containerAdd, builderAddFromString, widgetDestroy
+  (widgetShowAll, onButtonClicked, boxReorderChild, containerAdd
+  , builderAddFromString, widgetDestroy, labelSetText
   , builderNew, Button(..), Label(..), Box(..))
 
 data DisplayingNotificationInCenter = DisplayingNotificationInCenter
@@ -99,6 +100,7 @@ updateNoti config mainBox dNoti tNState = do
           $ notiStList nState
 
     updateNotiContent config noti dNoti
+    Gtk.labelSetText (_dLabelTime dNoti) $ notiTime noti
 
     when (configNotiCenterNewFirst config)
       (Gtk.boxReorderChild mainBox (view dContainer dNoti) 0)

@@ -12,28 +12,30 @@ import NotificationCenter.Notifications.NotificationPopup
   , DisplayingNotificationPopup(..)
   )
 import NotificationCenter.Notifications.Data
-  (Urgency(..), Notification(..))
+  (Urgency(..), Notification(..), Image(..), parseImageString)
 import TransparentWindow
 import Config (Config(..))
 import NotificationCenter.Notifications.Data
 
+import Control.Applicative ((<|>))
 import Control.Concurrent (forkIO)
 import Control.Concurrent.STM
   (readTVarIO, stateTVar, modifyTVar, modifyTVar', TVar(..),
    atomically, newTVarIO)
 
-import DBus (Variant(..), fromVariant, signal, toVariant)
+import DBus (Variant(..), Structure(..), fromVariant, signal, toVariant, variantType)
 import DBus.Internal.Message (Signal(..))
 import DBus.Client
        ( connectSession, AutoMethod(..), autoMethod, requestName, export
        , nameAllowReplacement, nameReplaceExisting, emit)
-import Data.Text (unpack,  Text, pack )
+import Data.Text (unpack, Text, pack )
 import Data.Word ( Word, Word8, Word32 )
 import Data.Int ( Int32 )
 import Data.List
 import qualified Data.Map as Map
 import Data.Time
 import Data.Time.LocalTime
+import Data.Maybe (fromMaybe)
 
 import System.Locale.Read
 
@@ -69,7 +71,10 @@ getCapabilities :: Config -> IO [Text]
 getCapabilities config = return ( [ "body"
                                 , "hints"
                                 , "actions"
-                                , "persistence"]
+                                , "persistence"
+                                , "icon-static"
+                                , "action-icons"
+                                , "body-images" ]
                                   ++ if (configNotiMarkup config) then
                                     [ "body-markup"
                                     , "body-hyperlinks"] else [])
@@ -90,6 +95,7 @@ emitNotificationClosed doSend onClose id ctype =
 
 emitAction :: (Signal -> IO ()) -> Int -> String -> IO ()
 emitAction onAction id key = do
+  putStrLn key
   onAction $ (signal "/org/freedesktop/Notifications"
                "org.freedesktop.Notifications"
                "ActionInvoked")
@@ -97,15 +103,16 @@ emitAction onAction id key = do
                    , toVariant key] }
 
 
+parseActionIcons hints =
+  fromMaybe False $ (fromVariant =<< Map.lookup "action-icons" hints :: Maybe Bool)
+
 parseUrgency hints =
-  let urgency = (do v <- Map.lookup "urgency" hints
-                    fromVariant v) :: Maybe Word8
-  in
-    case urgency of
-      (Just 0) -> Low
-      Nothing  -> Normal
-      (Just 1) -> Normal
-      (Just 2) -> High
+  let urgency = fromVariant =<< Map.lookup "urgency" hints :: Maybe Word8
+  in case urgency of
+       (Just 0) -> Low
+       Nothing  -> Normal
+       (Just 1) -> Normal
+       (Just 2) -> High
 
 
 parseTransient :: Map.Map Text Variant -> Bool
@@ -114,6 +121,19 @@ parseTransient hints =
   in case transient of
     Nothing -> False
     (Just b) -> True
+
+parseIcon :: Map.Map Text Variant -> Text -> Image
+parseIcon hints icon =
+  parseImageString icon
+
+parseImg :: Map.Map Text Variant -> Image
+parseImg hints =
+  fromMaybe NoImage
+  $ fromImageData <|> fromImagePath <|> fromIcon
+  where
+    fromIcon = RawImg <$> (fromVariant =<< Map.lookup "icon_data" hints)
+    fromImageData = RawImg <$> (fromVariant =<< Map.lookup "image-data" hints)
+    fromImagePath = ImagePath <$> (fromVariant =<< Map.lookup "image-path" hints)
 
 getTime = do
   now <- zonedTimeToLocalTime <$> getZonedTime
@@ -145,10 +165,12 @@ notify config tState emit
         -- in order to not create a race condition this can not be
         -- done, instead it is handled lower done
         , notiId = 0
-        , notiIcon = icon
+        , notiIcon = parseIcon hints icon
+        , notiImg = parseImg hints
         , notiSummary = summary
         , notiBody = body
         , notiActions = actions
+        , notiActionIcons = parseActionIcons hints
         , notiHints = hints
         , notiUrgency = parseUrgency hints
         , notiTimeout = timeout
@@ -156,6 +178,7 @@ notify config tState emit
         , notiTransient = parseTransient hints
         , notiSendClosedMsg = (configSendNotiClosedDbusMessage config)
         }
+
 
   if Map.member (pack "deadd-notification-center")
     $ notiHints newNotiWithoutId
