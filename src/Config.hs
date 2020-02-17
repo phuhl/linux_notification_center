@@ -149,8 +149,7 @@ getConfig p =
                           [ ("title", notiSummary)
                           , ("body", notiBody)
                           , ("app", notiAppName)
-                          , ("time", notiTime)
-                          , ("icon", notiIcon) ]) <*> (Just noti))
+                          , ("time", notiTime) ]) <*> (Just noti))
                       matcherFunction conditions = \noti -> foldl (
                         \matches (k:v:[]) -> matches && ((v == lookupFun k noti)))
                                                       True (keys conditions)
@@ -163,7 +162,7 @@ getConfig p =
                                 | k == "body" = noti { notiBody = Text.pack v }
                                 | k == "app" = noti { notiAppName = Text.pack v }
                                 | k == "time" = noti { notiTime = Text.pack v }
-                                | k == "icon" = noti { notiIcon = Text.pack v }
+--                                | k == "icon" = noti { notiIcon = Text.pack v }
                                 | k == "transient" && v == "true" = noti { notiTransient = True }
                                 | k == "transient" && v == "false" = noti { notiTransient = False }
                                 | k == "noClosedMsg" && v == "true" = noti { notiSendClosedMsg = False }

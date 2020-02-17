@@ -13,7 +13,7 @@ module NotificationCenter.Notifications.AbstractNotification
 import Helpers (markupify)
 import Config (Config(..))
 import NotificationCenter.Notifications.Data
-  (Urgency(..), CloseType(..), Notification(..))
+  (Urgency(..), CloseType(..), Notification(..), Image(..), rawImgToPixBuf)
 import NotificationCenter.Notifications.Action
   (Action(..), createAction)
 import TransparentWindow (label, image, box, getObjs, addClass)
@@ -29,7 +29,9 @@ import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , labelSetXalign, widgetGetPreferredHeightForWidth
               , onWidgetButtonPressEvent, imageSetFromPixbuf
               , imageSetFromIconName, setWidgetWidthRequest)
-import GI.GdkPixbuf (Pixbuf(..), pixbufNewFromFileAtScale)
+import GI.GdkPixbuf (pixbufScaleSimple, pixbufGetHeight, pixbufGetWidth
+                    , Pixbuf(..), pixbufNewFromFileAtScale
+                    , InterpType(..))
 import qualified GI.Gtk as Gtk
   (IsWidget, Box(..), Label(..), Button(..), Window(..), Image(..)
   , Builder(..), containerAdd, containerRemove, containerGetChildren)
@@ -39,6 +41,7 @@ data DisplayingNotificationContent = DisplayingNotificationContent
   , _dLabelBody :: Gtk.Label
   , _dLabelAppname :: Gtk.Label
   , _dImgAppIcon :: Gtk.Image
+  , _dImgImage :: Gtk.Image
   , _dContainer :: Gtk.Box
   , _dActions :: Gtk.Box
   }
@@ -54,6 +57,7 @@ createNotification config builder noti dispNoti = do
                           , "label_body"
                           , "label_appname"
                           , "img_icon"
+                          , "img_img"
                           , "box_container"
                           , "box_actions"]
 
@@ -63,13 +67,20 @@ createNotification config builder noti dispNoti = do
   container <- box objs "box_container"
   actions <- box objs "box_actions"
   imgAppIcon <- image objs "img_icon"
+  imgImage <- image objs "img_img"
+
+  onWidgetButtonPressEvent container $ \(_) -> do
+    putStrLn "NNOOOW"
+    notiOnAction noti "default"
+    return False
+
 
   return
     $ set dLabelTitel labelTitel
-
     $ set dLabelBody labelBody
     $ set dLabelAppname labelAppname
     $ set dImgAppIcon imgAppIcon
+    $ set dImgImage imgImage
     $ set dContainer container
     $ set dActions actions
     dispNoti
@@ -97,20 +108,39 @@ updateNotiContent config noti dNoti = do
   labelSetText (view dLabelAppname dNoti) $ notiAppName noti
   labelSetXalign (view dLabelTitel dNoti) 0
   labelSetXalign (view dLabelBody dNoti) 0
-  if (Text.isPrefixOf "file://" $ notiIcon noti) then do
-    pb <- pixbufNewFromFileAtScale
-      (Text.unpack $ Text.drop 6 $ notiIcon noti)
-      15 15 True
-    imageSetFromPixbuf (view dImgAppIcon dNoti) (Just pb)
-    else do
-    imageSetFromIconName (view dImgAppIcon dNoti)
-      (Just $ notiIcon noti) 10
+  let iconSize = 15
+      imageSize = 100
+  case notiIcon noti of
+    NoImage -> return ()
+    (ImagePath path) -> do
+      pb <- pixbufNewFromFileAtScale path iconSize iconSize True
+      imageSetFromPixbuf (view dImgAppIcon dNoti) (Just pb)
+    (NamedIcon name) -> do
+      imageSetFromIconName (view dImgAppIcon dNoti)
+        (Just $ pack name) iconSize
+    (RawImg a) -> do
+      pb <- rawImgToPixBuf $ RawImg a
+      pb' <- scalePixbuf iconSize iconSize pb
+      imageSetFromPixbuf (view dImgAppIcon dNoti) pb'
+  case notiImg noti of
+    NoImage -> return ()
+    (ImagePath path) -> do
+      pb <- pixbufNewFromFileAtScale path imageSize imageSize True
+      imageSetFromPixbuf (view dImgImage dNoti) (Just pb)
+    (NamedIcon name) -> do
+      imageSetFromIconName (view dImgImage dNoti)
+        (Just $ pack name) imageSize
+    (RawImg a) -> do
+      pb <- rawImgToPixBuf $ RawImg a
+      pb' <- scalePixbuf imageSize imageSize pb
+      imageSetFromPixbuf (view dImgImage dNoti) pb'
 
   let takeTwo (a:b:cs) = (a,b):(takeTwo cs)
       takeTwo _ = []
-  actionButtons <- sequence $ (
-    \(a, b) -> createAction config (notiOnAction noti) 20 20 a b)
-                   <$> takeTwo (unpack <$> notiActions noti)
+  actionButtons <- sequence
+    $ (\(a, b) -> createAction config (notiActionIcons noti) (notiOnAction noti) 20 20 a b)
+    <$> (Prelude.filter (\(a, b) -> a /= "default")
+         $ takeTwo (unpack <$> notiActions noti))
   currentButtons <- Gtk.containerGetChildren (view dActions dNoti)
   sequence $ Gtk.containerRemove (view dActions dNoti) <$> currentButtons
   sequence $ Gtk.containerAdd (view dActions dNoti) <$> actionButton <$> actionButtons
@@ -118,3 +148,17 @@ updateNotiContent config noti dNoti = do
   widgetShowAll (view dActions dNoti)
 
   return ()
+
+
+scalePixbuf :: Int32 -> Int32 -> Pixbuf -> IO (Maybe Pixbuf)
+scalePixbuf w h pb = do
+  oldW <- fromIntegral <$> pixbufGetWidth pb :: IO Double
+  oldH <- fromIntegral <$> pixbufGetHeight pb :: IO Double
+
+  let targetW = fromIntegral w :: Double
+      targetH = fromIntegral h :: Double
+      newW = fromIntegral $ floor $ if oldW > oldH then
+        targetW else (oldW * (targetH / oldH))
+      newH = fromIntegral $ floor $ if oldW > oldH then
+        (oldH * (targetW / oldW)) else targetH
+  pixbufScaleSimple pb newW newH InterpTypeBilinear

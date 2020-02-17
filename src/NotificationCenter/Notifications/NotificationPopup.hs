@@ -102,6 +102,7 @@ showNotificationWindow config noti dispNotis onClose = do
     hBefore
 
   onWidgetButtonPressEvent mainWindow $ \(_) -> do
+    notiOnAction noti "default"
     notiOnClosed noti $ User
     onClose
     return False

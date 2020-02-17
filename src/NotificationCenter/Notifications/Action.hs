@@ -29,7 +29,8 @@ import GI.Gtk
        , setAboutDialogProgramName, aboutDialogNew, labelNew, get
        , afterWindowSetFocus, labelSetText
        , onWidgetFocusOutEvent, onWidgetKeyReleaseEvent, widgetGetParentWindow
-       , onButtonClicked, windowGetScreen, boxNew, widgetSetValign)
+       , onButtonClicked, windowGetScreen, boxNew, widgetSetValign
+       , imageNewFromIconName)
 import GI.Gtk.Enums
        (Orientation(..), PositionType(..), ReliefStyle(..), Align(..))
 
@@ -40,16 +41,13 @@ import System.Process (runCommand)
 data Action = Action
   { actionButton :: Gtk.Button
     -- ^ Button Element for displaying
-  , actionLabel :: Gtk.Label
-    -- ^ Description text label
   , actionCommand :: String
     -- ^ Shell command to execute
   }
 
-createAction :: Config -> (String -> IO ()) -> Int -> Int -> String -> String -> IO Action
-createAction config onAction width height command description = do
+createAction :: Config -> Bool -> (String -> IO ()) -> Int -> Int -> String -> String -> IO Action
+createAction config useIcons onAction width height command description = do
   button <- buttonNew
-  label <- labelNew $ Just $ Text.pack description
   widgetSetSizeRequest button (fromIntegral width) (fromIntegral height)
   addClass button "userbutton"
   addClass button "deadd-noti-center"
@@ -57,15 +55,19 @@ createAction config onAction width height command description = do
   setWidgetMargin button $ fromIntegral $ configButtonMargin config
 --  widgetSetHalign label AlignStart
 --  widgetSetValign label AlignEnd
-  addClass label "userbuttonlabel"
-  addClass label "deadd-noti-center"
 
   let theButton = Action
         { actionButton = button
-        , actionLabel = label
         , actionCommand = command }
   onButtonClicked button $ do
     onAction command
     return ()
-  Gtk.containerAdd button label
+  if useIcons then do
+    img <-imageNewFromIconName (Just $ Text.pack description) 10
+    Gtk.containerAdd button img
+  else do
+    label <- labelNew $ Just $ Text.pack description
+    addClass label "userbuttonlabel"
+    addClass label "deadd-noti-center"
+    Gtk.containerAdd button label
   return theButton
