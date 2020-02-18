@@ -6,6 +6,8 @@ module NotificationCenter.Notifications
   , hideAllNotis
   ) where
 
+import Helpers (trim, isPrefix, splitOn, atMay, eitherToMaybe)
+
 import NotificationCenter.Notifications.NotificationPopup
   ( showNotificationWindow
   , updateNoti
@@ -28,7 +30,9 @@ import DBus.Internal.Message (Signal(..))
 import DBus.Client
        ( connectSession, AutoMethod(..), autoMethod, requestName, export
        , nameAllowReplacement, nameReplaceExisting, emit)
+import Data.Char (toLower)
 import Data.Text (unpack, Text, pack )
+import qualified Data.Text as Text
 import Data.Word ( Word, Word8, Word32 )
 import Data.Int ( Int32 )
 import Data.List
@@ -38,7 +42,11 @@ import Data.Time.LocalTime
 import Data.Maybe (fromMaybe)
 
 import System.Locale.Read
+import System.IO (readFile)
+import System.IO.Error (tryIOError)
 
+import GI.Gio.Interfaces.AppInfo (appInfoCreateFromCommandline, appInfoGetIcon)
+import GI.Gio.Interfaces.Icon (iconToString)
 
 data NotifyState = NotifyState
   { notiStList :: [ Notification ]
@@ -69,12 +77,12 @@ getServerInformation =
 
 getCapabilities :: Config -> IO [Text]
 getCapabilities config = return ( [ "body"
-                                , "hints"
-                                , "actions"
-                                , "persistence"
-                                , "icon-static"
-                                , "action-icons"
-                                , "body-images" ]
+                                  , "hints"
+                                  , "actions"
+                                  , "persistence"
+                                  , "icon-static"
+                                  , "action-icons"
+                                  , "body-images" ]
                                   ++ if (configNotiMarkup config) then
                                     [ "body-markup"
                                     , "body-hyperlinks"] else [])
@@ -122,9 +130,36 @@ parseTransient hints =
     Nothing -> False
     (Just b) -> True
 
-parseIcon :: Map.Map Text Variant -> Text -> Image
-parseIcon hints icon =
-  parseImageString icon
+getDesktopFile :: String -> IO (Maybe String)
+getDesktopFile name = do
+  putStrLn name
+  [try1, try2, try3] <- sequence [ getIt "~/.local/share/applications/"
+                                 , getIt "/usr/local/share/applications/"
+                                 , getIt "/usr/share/applications/"]
+  return $ try1 <|> try2 <|> try3
+  where getIt path = eitherToMaybe <$>
+          (tryIOError $ readFile $ path ++ name ++ ".desktop")
+
+getIconFromDesktopFile :: String -> Image
+getIconFromDesktopFile w =
+  fromMaybe NoImage $ imgFromString
+  <$> (trim <$> ((flip atMay 1) =<< splitOn '='
+                 <$> (filter (isPrefix "Icon") $ trim <$> lines w) `atMay` 0))
+  where imgFromString w = if isPrefix "/" w then
+          ImagePath w else NamedIcon w
+
+parseIcon :: Map.Map Text Variant -> Text -> Text -> IO Image
+parseIcon hints icon appName =
+  if (Text.length icon) > 0 then do
+    return $ parseImageString icon
+    else
+    let mFileName = fromVariant =<< Map.lookup "desktop-entry" hints
+    in do
+      mIconName <- iconToString =<< appInfoGetIcon
+        =<< appInfoCreateFromCommandline [] (Just $ fromMaybe appName mFileName) []
+      return $ case mIconName  of
+        Nothing -> NoImage
+        (Just name) -> NamedIcon $ Text.unpack name
 
 parseImg :: Map.Map Text Variant -> Image
 parseImg hints =
@@ -158,6 +193,7 @@ notify config tState emit
   appName replaceId icon summary body actions hints timeout = do
   state <- readTVarIO tState
   time <- getTime
+  icon <- parseIcon hints icon appName
   let newNotiWithoutId = Notification
         { notiAppName = appName
         , notiRepId = replaceId
@@ -165,7 +201,7 @@ notify config tState emit
         -- in order to not create a race condition this can not be
         -- done, instead it is handled lower done
         , notiId = 0
-        , notiIcon = parseIcon hints icon
+        , notiIcon = icon
         , notiImg = parseImg hints
         , notiSummary = summary
         , notiBody = body
@@ -179,6 +215,9 @@ notify config tState emit
         , notiSendClosedMsg = (configSendNotiClosedDbusMessage config)
         }
 
+  putStrLn ""
+  putStrLn $ "Hints: " ++ (show $ Map.keys $ notiHints newNotiWithoutId)
+  putStrLn $ "Icon: " ++ (show $ notiIcon newNotiWithoutId)
 
   if Map.member (pack "deadd-notification-center")
     $ notiHints newNotiWithoutId

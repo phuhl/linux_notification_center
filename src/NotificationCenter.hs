@@ -27,7 +27,6 @@ import Data.Tuple.Sequence (sequenceT)
 import Data.Maybe
 import Data.IORef
 import Data.List
-import Data.List.Split (splitOn)
 import Data.Time
 import Data.Time.LocalTime
 import qualified Data.Text as Text
@@ -195,6 +194,7 @@ createNotiCenter tState config = do
   setNotificationCenterPosition mainWindow config
 
   onWidgetDestroy mainWindow mainQuit
+
   return ()
 
 setNotificationCenterPosition mainWindow config = do
