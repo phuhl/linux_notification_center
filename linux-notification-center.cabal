@@ -44,6 +44,7 @@ library
                      , gi-gdk
                      , gi-gdkpixbuf
                      , gi-gtk >= 3.0.19
+                     , gi-gio
                      , time
                      , system-locale
                      , gi-gobject

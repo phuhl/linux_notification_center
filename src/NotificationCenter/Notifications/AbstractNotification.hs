@@ -28,7 +28,8 @@ import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , labelSetText, labelSetMarkup, widgetSetSizeRequest
               , labelSetXalign, widgetGetPreferredHeightForWidth
               , onWidgetButtonPressEvent, imageSetFromPixbuf
-              , imageSetFromIconName, setWidgetWidthRequest)
+              , imageSetFromIconName, setWidgetWidthRequest
+              , setImageUseFallback)
 import GI.GdkPixbuf (pixbufScaleSimple, pixbufGetHeight, pixbufGetWidth
                     , Pixbuf(..), pixbufNewFromFileAtScale
                     , InterpType(..))
@@ -118,6 +119,7 @@ updateNotiContent config noti dNoti = do
     (NamedIcon name) -> do
       imageSetFromIconName (view dImgAppIcon dNoti)
         (Just $ pack name) iconSize
+      setImageUseFallback (view dImgAppIcon dNoti) True
     (RawImg a) -> do
       pb <- rawImgToPixBuf $ RawImg a
       pb' <- scalePixbuf iconSize iconSize pb
@@ -130,6 +132,7 @@ updateNotiContent config noti dNoti = do
     (NamedIcon name) -> do
       imageSetFromIconName (view dImgImage dNoti)
         (Just $ pack name) imageSize
+      setImageUseFallback (view dImgAppIcon dNoti) True
     (RawImg a) -> do
       pb <- rawImgToPixBuf $ RawImg a
       pb' <- scalePixbuf imageSize imageSize pb
@@ -154,11 +157,13 @@ scalePixbuf :: Int32 -> Int32 -> Pixbuf -> IO (Maybe Pixbuf)
 scalePixbuf w h pb = do
   oldW <- fromIntegral <$> pixbufGetWidth pb :: IO Double
   oldH <- fromIntegral <$> pixbufGetHeight pb :: IO Double
-
   let targetW = fromIntegral w :: Double
       targetH = fromIntegral h :: Double
-      newW = fromIntegral $ floor $ if oldW > oldH then
-        targetW else (oldW * (targetH / oldH))
-      newH = fromIntegral $ floor $ if oldW > oldH then
-        (oldH * (targetW / oldW)) else targetH
-  pixbufScaleSimple pb newW newH InterpTypeBilinear
+  if (oldW < targetW || oldH < targetH) then
+    return (Just pb)
+    else do
+    let newW = fromIntegral $ floor $ if oldW > oldH then
+          targetW else (oldW * (targetH / oldH))
+        newH = fromIntegral $ floor $ if oldW > oldH then
+          (oldH * (targetW / oldW)) else targetH
+    pixbufScaleSimple pb newW newH InterpTypeBilinear

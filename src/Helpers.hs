@@ -46,6 +46,9 @@ fromEither a e = case e of
   Left _ -> a
   Right x -> x
 
+eitherToMaybe :: Either a b -> Maybe b
+eitherToMaybe (Right b) = Just b
+eitherToMaybe _ = Nothing
 
 replace a b c = replace' c a b
 replace' :: Eq a => [a] -> [a] -> [a] -> [a]
@@ -61,6 +64,28 @@ split ('"':':':'"':ds) = "" : split ds
 split (a:[]) = [[a]]
 split (a:bs) = (a:(split bs !! 0)): (tail $ split bs)
 split [] = []
+
+splitOn :: Char -> String -> [String]
+splitOn c s = case rest of
+                []     -> [chunk]
+                _:rest -> chunk : splitOn c rest
+  where (chunk, rest) = break (==c) s
+
+
+trimFront :: String -> String
+trimFront (' ':ss) = trimFront ss
+trimFront ss = ss
+
+trimBack :: String -> String
+trimBack = reverse . trimFront . reverse
+
+trim :: String -> String
+trim = trimBack . trimFront
+
+isPrefix :: String -> String -> Bool
+isPrefix (a:pf) (b:s) = a == b && isPrefix pf s
+isPrefix [] _ = True
+isPrefix _ _ = False
 
 removeOuterLetters (a:as) = reverse $ tail $ reverse as
 removeOuterLetters [] = []
@@ -79,3 +104,9 @@ markupify' :: String -> String
 markupify' ('&':ls) = "&amp;" ++ (markupify' ls)
 markupify' (l:ls) = l:(markupify' ls)
 markupify' [] = []
+
+atMay :: [a] -> Int -> Maybe a
+atMay ls i = if length ls > i then
+  Just $ ls !! i else Nothing
+
+
