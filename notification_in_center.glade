@@ -124,7 +124,6 @@
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_right">10</property>
             <property name="margin_bottom">5</property>
             <child>
               <object class="GtkLabel" id="label_time">
@@ -144,19 +143,11 @@
               </packing>
             </child>
             <child>
-              <placeholder/>
-            </child>
-            <child>
-              <object class="GtkLabel" id="label_appname">
+              <object class="GtkImage" id="img_icon">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Thunderbird</property>
-                <property name="justify">right</property>
-                <style>
-                  <class name="appname"/>
-                  <class name="deadd-noti-center"/>
-                  <class name="in-center"/>
-                </style>
+                <property name="margin_left">10</property>
+                <property name="margin_right">10</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -166,10 +157,16 @@
               </packing>
             </child>
             <child>
-              <object class="GtkImage" id="img_icon">
+              <object class="GtkLabel" id="label_appname">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="margin_right">10</property>
+                <property name="label" translatable="yes">a</property>
+                <property name="justify">right</property>
+                <style>
+                  <class name="appname"/>
+                  <class name="deadd-noti-center"/>
+                  <class name="in-center"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">False</property>
