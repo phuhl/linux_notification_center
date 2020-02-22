@@ -28,6 +28,7 @@ data Config = Config
   , configMatchingRules :: [((Notification -> Bool), (Notification -> Notification), Maybe String)]
   , configNotiMarkup :: Bool
   , configSendNotiClosedDbusMessage :: Bool
+  , configGuessIconFromAppname :: Bool
 
   -- notification-center-notification-popup
   , configNotiDefaultTimeout :: Int
@@ -88,6 +89,7 @@ getConfig p =
   , configMatchingRules = zip3 match (modify ++ repeat id) $ run ++ repeat Nothing -- run
   , configNotiMarkup = r'' True p nCenter "useMarkup"
   , configSendNotiClosedDbusMessage = r'' False p nCenter "configSendNotiClosedDbusMessage"
+  , configGuessIconFromAppname = r'' True p nCenter "guessIconFromAppname"
 
     -- notification-center-notification-popup
   , configNotiDefaultTimeout = r 10000 p nPopup "notiDefaultTimeout"
