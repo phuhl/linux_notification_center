@@ -29,7 +29,7 @@ import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , labelSetXalign, widgetGetPreferredHeightForWidth
               , onWidgetButtonPressEvent, imageSetFromPixbuf
               , imageSetFromIconName, setWidgetWidthRequest
-              , setImageUseFallback, widgetSetMarginStart, widgetSetMarginEnd)
+              , setImagePixelSize, widgetSetMarginStart, widgetSetMarginEnd)
 import GI.GdkPixbuf (pixbufScaleSimple, pixbufGetHeight, pixbufGetWidth
                     , Pixbuf(..), pixbufNewFromFileAtScale
                     , InterpType(..))
@@ -121,7 +121,7 @@ updateNotiContent config noti dNoti = do
     (NamedIcon name) -> do
       imageSetFromIconName (view dImgAppIcon dNoti)
         (Just $ pack name) iconSize
-      setImageUseFallback (view dImgAppIcon dNoti) True
+      setImagePixelSize (view dImgAppIcon dNoti) 20
     (RawImg a) -> do
       pb <- rawImgToPixBuf $ RawImg a
       pb' <- scalePixbuf iconSize iconSize pb
@@ -134,7 +134,7 @@ updateNotiContent config noti dNoti = do
     (NamedIcon name) -> do
       imageSetFromIconName (view dImgImage dNoti)
         (Just $ pack name) imageSize
-      setImageUseFallback (view dImgAppIcon dNoti) True
+      setImagePixelSize (view dImgAppIcon dNoti) 100
     (RawImg a) -> do
       pb <- rawImgToPixBuf $ RawImg a
       pb' <- scalePixbuf imageSize imageSize pb
