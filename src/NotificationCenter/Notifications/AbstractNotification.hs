@@ -29,7 +29,7 @@ import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , labelSetXalign, widgetGetPreferredHeightForWidth
               , onWidgetButtonPressEvent, imageSetFromPixbuf
               , imageSetFromIconName, setWidgetWidthRequest
-              , setImageUseFallback)
+              , setImageUseFallback, widgetSetMarginStart, widgetSetMarginEnd)
 import GI.GdkPixbuf (pixbufScaleSimple, pixbufGetHeight, pixbufGetWidth
                     , Pixbuf(..), pixbufNewFromFileAtScale
                     , InterpType(..))
@@ -112,7 +112,9 @@ updateNotiContent config noti dNoti = do
   let iconSize = 15
       imageSize = 100
   case notiIcon noti of
-    NoImage -> return ()
+    NoImage -> do
+      widgetSetMarginStart (view dImgAppIcon dNoti) 0
+      widgetSetMarginEnd (view dImgAppIcon dNoti) 0
     (ImagePath path) -> do
       pb <- pixbufNewFromFileAtScale path iconSize iconSize True
       imageSetFromPixbuf (view dImgAppIcon dNoti) (Just pb)
