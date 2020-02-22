@@ -124,12 +124,12 @@ packages:
   original:
     hackage: gi-gdkpixbuf-2.0.23
 - completed:
-    hackage: gi-gio-2.0.25@sha256:11322bbed1688de35886949845fd1bf37c7a4e1020f19c1b60ce319f5f07655b,21869
+    hackage: gi-gio-2.0.26@sha256:d79cdefd6ffe792e1f353b2c8c190d3adde961c7e6438e3deea80afe5e253e16,21869
     pantry-tree:
       size: 359
-      sha256: fcfaa95fa71364b94c520b7d5881b6296cec32bebe2cba8ea3b2a23e8192f678
+      sha256: 0e0da90130fd79dd516b5f059798990d77209ccc40fa2d9118f9d7102cd95764
   original:
-    hackage: gi-gio-2.0.25
+    hackage: gi-gio-2.0.26
 - completed:
     hackage: gi-gobject-2.0.22@sha256:2e529981f39e5d399107d3468d4523badb8f856c926d09dcfa13a8e835f2c6cb,9347
     pantry-tree:

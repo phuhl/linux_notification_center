@@ -137,6 +137,12 @@ useMarkup = true
 # notification.
 configSendNotiClosedDbusMessage = false
 
+# If set to true: If no icon is passed by the app_icon parameter 
+# and no application "desktop-entry"-hint is present, the notification
+# center will try to guess the icon from the application name (if present).
+# Default is true.
+guessIconFromAppname = true
+
 # See section "Notification based scripting" for an explenation
 #match = "title=Abc;body=abc":"app=notify-send"
 #modify = "transient=false"

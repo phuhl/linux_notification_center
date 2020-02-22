@@ -44,9 +44,10 @@ import Data.Maybe (fromMaybe)
 import System.Locale.Read
 import System.IO (readFile)
 import System.IO.Error (tryIOError)
+import Data.GI.Base.GError (catchGErrorJust)
 
-import GI.Gio.Interfaces.AppInfo (appInfoCreateFromCommandline, appInfoGetIcon)
-import GI.Gio.Interfaces.Icon (iconToString)
+import GI.Gio.Interfaces.AppInfo (appInfoGetIcon, appInfoGetAll, appInfoGetName)
+import GI.Gio.Interfaces.Icon (iconToString, Icon(..))
 
 data NotifyState = NotifyState
   { notiStList :: [ Notification ]
@@ -140,26 +141,38 @@ getDesktopFile name = do
   where getIt path = eitherToMaybe <$>
           (tryIOError $ readFile $ path ++ name ++ ".desktop")
 
-getIconFromDesktopFile :: String -> Image
-getIconFromDesktopFile w =
-  fromMaybe NoImage $ imgFromString
-  <$> (trim <$> ((flip atMay 1) =<< splitOn '='
-                 <$> (filter (isPrefix "Icon") $ trim <$> lines w) `atMay` 0))
-  where imgFromString w = if isPrefix "/" w then
-          ImagePath w else NamedIcon w
+getAppIcon :: String -> IO Image
+getAppIcon name = do
+  apps <- appInfoGetAll
+  names <- sequence $ appInfoGetName <$> apps
+  let appInfos = filter (\(_, name') -> name' == (pack name))
+              $ zip apps names
+  if length appInfos > 0 then do
+    mIcon <- appInfoGetIcon (fst $ appInfos !! 0)
+    case mIcon of
+      (Just icon) -> imgFromMaybe <$> ((<$>) unpack) <$> iconToString icon
+      Nothing -> return NoImage
+    else
+    return NoImage
+  where imgFromMaybe mI= case mI  of
+                           Nothing -> NoImage
+                           (Just w) -> if isPrefix "/" w then
+                             ImagePath w else NamedIcon w
 
-parseIcon :: Map.Map Text Variant -> Text -> Text -> IO Image
-parseIcon hints icon appName =
+parseIcon :: Config -> Map.Map Text Variant -> Text -> Text -> IO Image
+parseIcon config hints icon appName =
   if (Text.length icon) > 0 then do
     return $ parseImageString icon
-    else
-    let mFileName = fromVariant =<< Map.lookup "desktop-entry" hints
-    in do
-      mIconName <- iconToString =<< appInfoGetIcon
-        =<< appInfoCreateFromCommandline [] (Just $ fromMaybe appName mFileName) []
-      return $ case mIconName  of
-        Nothing -> NoImage
-        (Just name) -> NamedIcon $ Text.unpack name
+    else do
+      let mFileName = fromVariant =<< Map.lookup "desktop-entry" hints
+        in case mFileName of
+         (Just fileName) -> do
+           getAppIcon fileName
+
+         Nothing -> if configGuessIconFromAppname config then
+                      getAppIcon $ unpack appName
+                    else
+                      return NoImage
 
 parseImg :: Map.Map Text Variant -> Image
 parseImg hints =
@@ -193,7 +206,7 @@ notify config tState emit
   appName replaceId icon summary body actions hints timeout = do
   state <- readTVarIO tState
   time <- getTime
-  icon <- parseIcon hints icon appName
+  icon <- parseIcon config hints icon appName
   let newNotiWithoutId = Notification
         { notiAppName = appName
         , notiRepId = replaceId
@@ -214,10 +227,6 @@ notify config tState emit
         , notiTransient = parseTransient hints
         , notiSendClosedMsg = (configSendNotiClosedDbusMessage config)
         }
-
-  putStrLn ""
-  putStrLn $ "Hints: " ++ (show $ Map.keys $ notiHints newNotiWithoutId)
-  putStrLn $ "Icon: " ++ (show $ notiIcon newNotiWithoutId)
 
   if Map.member (pack "deadd-notification-center")
     $ notiHints newNotiWithoutId

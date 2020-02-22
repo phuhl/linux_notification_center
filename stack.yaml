@@ -56,7 +56,7 @@ extra-deps: [ ConfigFile-1.1.4
             , gi-atk-2.0.21
             , gi-gdk-3.0.22
             , gi-gdkpixbuf-2.0.23
-            , gi-gio-2.0.25
+            , gi-gio-2.0.26
             , gi-gobject-2.0.22
             , gi-gtk-3.0.32
             , gi-graphene-1.0.1
