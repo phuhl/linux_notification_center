@@ -96,13 +96,14 @@ updateNoti :: Config -> Gtk.Box
 updateNoti config mainBox dNoti tNState = do
   addSource $ do
     nState <- readTVarIO tNState
-    let (Just noti) = find (\n -> notiId n == _dNotiId dNoti)
+    let mNoti = find (\n -> notiId n == _dNotiId dNoti)
           $ notiStList nState
-
-    updateNotiContent config noti dNoti
-    Gtk.labelSetText (_dLabelTime dNoti) $ notiTime noti
-
-    when (configNotiCenterNewFirst config)
-      (Gtk.boxReorderChild mainBox (view dContainer dNoti) 0)
+    case mNoti of
+      (Just noti) -> do
+        updateNotiContent config noti dNoti
+        Gtk.labelSetText (_dLabelTime dNoti) $ notiTime noti
+        when (configNotiCenterNewFirst config)
+          (Gtk.boxReorderChild mainBox (view dContainer dNoti) 0)
+      Nothing -> return ()
     return False
   return ()
