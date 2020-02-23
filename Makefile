@@ -4,6 +4,7 @@
 PREFIX ?= /usr
 MANPREFIX = ${PREFIX}/share/man
 PKG_CONFIG ?= pkg-config
+SYSTEMCTL ?= systemctl
 
 ifeq (,${SYSTEMD})
 # Check for systemctl to avoid discrepancies on systems, where
@@ -66,7 +67,9 @@ install-stack:
 install-service: service
 	mkdir -p ${DESTDIR}${SERVICEDIR_DBUS}
 	install -m644 com.ph-uhl.deadd.notification.service ${DESTDIR}${SERVICEDIR_DBUS}
-	install -m644 deadd-notification-center.service ${SERVICEDIR_SYSTEMD}
+	ifneq (0,${SYSTEMD})
+		install -m644 deadd-notification-center.service ${DESTDIR}${SERVICEDIR_SYSTEMD}
+	endif
 
 install-lang:
 	mkdir -p ${DESTDIR}${PREFIX}/share/locale/{de,en}/LC_MESSAGES
@@ -81,7 +84,9 @@ uninstall:
 	rm -f ${DESTDIR}${SERVICEDIR_DBUS}/com.ph-uhl.deadd.notification.service
 	rm -f ${DESTDIR}${PREFIX}/share/licenses/deadd-notification-center/LICENSE
 	rm -f ${DESTDIR}${PREFIX}/share/locale/{de,en}/LC_MESSAGES/deadd-notification-center.mo
-	rm -f ${SERVICEDIR_SYSTEMD}/deadd-notification-center.service
+	ifneq (0,${SYSTEMD})
+		rm -f ${DESTDIR}${SERVICEDIR_SYSTEMD}/deadd-notification-center.service
+	endif
 
 
 .PHONY: all clean install uninstall
