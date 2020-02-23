@@ -91,7 +91,8 @@ Nearly all colors and many sizes are customizable, as well well as the
 default timeout for notifications and the optional buttons in the
 notification center. Below are possible configurable options shown.
 The configuration file must be located at
-=~/.config/deadd/deadd.conf=.
+=~/.config/deadd/deadd.conf= (or, if configured differently on your
+system: =${XDG_CONFIG_HOME}/deadd/deadd.conf=).
 
 #+BEGIN_EXAMPLE
 [notification-center]
