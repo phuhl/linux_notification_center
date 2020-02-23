@@ -3,7 +3,31 @@
 
 PREFIX ?= /usr
 MANPREFIX = ${PREFIX}/share/man
-SYSTEMD_DIR=`pkg-config systemd --variable=systemdsystemunitdir`
+PKG_CONFIG ?= pkg-config
+
+ifeq (,${SYSTEMD})
+# Check for systemctl to avoid discrepancies on systems, where
+# systemd is installed, but systemd.pc is in another package
+systemctl := $(shell command -v ${SYSTEMCTL} >/dev/null && echo systemctl)
+ifeq (systemctl,${systemctl})
+SYSTEMD := 1
+else
+SYSTEMD := 0
+endif
+endif
+
+ifneq (0,${SYSTEMD})
+SERVICEDIR_SYSTEMD ?= $(shell $(PKG_CONFIG) systemd --variable=systemduserunitdir)
+SERVICEDIR_SYSTEMD := ${SERVICEDIR_SYSTEMD}
+ifeq (,${SERVICEDIR_SYSTEMD})
+$(error "Failed to query $(PKG_CONFIG) for package 'systemd'!")
+endif
+endif
+
+SERVICEDIR_DBUS ?= $(shell $(PKG_CONFIG) dbus-1 --variable=session_bus_services_dir)
+SERVICEDIR_DBUS := ${SERVICEDIR_DBUS}
+
+
 
 all: stack service
 
@@ -40,9 +64,9 @@ install-stack:
 	install -Dm644 LICENSE ${DESTDIR}${PREFIX}/share/licenses/deadd-notification-center/LICENSE
 
 install-service: service
-	mkdir -p ${DESTDIR}${PREFIX}/share/dbus-1/services/
-	install -m644 com.ph-uhl.deadd.notification.service ${DESTDIR}${PREFIX}/share/dbus-1/services
-	install -m644 deadd-notification-center.service ${SYSTEMD_DIR}
+	mkdir -p ${DESTDIR}${SERVICEDIR_DBUS}
+	install -m644 com.ph-uhl.deadd.notification.service ${DESTDIR}${SERVICEDIR_DBUS}
+	install -m644 deadd-notification-center.service ${SERVICEDIR_SYSTEMD}
 
 install-lang:
 	mkdir -p ${DESTDIR}${PREFIX}/share/locale/{de,en}/LC_MESSAGES
@@ -54,10 +78,10 @@ install: install-stack install-service install-lang
 uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/deadd-notification-center
 	rm -f ${DESTDIR}${MANPREFIX}/man1/deadd-notification-center.1
-	rm -f ${DESTDIR}${PREFIX}/share/dbus-1/services/com.ph-uhl.deadd.notification.service
+	rm -f ${DESTDIR}${SERVICEDIR_DBUS}/com.ph-uhl.deadd.notification.service
 	rm -f ${DESTDIR}${PREFIX}/share/licenses/deadd-notification-center/LICENSE
 	rm -f ${DESTDIR}${PREFIX}/share/locale/{de,en}/LC_MESSAGES/deadd-notification-center.mo
-	rm -f ${SYSTEMD_DIR}/deadd-notification-center.service
+	rm -f ${SERVICEDIR_SYSTEMD}/deadd-notification-center.service
 
 
 .PHONY: all clean install uninstall
