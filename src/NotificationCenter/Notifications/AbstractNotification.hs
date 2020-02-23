@@ -111,34 +111,10 @@ updateNotiContent config noti dNoti = do
   labelSetXalign (view dLabelBody dNoti) 0
   let iconSize = 15
       imageSize = 100
-  case notiIcon noti of
-    NoImage -> do
-      widgetSetMarginStart (view dImgAppIcon dNoti) 0
-      widgetSetMarginEnd (view dImgAppIcon dNoti) 0
-    (ImagePath path) -> do
-      pb <- pixbufNewFromFileAtScale path iconSize iconSize True
-      imageSetFromPixbuf (view dImgAppIcon dNoti) (Just pb)
-    (NamedIcon name) -> do
-      imageSetFromIconName (view dImgAppIcon dNoti)
-        (Just $ pack name) iconSize
-      setImagePixelSize (view dImgAppIcon dNoti) 20
-    (RawImg a) -> do
-      pb <- rawImgToPixBuf $ RawImg a
-      pb' <- scalePixbuf iconSize iconSize pb
-      imageSetFromPixbuf (view dImgAppIcon dNoti) pb'
-  case notiImg noti of
-    NoImage -> return ()
-    (ImagePath path) -> do
-      pb <- pixbufNewFromFileAtScale path imageSize imageSize True
-      imageSetFromPixbuf (view dImgImage dNoti) (Just pb)
-    (NamedIcon name) -> do
-      imageSetFromIconName (view dImgImage dNoti)
-        (Just $ pack name) imageSize
-      setImagePixelSize (view dImgAppIcon dNoti) 100
-    (RawImg a) -> do
-      pb <- rawImgToPixBuf $ RawImg a
-      pb' <- scalePixbuf imageSize imageSize pb
-      imageSetFromPixbuf (view dImgImage dNoti) pb'
+  setImage (notiIcon noti) (fromIntegral $ configIconSize config)
+    $ view dImgAppIcon dNoti
+  setImage (notiImg noti) (fromIntegral $ configImgSize config)
+    $ view dImgImage dNoti
 
   let takeTwo (a:b:cs) = (a,b):(takeTwo cs)
       takeTwo _ = []
@@ -153,6 +129,25 @@ updateNotiContent config noti dNoti = do
   widgetShowAll (view dActions dNoti)
 
   return ()
+
+
+setImage :: Image -> Int32 -> Gtk.Image -> IO ()
+setImage image imageSize widget = do
+  case image of
+    NoImage -> do
+      widgetSetMarginStart widget 0
+      widgetSetMarginEnd widget 0
+    (ImagePath path) -> do
+      pb <- pixbufNewFromFileAtScale path imageSize imageSize True
+      imageSetFromPixbuf widget (Just pb)
+    (NamedIcon name) -> do
+      imageSetFromIconName widget
+        (Just $ pack name) imageSize
+      setImagePixelSize widget imageSize
+    (RawImg a) -> do
+      pb <- rawImgToPixBuf $ RawImg a
+      pb' <- scalePixbuf imageSize imageSize pb
+      imageSetFromPixbuf widget pb'
 
 
 scalePixbuf :: Int32 -> Int32 -> Pixbuf -> IO (Maybe Pixbuf)

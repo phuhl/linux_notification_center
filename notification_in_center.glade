@@ -10,7 +10,13 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="valign">center</property>
+        <property name="margin_left">10</property>
         <property name="icon_size">0</property>
+        <style>
+          <class name="deadd-noti-center"/>
+          <class name="in-center"/>
+          <class name="image"/>
+        </style>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -62,6 +68,11 @@
                 <property name="valign">start</property>
                 <property name="border_width">0</property>
                 <property name="relief">none</property>
+                <style>
+                  <class name="in-center"/>
+                  <class name="deadd-noti-center"/>
+                  <class name="button-close"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -148,6 +159,11 @@
                 <property name="can_focus">False</property>
                 <property name="margin_left">10</property>
                 <property name="margin_right">10</property>
+                <style>
+                  <class name="deadd-noti-center"/>
+                  <class name="in-center"/>
+                  <class name="icon"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">False</property>

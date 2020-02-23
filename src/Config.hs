@@ -37,6 +37,8 @@ data Config = Config
   , configDistanceBetween :: Int
   , configWidthNoti :: Int
   , configNotiMonitor :: Int
+  , configImgSize :: Int
+  , configIconSize :: Int
 
   -- buttons
   , configButtonsPerRow :: Int
@@ -98,6 +100,8 @@ getConfig p =
   , configDistanceBetween = r 20 p nPopup "distanceBetween"
   , configWidthNoti = r 300 p nPopup "width"
   , configNotiMonitor = r 0 p nPopup "monitor"
+  , configImgSize = r 100 p nPopup "maxImageSize"
+  , configIconSize = r 20 p nPopup "iconSize"
 
     -- buttons
   , configButtonsPerRow = r 5 p buttons "buttonsPerRow"
