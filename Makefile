@@ -70,6 +70,7 @@ install-service: service
 ifneq (0,${SYSTEMD})
 install-service: install-service-systemd
 install-service-systemd:
+	mkdir -p ${DESTDIR}${SERVICEDIR_SYSTEMD}
 	install -m644 deadd-notification-center.service ${DESTDIR}${SERVICEDIR_SYSTEMD}
 endif
 
