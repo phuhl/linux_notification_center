@@ -24,13 +24,13 @@ center can display custom buttons in notifications.
 ** Screenshots
 
 Some applications, notification:
-[[file:README.org.img/org_20181125_131724_ZI9o09.jpg]]
+[[file:README.org.img/org_20200223_193450_1en7sh.jpg]]
 
 Notification Center opened:
-[[file:README.org.img/org_20181203_164608_WqFdmO.jpg]]
+[[file:README.org.img/org_20200223_193345_VhlbOf.jpg]]
 
 Link, Markup and Action support:
-[[file:README.org.img/more_notifications.png]]
+[[file:README.org.img/org_20200223_200131_4WWV2Y.jpg]]
 
 ** Usage
 
