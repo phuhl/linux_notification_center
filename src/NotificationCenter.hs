@@ -5,11 +5,11 @@ module NotificationCenter where
 
 import Config
   (replaceColors,getConfig,Config(..))
-import NotificationCenter.Notification
-  (DisplayingNotificaton(..), showNotification, updateNoti)
+import NotificationCenter.NotificationInCenter
+  (DisplayingNotificationInCenter(..), showNotification, updateNoti)
 import NotificationCenter.Notifications
-  (NotifyState(..), startNotificationDaemon, Notification(..)
-  , hideAllNotis)
+  (NotifyState(..), startNotificationDaemon, hideAllNotis)
+import NotificationCenter.Notifications.Data (Notification(..))
 import NotificationCenter.Glade (glade, style)
 import NotificationCenter.Button
   (Button(..), createButton, setButtonState)
@@ -27,7 +27,6 @@ import Data.Tuple.Sequence (sequenceT)
 import Data.Maybe
 import Data.IORef
 import Data.List
-import Data.List.Split (splitOn)
 import Data.Time
 import Data.Time.LocalTime
 import qualified Data.Text as Text
@@ -92,7 +91,7 @@ data State = State
   , stDeleteAll :: Gtk.Button
   , stUserButtons :: [ Button ]
   , stNotiState :: TVar NotifyState
-  , stDisplayingNotiList :: [ DisplayingNotificaton ]
+  , stDisplayingNotiList :: [ DisplayingNotificationInCenter ]
   , stNotisForMe :: [ Notification ]
   , stCenterShown :: Bool
   }
@@ -124,7 +123,7 @@ startSetTimeThread' tState = do
 
 createNotiCenter :: TVar State -> Config -> IO ()
 createNotiCenter tState config = do
-  objs <- createTransparentWindow (Text.pack glade)
+  (objs, _) <- createTransparentWindow (Text.pack glade)
     [ "main_window"
     , "label_time"
     , "label_date"
@@ -195,6 +194,7 @@ createNotiCenter tState config = do
   setNotificationCenterPosition mainWindow config
 
   onWidgetDestroy mainWindow mainQuit
+
   return ()
 
 setNotificationCenterPosition mainWindow config = do
@@ -285,21 +285,21 @@ updateNotis config tState = do
   notiState <- readTVarIO $ stNotiState state
 
   let newNotis = filter (
-        \n -> (find (\nd -> dNotiId nd == notiId n )
+        \n -> (find (\nd -> _dNotiId nd == notiId n )
                (stDisplayingNotiList state))
               == Nothing
               && ((configIgnoreTransient config) || (not $ notiTransient n)))
                  $ notiStList notiState
   newNotis' <- mapM (
     \n -> do
-      let newNoti = DisplayingNotificaton
-                    { dNotiId = notiId n }
+      let newNoti = DisplayingNotificationInCenter
+                    { _dNotiId = notiId n }
       showNotification config
         (stNotiBox state) newNoti
         (stNotiState state) $ removeNoti tState
     ) newNotis
 
-  let delNotis = filter (\nd -> (find (\n -> dNotiId nd == notiId n)
+  let delNotis = filter (\nd -> (find (\n -> _dNotiId nd == notiId n)
                                 $ notiStList notiState) == Nothing)
                  $ stDisplayingNotiList state
   atomically $ modifyTVar' tState (
@@ -314,7 +314,7 @@ updateNotis config tState = do
   return ()
 
 
-removeNoti :: TVar State -> DisplayingNotificaton -> IO ()
+removeNoti :: TVar State -> DisplayingNotificationInCenter -> IO ()
 removeNoti tState dNoti = do
   state <- readTVarIO tState
   atomically $ modifyTVar' tState $ \state ->
@@ -323,10 +323,10 @@ removeNoti tState dNoti = do
   setDeleteAllState tState
   atomically $ modifyTVar' (stNotiState state) $ \state ->
     state { notiStList = filter
-                         (\n -> notiId n /= dNotiId dNoti) $
+                         (\n -> notiId n /= _dNotiId dNoti) $
                          notiStList state }
   addSource $ do
-    dNotiDestroy dNoti
+    _dNotiDestroy dNoti
     return False
   return ()
 

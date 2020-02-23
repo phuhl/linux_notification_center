@@ -28,6 +28,7 @@ data Config = Config
   , configMatchingRules :: [((Notification -> Bool), (Notification -> Notification), Maybe String)]
   , configNotiMarkup :: Bool
   , configSendNotiClosedDbusMessage :: Bool
+  , configGuessIconFromAppname :: Bool
 
   -- notification-center-notification-popup
   , configNotiDefaultTimeout :: Int
@@ -36,6 +37,8 @@ data Config = Config
   , configDistanceBetween :: Int
   , configWidthNoti :: Int
   , configNotiMonitor :: Int
+  , configImgSize :: Int
+  , configIconSize :: Int
 
   -- buttons
   , configButtonsPerRow :: Int
@@ -88,6 +91,7 @@ getConfig p =
   , configMatchingRules = zip3 match (modify ++ repeat id) $ run ++ repeat Nothing -- run
   , configNotiMarkup = r'' True p nCenter "useMarkup"
   , configSendNotiClosedDbusMessage = r'' False p nCenter "configSendNotiClosedDbusMessage"
+  , configGuessIconFromAppname = r'' True p nCenter "guessIconFromAppname"
 
     -- notification-center-notification-popup
   , configNotiDefaultTimeout = r 10000 p nPopup "notiDefaultTimeout"
@@ -96,6 +100,8 @@ getConfig p =
   , configDistanceBetween = r 20 p nPopup "distanceBetween"
   , configWidthNoti = r 300 p nPopup "width"
   , configNotiMonitor = r 0 p nPopup "monitor"
+  , configImgSize = r 100 p nPopup "maxImageSize"
+  , configIconSize = r 20 p nPopup "iconSize"
 
     -- buttons
   , configButtonsPerRow = r 5 p buttons "buttonsPerRow"
@@ -149,8 +155,7 @@ getConfig p =
                           [ ("title", notiSummary)
                           , ("body", notiBody)
                           , ("app", notiAppName)
-                          , ("time", notiTime)
-                          , ("icon", notiIcon) ]) <*> (Just noti))
+                          , ("time", notiTime) ]) <*> (Just noti))
                       matcherFunction conditions = \noti -> foldl (
                         \matches (k:v:[]) -> matches && ((v == lookupFun k noti)))
                                                       True (keys conditions)
@@ -163,7 +168,7 @@ getConfig p =
                                 | k == "body" = noti { notiBody = Text.pack v }
                                 | k == "app" = noti { notiAppName = Text.pack v }
                                 | k == "time" = noti { notiTime = Text.pack v }
-                                | k == "icon" = noti { notiIcon = Text.pack v }
+--                                | k == "icon" = noti { notiIcon = Text.pack v }
                                 | k == "transient" && v == "true" = noti { notiTransient = True }
                                 | k == "transient" && v == "false" = noti { notiTransient = False }
                                 | k == "noClosedMsg" && v == "true" = noti { notiSendClosedMsg = False }

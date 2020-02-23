@@ -5,7 +5,6 @@
   <!-- interface-css-provider-path style.css -->
   <object class="GtkWindow" id="main_window">
     <property name="width_request">300</property>
-    <property name="height_request">30</property>
     <property name="can_focus">False</property>
     <property name="hexpand">False</property>
     <property name="vexpand">True</property>
@@ -30,14 +29,22 @@
           </packing>
         </child>
         <child type="overlay">
-          <object class="GtkBox" id="container_box">
+          <object class="GtkBox" id="box_container">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="vexpand">True</property>
             <child>
-              <object class="GtkImage">
+              <object class="GtkImage" id="img_img">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="valign">start</property>
+                <property name="vexpand">True</property>
+                <property name="pixel_size">185</property>
+                <property name="icon_size">0</property>
+                <style>
+                  <class name="deadd-noti-center"/>
+                  <class name="notification"/>
+                  <class name="image"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -49,18 +56,18 @@
               <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="valign">baseline</property>
-                <property name="margin_left">10</property>
+                <property name="margin_left">15</property>
                 <property name="margin_right">10</property>
                 <property name="vexpand">True</property>
                 <property name="orientation">vertical</property>
+                <property name="baseline_position">bottom</property>
                 <child>
                   <object class="GtkLabel" id="label_titel">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="halign">start</property>
+                    <property name="valign">start</property>
                     <property name="margin_top">10</property>
-                    <property name="hexpand">False</property>
                     <property name="label" translatable="yes">Titel</property>
                     <property name="wrap">True</property>
                     <property name="wrap_mode">word-char</property>
@@ -72,7 +79,7 @@
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="fill">True</property>
+                    <property name="fill">False</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
@@ -81,7 +88,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="halign">start</property>
-                    <property name="hexpand">False</property>
+                    <property name="valign">start</property>
                     <property name="use_markup">True</property>
                     <property name="wrap">True</property>
                     <style>
@@ -92,16 +99,15 @@
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="fill">True</property>
+                    <property name="fill">False</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox" id="action_box">
+                  <object class="GtkBox" id="box_actions">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="halign">center</property>
-                    <property name="valign">center</property>
                     <child>
                       <placeholder/>
                     </child>
@@ -119,21 +125,55 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel" id="label_appname">
+                  <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="halign">end</property>
-                    <property name="margin_bottom">8</property>
-                    <property name="label" translatable="yes">Appname</property>
-                    <style>
-                      <class name="notification"/>
-                      <class name="appname"/>
-                      <class name="deadd-noti-center"/>
-                    </style>
+                    <child>
+                      <object class="GtkImage" id="img_icon">
+                        <property name="width_request">10</property>
+                        <property name="height_request">10</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">end</property>
+                        <property name="valign">end</property>
+                        <property name="margin_right">10</property>
+                        <property name="icon_size">0</property>
+                        <style>
+                          <class name="deadd-noti-center"/>
+                          <class name="notification"/>
+                          <class name="icon"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="label_appname">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">end</property>
+                        <property name="label" translatable="yes">Appname</property>
+                        <style>
+                          <class name="notification"/>
+                          <class name="appname"/>
+                          <class name="deadd-noti-center"/>
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="fill">True</property>
+                    <property name="fill">False</property>
+                    <property name="padding">8</property>
                     <property name="position">3</property>
                   </packing>
                 </child>
@@ -141,6 +181,7 @@
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
+                <property name="pack_type">end</property>
                 <property name="position">1</property>
               </packing>
             </child>

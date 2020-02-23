@@ -42,7 +42,7 @@ CLOCK: [2019-01-19 Sat 23:02]--[2019-01-19 Sat 23:49] =>  0:47
 :LOGBOOK:
 CLOCK: [2019-01-02 Wed 02:04]--[2019-01-02 Wed 03:14] =>  1:10
 :END:
-** TODO Aur does not build (#4)
+** DONE Aur does not build (#4)
 :LOGBOOK:
 CLOCK: [2019-01-24 Thu 14:31]--[2019-01-24 Thu 14:42] =>  0:11
 CLOCK: [2019-01-24 Thu 13:04]--[2019-01-24 Thu 14:04] =>  1:00
@@ -127,12 +127,16 @@ CLOCK: [2019-03-20 Wed 14:10]--[2019-03-20 Wed 15:47] =>  1:37
 :LOGBOOK:
 CLOCK: [2019-03-20 Wed 15:47]--[2019-03-20 Wed 17:41] =>  1:54
 :END:
-** TODO Image support
-** TODO Bin-Package
+** DONE Image support
+** DONE Bin-Package
 :LOGBOOK:
-CLOCK: [2019-03-25 Mon 12:32]
+CLOCK: [2019-03-25 Mon 12:32]--[2019-03-25 Mon 13:20] =>  0:48
 :END:
 
 - No build time
 - No compilation issues
+** DONE Translation of program
+:LOGBOOK:
+CLOCK: [2019-05-24 Fri 18:15]--[2019-05-24 Fri 19:15] =>  1:00
+:END:
 
