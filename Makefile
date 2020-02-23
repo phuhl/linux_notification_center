@@ -3,6 +3,7 @@
 
 PREFIX ?= /usr
 MANPREFIX = ${PREFIX}/share/man
+SYSTEMD_DIR=`pkg-config systemd --variable=systemdsystemunitdir`
 
 all: stack service
 
@@ -29,7 +30,7 @@ doc:
 
 service:
 	@sed "s|##PREFIX##|$(PREFIX)|" com.ph-uhl.deadd.notification.service.in > com.ph-uhl.deadd.notification.service
-	@sed "s|##PREFIX##|$(PREFIX)|" deadd.notification.systemd.service.in > deadd.notification.systemd.service
+	@sed "s|##PREFIX##|$(PREFIX)|" deadd-notification-center.service.in > deadd-notification-center.service
 
 install-stack:
 	mkdir -p ${DESTDIR}${PREFIX}/bin
@@ -41,6 +42,7 @@ install-stack:
 install-service: service
 	mkdir -p ${DESTDIR}${PREFIX}/share/dbus-1/services/
 	install -m644 com.ph-uhl.deadd.notification.service ${DESTDIR}${PREFIX}/share/dbus-1/services
+	install -m644 deadd-notification-center.service ${SYSTEMD_DIR}
 
 install-lang:
 	mkdir -p ${DESTDIR}${PREFIX}/share/locale/{de,en}/LC_MESSAGES
@@ -55,5 +57,7 @@ uninstall:
 	rm -f ${DESTDIR}${PREFIX}/share/dbus-1/services/com.ph-uhl.deadd.notification.service
 	rm -f ${DESTDIR}${PREFIX}/share/licenses/deadd-notification-center/LICENSE
 	rm -f ${DESTDIR}${PREFIX}/share/locale/{de,en}/LC_MESSAGES/deadd-notification-center.mo
+	rm -f ${SYSTEMD_DIR}/deadd-notification-center.service
+
 
 .PHONY: all clean install uninstall

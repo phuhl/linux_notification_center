@@ -3,47 +3,56 @@
 module NotificationCenter.Notifications
   ( startNotificationDaemon
   , NotifyState(..)
-  , Notification(..)
   , hideAllNotis
   ) where
 
-import NotificationCenter.Notifications.Notification
+import Helpers (trim, isPrefix, splitOn, atMay, eitherToMaybe)
+
+import NotificationCenter.Notifications.NotificationPopup
   ( showNotificationWindow
   , updateNoti
-  , Notification(..)
-  , DisplayingNotificaton(..)
+  , DisplayingNotificationPopup(..)
   )
 import NotificationCenter.Notifications.Data
-  (Urgency(..))
+  (Urgency(..), Notification(..), Image(..), parseImageString)
 import TransparentWindow
 import Config (Config(..))
 import NotificationCenter.Notifications.Data
 
+import Control.Applicative ((<|>))
 import Control.Concurrent (forkIO)
 import Control.Concurrent.STM
   (readTVarIO, stateTVar, modifyTVar, modifyTVar', TVar(..),
    atomically, newTVarIO)
 
-import DBus (Variant(..), fromVariant, signal, toVariant)
+import DBus (Variant(..), Structure(..), fromVariant, signal, toVariant, variantType)
 import DBus.Internal.Message (Signal(..))
 import DBus.Client
        ( connectSession, AutoMethod(..), autoMethod, requestName, export
        , nameAllowReplacement, nameReplaceExisting, emit)
-import Data.Text (unpack,  Text, pack )
+import Data.Char (toLower)
+import Data.Text (unpack, Text, pack )
+import qualified Data.Text as Text
 import Data.Word ( Word, Word8, Word32 )
 import Data.Int ( Int32 )
 import Data.List
 import qualified Data.Map as Map
 import Data.Time
 import Data.Time.LocalTime
+import Data.Maybe (fromMaybe)
 
 import System.Locale.Read
+import System.IO (readFile)
+import System.IO.Error (tryIOError)
+import Data.GI.Base.GError (catchGErrorJust)
 
+import GI.Gio.Interfaces.AppInfo (appInfoGetIcon, appInfoGetAll, appInfoGetName)
+import GI.Gio.Interfaces.Icon (iconToString, Icon(..))
 
 data NotifyState = NotifyState
   { notiStList :: [ Notification ]
     -- ^ List of all notis
-  , notiDisplayingList :: [ DisplayingNotificaton ]
+  , notiDisplayingList :: [ DisplayingNotificationPopup ]
     -- ^ List of all notis getting displayed as popup
   , notiStNextId :: Int
     -- ^ Id for the next noti
@@ -69,9 +78,12 @@ getServerInformation =
 
 getCapabilities :: Config -> IO [Text]
 getCapabilities config = return ( [ "body"
-                                , "hints"
-                                , "actions"
-                                , "persistence"]
+                                  , "hints"
+                                  , "actions"
+                                  , "persistence"
+                                  , "icon-static"
+                                  , "action-icons"
+                                  , "body-images" ]
                                   ++ if (configNotiMarkup config) then
                                     [ "body-markup"
                                     , "body-hyperlinks"] else [])
@@ -92,6 +104,7 @@ emitNotificationClosed doSend onClose id ctype =
 
 emitAction :: (Signal -> IO ()) -> Int -> String -> IO ()
 emitAction onAction id key = do
+  putStrLn key
   onAction $ (signal "/org/freedesktop/Notifications"
                "org.freedesktop.Notifications"
                "ActionInvoked")
@@ -99,15 +112,16 @@ emitAction onAction id key = do
                    , toVariant key] }
 
 
+parseActionIcons hints =
+  fromMaybe False $ (fromVariant =<< Map.lookup "action-icons" hints :: Maybe Bool)
+
 parseUrgency hints =
-  let urgency = (do v <- Map.lookup "urgency" hints
-                    fromVariant v) :: Maybe Word8
-  in
-    case urgency of
-      (Just 0) -> Low
-      Nothing  -> Normal
-      (Just 1) -> Normal
-      (Just 2) -> High
+  let urgency = fromVariant =<< Map.lookup "urgency" hints :: Maybe Word8
+  in case urgency of
+       (Just 0) -> Low
+       Nothing  -> Normal
+       (Just 1) -> Normal
+       (Just 2) -> High
 
 
 parseTransient :: Map.Map Text Variant -> Bool
@@ -116,6 +130,58 @@ parseTransient hints =
   in case transient of
     Nothing -> False
     (Just b) -> True
+
+getDesktopFile :: String -> IO (Maybe String)
+getDesktopFile name = do
+  putStrLn name
+  [try1, try2, try3] <- sequence [ getIt "~/.local/share/applications/"
+                                 , getIt "/usr/local/share/applications/"
+                                 , getIt "/usr/share/applications/"]
+  return $ try1 <|> try2 <|> try3
+  where getIt path = eitherToMaybe <$>
+          (tryIOError $ readFile $ path ++ name ++ ".desktop")
+
+getAppIcon :: String -> IO Image
+getAppIcon name = do
+  apps <- appInfoGetAll
+  names <- sequence $ appInfoGetName <$> apps
+  let appInfos = filter (\(_, name') -> name' == (pack name))
+              $ zip apps names
+  if length appInfos > 0 then do
+    mIcon <- appInfoGetIcon (fst $ appInfos !! 0)
+    case mIcon of
+      (Just icon) -> imgFromMaybe <$> ((<$>) unpack) <$> iconToString icon
+      Nothing -> return NoImage
+    else
+    return NoImage
+  where imgFromMaybe mI= case mI  of
+                           Nothing -> NoImage
+                           (Just w) -> if isPrefix "/" w then
+                             ImagePath w else NamedIcon w
+
+parseIcon :: Config -> Map.Map Text Variant -> Text -> Text -> IO Image
+parseIcon config hints icon appName =
+  if (Text.length icon) > 0 then do
+    return $ parseImageString icon
+    else do
+      let mFileName = fromVariant =<< Map.lookup "desktop-entry" hints
+        in case mFileName of
+         (Just fileName) -> do
+           getAppIcon fileName
+
+         Nothing -> if configGuessIconFromAppname config then
+                      getAppIcon $ unpack appName
+                    else
+                      return NoImage
+
+parseImg :: Map.Map Text Variant -> Image
+parseImg hints =
+  fromMaybe NoImage
+  $ fromImageData <|> fromImagePath <|> fromIcon
+  where
+    fromIcon = RawImg <$> (fromVariant =<< Map.lookup "icon_data" hints)
+    fromImageData = RawImg <$> (fromVariant =<< Map.lookup "image-data" hints)
+    fromImagePath = ImagePath <$> (fromVariant =<< Map.lookup "image-path" hints)
 
 getTime = do
   now <- zonedTimeToLocalTime <$> getZonedTime
@@ -140,6 +206,7 @@ notify config tState emit
   appName replaceId icon summary body actions hints timeout = do
   state <- readTVarIO tState
   time <- getTime
+  icon <- parseIcon config hints icon appName
   let newNotiWithoutId = Notification
         { notiAppName = appName
         , notiRepId = replaceId
@@ -148,9 +215,11 @@ notify config tState emit
         -- done, instead it is handled lower done
         , notiId = 0
         , notiIcon = icon
+        , notiImg = parseImg hints
         , notiSummary = summary
         , notiBody = body
         , notiActions = actions
+        , notiActionIcons = parseActionIcons hints
         , notiHints = hints
         , notiUrgency = parseUrgency hints
         , notiTimeout = timeout
@@ -179,7 +248,7 @@ notify config tState emit
 
       let newNoti = newNotiWoIdModified
 
-      let notisToBeReplaced = filter (\n -> dNotiId n ==
+      let notisToBeReplaced = filter (\n -> _dNotiId n ==
                                        fromIntegral (notiRepId newNoti))
                               $ notiDisplayingList state
       newId <- atomically $ stateTVar tState
@@ -220,11 +289,11 @@ replaceNoti newNoti tState = do
   addSource $ do
     atomically $ modifyTVar tState $ \state ->
       state { notiDisplayingList = map
-              (\n -> if dNotiId n /= repId then n
-                     else n { dNotiId = notiId newNoti } )
+              (\n -> if _dNotiId n /= repId then n
+                     else n { _dNotiId = notiId newNoti } )
               $ notiDisplayingList state}
     state <- readTVarIO tState
-    let notis = filter (\n -> dNotiId n == notiId newNoti)
+    let notis = filter (\n -> _dNotiId n == notiId newNoti)
                 $ notiDisplayingList state
     mapM (updateNoti (notiConfig state)
            (removeNotiFromDistList tState $ notiId newNoti)
@@ -258,17 +327,17 @@ removeNotiFromDistList tState id = do
   state <- readTVarIO tState
   atomically $ modifyTVar' tState $ \state ->
     state { notiDisplayingList =
-              filter (\n -> (dNotiId n) /= id)
+              filter (\n -> (_dNotiId n) /= id)
               (notiDisplayingList state)}
   addSource $ do
-    let mDn = find (\n -> dNotiId n == id) $ notiDisplayingList state
-    maybe (return ()) dNotiDestroy mDn
+    let mDn = find (\n -> _dNotiId n == id) $ notiDisplayingList state
+    maybe (return ()) _dNotiDestroy mDn
     return False
   return ()
 
 hideAllNotis tState = do
   state <- readTVarIO tState
-  mapM (removeNotiFromDistList tState . dNotiId)
+  mapM (removeNotiFromDistList tState . _dNotiId)
     $ notiDisplayingList state
   return ()
 

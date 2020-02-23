@@ -11,6 +11,7 @@ module TransparentWindow
   , label
   , box
   , button
+  , image
   , getObjs
   , getScreenPos
   -- * General
@@ -59,7 +60,7 @@ import GI.Gtk
 import qualified GI.Gtk as Gtk
   (DrawingArea(..), unsafeCastTo, Window(..), IsWidget(..)
   , builderGetObject, builderAddFromString
-  , builderNew, Builder(..), Label(..), Box(..), Button(..))
+  , builderNew, Builder(..), Label(..), Box(..), Button(..), Image(..))
 import GI.Gtk.Constants
 import GI.Gdk (getRectangleHeight, getRectangleWidth, getRectangleY, getRectangleX, Monitor, monitorGetGeometry, displayGetMonitor, screenGetDisplay, screenGetHeight, screenGetWidth, Screen (..))
 import GI.GObject.Objects (IsObject(..), Object(..))
@@ -90,6 +91,7 @@ drawingArea = gObjLookup (Gtk.unsafeCastTo Gtk.DrawingArea)
 label = gObjLookup (Gtk.unsafeCastTo Gtk.Label)
 box = gObjLookup (Gtk.unsafeCastTo Gtk.Box)
 button = gObjLookup (Gtk.unsafeCastTo Gtk.Button)
+image  = gObjLookup (Gtk.unsafeCastTo Gtk.Image)
 
 
 getObjs :: Gtk.Builder -> [Text.Text] -> IO ObjDict
@@ -107,7 +109,7 @@ getScreenProportions window = do
   return (h, w)
 
 createTransparentWindow :: Text.Text -> [Text.Text] -> Maybe Text.Text
-                        -> IO ObjDict
+                        -> IO (ObjDict, Gtk.Builder)
 createTransparentWindow
   glade
 -- ^ Content of glade-file
@@ -131,7 +133,7 @@ createTransparentWindow
   when (title /= Nothing) $ let (Just title') = title in
     setWindowTitle mainWindow title'
 
-  return objs
+  return (objs, builder)
 
 runAfterDelay :: Int -> IO () -> IO ThreadId
 runAfterDelay t f = forkIO (threadDelay t >> f)
