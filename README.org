@@ -171,6 +171,14 @@ width = 300
 # Monitor on which the notification will be printed.
 monitor = 0
 
+# The display size of the application icons in the notification 
+# pop-ups and in the notification center
+iconSize = 20
+
+# The maximal display size of images that are part of notifications
+# for notification pop-ups and in the notification center
+maxImageSize = 100
+
 [colors]
 # Note about colors: Colors can be represented in (at least, I mean,
 # who knows...) three different ways:
@@ -330,20 +338,27 @@ The following class-names for labels are defined:
   - =label.deadd-noti-center.notification.appname=
   - =label.deadd-noti-center.notification.body=
   - =label.deadd-noti-center.notification.title=
+  - =image.deadd-noti-center.notification.image=
+  - =image.deadd-noti-center.notification.icon=
 - Notifications in the notification center:
   - =label.deadd-noti-center.in-center.appname=
   - =label.deadd-noti-center.in-center.body=
   - =label.deadd-noti-center.in-center.title=
   - =label.deadd-noti-center.in-center.time=
+  - =image.deadd-noti-center.in-center.image=
+  - =image.deadd-noti-center.in-center.icon=
+  - =button.deadd-noti-center.in-center.button-close=
 - Notification-center:
   - =label.deadd-noti-center.noti-center.time=
   - =label.deadd-noti-center.noti-center.date=
 
 _Examples:_
 
-#+CAPTION: Remove appname from notifications
+#+CAPTION: Remove appname and icon from notifications
 #+BEGIN_SRC css
+image.deadd-noti-center.notification.icon,
 label.deadd-noti-center.notification.appname,
+image.deadd-noti-center.in-center.icon,
 label.deadd-noti-center.in-center.appname {
     opacity: 0
 }
