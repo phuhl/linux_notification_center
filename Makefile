@@ -67,9 +67,14 @@ install-stack:
 install-service: service
 	mkdir -p ${DESTDIR}${SERVICEDIR_DBUS}
 	install -m644 com.ph-uhl.deadd.notification.service ${DESTDIR}${SERVICEDIR_DBUS}
-	ifneq (0,${SYSTEMD})
-		install -m644 deadd-notification-center.service ${DESTDIR}${SERVICEDIR_SYSTEMD}
-	endif
+ifneq (0,${SYSTEMD})
+install-service: install-service-systemd
+install-service-systemd:
+	install -m644 deadd-notification-center.service ${DESTDIR}${SERVICEDIR_SYSTEMD}
+endif
+
+
+
 
 install-lang:
 	mkdir -p ${DESTDIR}${PREFIX}/share/locale/{de,en}/LC_MESSAGES
@@ -84,9 +89,12 @@ uninstall:
 	rm -f ${DESTDIR}${SERVICEDIR_DBUS}/com.ph-uhl.deadd.notification.service
 	rm -f ${DESTDIR}${PREFIX}/share/licenses/deadd-notification-center/LICENSE
 	rm -f ${DESTDIR}${PREFIX}/share/locale/{de,en}/LC_MESSAGES/deadd-notification-center.mo
-	ifneq (0,${SYSTEMD})
+
+ifneq (0,${SYSTEMD})
+uninstall: uninstall-service-systemd
+uninstall-service-systemd:
 		rm -f ${DESTDIR}${SERVICEDIR_SYSTEMD}/deadd-notification-center.service
-	endif
+endif
 
 
 .PHONY: all clean install uninstall
