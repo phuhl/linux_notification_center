@@ -60,13 +60,12 @@ This snippet uses [[https://github.com/phuhl/notify-send.py][notify-send.py]], a
 
 ** Install
 
-Install from the AUR for Arch: [[https://aur.archlinux.org/packages/deadd-notification-center/][deadd-notification-center]]. Currently
-there exists an issue and a fix with building, as described [[https://github.com/phuhl/linux_notification_center/issues/4][here]]. 
+Install from the AUR for Arch: [[https://aur.archlinux.org/packages/deadd-notification-center/][deadd-notification-center]].
 
 *OR* 
 
-If you want to spare yourself the hassle to apply the fix and the
-build time there es an /all new/ binary package available:
+If you want to spare yourself the hassle of the
+build time there es a binary package available:
 [[https://aur.archlinux.org/packages/deadd-notification-center-bin/][deadd-notification-center-bin]].
 
 *OR*
