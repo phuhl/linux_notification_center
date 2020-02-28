@@ -136,6 +136,23 @@ build time there es a binary package available:
 
 *OR*
 
+On Ubuntu, Debian, everything... Replace 1.7.2 with the current-most release from the 
+[[https://github.com/phuhl/linux_notification_center/releases][release section]].
+
+Manually install the dependencies (exact names might differ in your distribution):
+- gtk3
+- gobject-introspection-runtime
+
+#+BEGIN_SRC sh
+tar -xvzf linux_notification_center-1.7.2.tar.gz
+cd linux_notification_center-1.7.2
+wget https://github.com/phuhl/linux_notification_center/releases/download/1.7.2/deadd-notification-center
+mv deadd-notification-center .out
+sudo make install
+#+END_SRC
+
+*OR*
+
 Dependencies:
 - [[https://www.archlinux.org/packages/community/x86_64/stack/][stack]]
 - cairo
