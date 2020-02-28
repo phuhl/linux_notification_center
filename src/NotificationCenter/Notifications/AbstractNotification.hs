@@ -29,10 +29,12 @@ import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , labelSetXalign, widgetGetPreferredHeightForWidth
               , onWidgetButtonPressEvent, imageSetFromPixbuf
               , imageSetFromIconName, setWidgetWidthRequest
-              , setImagePixelSize, widgetSetMarginStart, widgetSetMarginEnd)
+              , setImagePixelSize, widgetSetMarginStart, widgetSetMarginEnd
+              , catchGErrorJustDomain, GErrorMessage(..))
+import GI.GLib (FileError(..))
 import GI.GdkPixbuf (pixbufScaleSimple, pixbufGetHeight, pixbufGetWidth
                     , Pixbuf(..), pixbufNewFromFileAtScale
-                    , InterpType(..))
+                    , InterpType(..), PixbufError(..))
 import qualified GI.Gtk as Gtk
   (IsWidget, Box(..), Label(..), Button(..), Window(..), Image(..)
   , Builder(..), containerAdd, containerRemove, containerGetChildren)
@@ -138,8 +140,16 @@ setImage image imageSize widget = do
       widgetSetMarginStart widget 0
       widgetSetMarginEnd widget 0
     (ImagePath path) -> do
-      pb <- pixbufNewFromFileAtScale path imageSize imageSize True
-      imageSetFromPixbuf widget (Just pb)
+      pb <- catchGErrorJustDomain
+            (catchGErrorJustDomain
+             (Just <$> pixbufNewFromFileAtScale path imageSize imageSize True)
+             ((\err message -> return Nothing)
+              :: PixbufError -> GErrorMessage -> IO (Maybe Pixbuf)))
+            ((\err message -> return Nothing)
+              :: FileError -> GErrorMessage -> IO (Maybe Pixbuf))
+      case pb of
+        (Just pb') -> imageSetFromPixbuf widget (Just pb')
+        Nothing -> return ()
     (NamedIcon name) -> do
       imageSetFromIconName widget
         (Just $ pack name) imageSize
