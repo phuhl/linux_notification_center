@@ -58,6 +58,72 @@ notify-send.py a --hint boolean:deadd-notification-center:true int:id:0 boolean:
 This snippet uses [[https://github.com/phuhl/notify-send.py][notify-send.py]], an improved version of libnotify
 (notify-send).
 
+*** Example: Brightness indicator
+
+This snippet can be used to produce a brightness-indicator. It requires the 
+[[https://github.com/phuhl/notify-send.py][notify-send.py]] script.
+
+#+BEGIN_SRC sh
+#!/bin/bash
+
+if [ "$1" == "inc" ]; then
+    xbacklight -inc 5
+fi
+
+if [ "$1" == "dec" ]; then
+    xbacklight -lower 5
+fi
+
+BRIGHTNESS=$(xbacklight -get)
+NOTI_ID=$(notify-send.py "Bildschirmhelligkeit" "$BRIGHTNESS/100" \
+                         --hint string:image-path:video-display boolean:transient:true \
+                         --replaces-process "brightness-popup")
+#+END_SRC
+
+*** Example: Volume indicator
+
+This snippet can be used to produce a volume-indicator. It requires the 
+[[https://github.com/phuhl/notify-send.py][notify-send.py]] script.
+
+#+BEGIN_SRC sh
+#!/bin/bash
+
+if [ "$1" == "inc" ]; then
+   amixer -q sset Master 5%+
+fi
+
+if [ "$1" == "dec" ]; then
+   amixer -q sset Master 5%-
+fi
+
+if [ "$1" == "mute" ]; then
+   amixer -q sset Master toggle
+fi
+
+
+AMIXER=$(amixer sget Master)
+VOLUME=$(echo $AMIXER | grep 'Right:' | awk -F'[][]' '{ print $2 }' | tr -d "%")
+MUTE=$(echo $AMIXER | grep -o '\[off\]' | tail -n 1)
+if [ "$VOLUME" -le 20 ]; then
+    ICON=audio-volume-low
+else if [ "$VOLUME" -le 60 ]; then
+         ICON=audio-volume-medium
+     else 
+         ICON=audio-volume-high
+     fi
+fi
+if [ "$MUTE" == "[off]" ]; then
+    ICON=audio-volume-muted
+fi 
+
+
+
+NOTI_ID=$(notify-send.py "Lautstärke" "$VOLUME/100" \
+                         --hint string:image-path:$ICON boolean:transient:true \
+                         --replaces-process "volume-popup")
+#+END_SRC
+
+
 ** Install
 
 Install from the AUR for Arch: [[https://aur.archlinux.org/packages/deadd-notification-center/][deadd-notification-center]].
