@@ -181,7 +181,7 @@ parseImg hints =
   where
     fromIcon = RawImg <$> (fromVariant =<< Map.lookup "icon_data" hints)
     fromImageData = RawImg <$> (fromVariant =<< Map.lookup "image-data" hints)
-    fromImagePath = ImagePath <$> (fromVariant =<< Map.lookup "image-path" hints)
+    fromImagePath = parseImageString <$> (fromVariant =<< Map.lookup "image-path" hints)
 
 getTime = do
   now <- zonedTimeToLocalTime <$> getZonedTime
