@@ -147,6 +147,7 @@ Manually install the dependencies (exact names might differ in your distribution
 tar -xvzf linux_notification_center-1.7.2.tar.gz
 cd linux_notification_center-1.7.2
 wget https://github.com/phuhl/linux_notification_center/releases/download/1.7.2/deadd-notification-center
+mkdir -p .out
 mv deadd-notification-center .out
 sudo make install
 #+END_SRC
