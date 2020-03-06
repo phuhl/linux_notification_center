@@ -212,7 +212,7 @@ newFirst = true
 # the notification will be persisted in the notifiction center anyways
 ignoreTransient = false
 
-# If true, markup (<u>, <i>, <b>, <a>) will be displayed properly
+# If true, markup (<u>, <i>, <b>, <a> , <img>) will be displayed properly
 useMarkup = true
 
 # If set to true, the parameter noClosedMsg can be set on
