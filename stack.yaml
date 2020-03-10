@@ -60,6 +60,7 @@ extra-deps: [ ConfigFile-1.1.4
             , gi-gobject-2.0.22
             , gi-gtk-3.0.32
             , gi-graphene-1.0.1
+            , tagsoup-0.14.7
             ]
 
 # Override default flag values for local packages and extra-deps

@@ -151,6 +151,13 @@ packages:
       sha256: 457c9ab414f132881752f52a9c33703f36e0a6ce3ea6c4ecf8fcf8333c3b199a
   original:
     hackage: gi-graphene-1.0.1
+- completed:
+    hackage: tagsoup-0.14.7@sha256:07520669c752af2deea09499ff518e0a1dee44f1f3a40e273f41223b46252126,2141
+    pantry-tree:
+      size: 1429
+      sha256: 0dee9530f40656ea4987a0c6fcdabcae4d0d4d8218dc4d166a76c1d0db4fc48e
+  original:
+    hackage: tagsoup-0.14.7
 snapshots:
 - completed:
     size: 506735
