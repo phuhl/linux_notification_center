@@ -60,6 +60,7 @@ library
                      , hdaemonize
                      , directory
                      , process
+                     , tagsoup >= 0.14.7
                      , tuple
                      , split
                      , setlocale

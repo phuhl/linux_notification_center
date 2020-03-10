@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Helpers where
 
 import qualified Data.ConfigFile as CF
@@ -6,6 +8,7 @@ import Control.Applicative ((<|>))
 import Data.Maybe (fromMaybe)
 import Data.Functor (fmap)
 --import Data.Sequence (drop)
+import Text.HTML.TagSoup
 
 import qualified Data.Text as Text
 import Text.I18N.GetText (textDomain, bindTextDomain, getText)
@@ -99,14 +102,40 @@ splitEvery n as = (take n as) : (splitEvery n $ tailAt n as)
     tailAt n (a:as) = tailAt (n - 1) as
     tailAt _ [] = []
 
-markupify a = Text.pack $ markupify' $ Text.unpack a
-markupify' :: String -> String
-markupify' ('&':ls) = "&amp;" ++ (markupify' ls)
-markupify' (l:ls) = l:(markupify' ls)
-markupify' [] = []
+markupify :: Text.Text -> Text.Text
+markupify = renderTags . filterTags . canonicalizeTags . parseTags
 
 atMay :: [a] -> Int -> Maybe a
 atMay ls i = if length ls > i then
   Just $ ls !! i else Nothing
 
+-- The following tags should be supported:
+-- <b> ... </b> 	Bold
+-- <i> ... </i> 	Italic
+-- <u> ... </u> 	Underline
+-- <a href="..."> ... </a> 	Hyperlink
+supportedTags = ["b", "i", "u", "a"]
 
+filterTags :: [Tag Text.Text] -> [Tag Text.Text]
+filterTags [] = []
+filterTags (tag : rest) = case tag of
+  TagText _        -> keep
+  TagOpen "img" _  -> process "img" skip
+  TagOpen name _   ->
+    let conversion = if isSupported name then enclose name else strip
+    in process name conversion
+  otherwise        -> next
+  where
+    isSupported name = elem name supportedTags
+
+    keep = tag : next
+    next = filterTags rest
+
+    skip _ = []
+    strip  = filterTags
+    enclose name i = tag : (filterTags i) ++ [TagClose name]
+
+    process name conversion =
+      let
+        (inner, endTagRest) = break (isTagCloseName name) rest
+      in (conversion inner) ++ (filterTags endTagRest)
