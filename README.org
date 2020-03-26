@@ -199,6 +199,11 @@ width = 500
 # Monitor on which the notification center will be printed.
 monitor = 0
 
+# If true, the notification center will open on the screen, on which the
+# mouse is
+followMouse = false
+
+
 # (Optional) Command to run at startup.  This can be used to setup
 # button states.
 # startupCommand = "deadd-notification-center-startup"
@@ -254,6 +259,10 @@ width = 300
 
 # Monitor on which the notification will be printed.
 monitor = 0
+
+# If true, the notifications will open on the screen, on which the
+# mouse is
+followMouse = false
 
 # The display size of the application icons in the notification 
 # pop-ups and in the notification center
