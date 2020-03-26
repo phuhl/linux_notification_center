@@ -23,6 +23,7 @@ data Config = Config
   , configWidth :: Int
   , configStartupCommand :: String
   , configNotiCenterMonitor :: Int
+  , configNotiCenterFollowMouse :: Bool
   , configNotiCenterNewFirst :: Bool
   , configIgnoreTransient :: Bool
   , configMatchingRules :: [((Notification -> Bool), (Notification -> Notification), Maybe String)]
@@ -36,6 +37,7 @@ data Config = Config
   , configDistanceRight :: Int
   , configDistanceBetween :: Int
   , configWidthNoti :: Int
+  , configNotiFollowMouse :: Bool
   , configNotiMonitor :: Int
   , configImgSize :: Int
   , configIconSize :: Int
@@ -86,6 +88,7 @@ getConfig p =
   , configWidth = r 500 p nCenter "width"
   , configStartupCommand = r' "" p nCenter "startupCommand"
   , configNotiCenterMonitor = r 0 p nCenter "monitor"
+  , configNotiCenterFollowMouse = r'' False p nPopup "followMouse"
   , configNotiCenterNewFirst = r'' True p nCenter "newFirst"
   , configIgnoreTransient = r'' False p nCenter "ignoreTransient"
   , configMatchingRules = zip3 match (modify ++ repeat id) $ run ++ repeat Nothing -- run
@@ -100,6 +103,7 @@ getConfig p =
   , configDistanceBetween = r 20 p nPopup "distanceBetween"
   , configWidthNoti = r 300 p nPopup "width"
   , configNotiMonitor = r 0 p nPopup "monitor"
+  , configNotiFollowMouse = r'' False p nPopup "followMouse"
   , configImgSize = r 100 p nPopup "maxImageSize"
   , configIconSize = r 20 p nPopup "iconSize"
 

@@ -198,8 +198,11 @@ createNotiCenter tState config = do
   return ()
 
 setNotificationCenterPosition mainWindow config = do
-  (screenW, screenY, screenH) <- getScreenPos mainWindow
-    (fromIntegral $ configNotiCenterMonitor config)
+
+  (screenW, screenY, screenH) <- if configNotiCenterFollowMouse config then
+    getMouseActiveScreenPos mainWindow (fromIntegral $ configNotiMonitor config)
+    else
+    getScreenPos mainWindow (fromIntegral $ configNotiCenterMonitor config)
 
   windowSetDefaultSize mainWindow
     width -- w

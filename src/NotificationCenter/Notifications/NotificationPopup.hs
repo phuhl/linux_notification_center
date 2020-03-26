@@ -8,7 +8,7 @@ module NotificationCenter.Notifications.NotificationPopup
   , DisplayingNotificationPopup(..)
   ) where
 
-import TransparentWindow (addSource, runAfterDelay, getScreenPos, label
+import TransparentWindow (getMouseActiveScreenPos, addSource, runAfterDelay, getScreenPos, label
                          , window, createTransparentWindow)
 import Config (Config(..))
 import NotificationCenter.Notifications.AbstractNotification
@@ -88,8 +88,12 @@ showNotificationWindow config noti dispNotis onClose = do
 
   height <- updateNoti' config onClose noti dispNoti
 
-  (screenW, screenY, screenH) <- getScreenPos mainWindow
-    (fromIntegral $ configNotiMonitor config)
+  (screenW, screenY, screenH) <- if configNotiFollowMouse config then
+                                   getMouseActiveScreenPos mainWindow
+                                   (fromIntegral $ configNotiMonitor config)
+                                  else
+                                   getScreenPos mainWindow
+                                   (fromIntegral $ configNotiMonitor config)
 
   hBefores <- sortOn fst <$> mapM
     (\n -> (,) (_dNotiTop n) <$> (_dNotiGetHeight n)) dispNotis
