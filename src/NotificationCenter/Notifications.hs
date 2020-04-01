@@ -83,8 +83,7 @@ getCapabilities config = return ( [ "body"
                                   , "actions"
                                   , "persistence"
                                   , "icon-static"
-                                  , "action-icons"
-                                  , "body-images" ]
+                                  , "action-icons" ]
                                   ++ if (configNotiMarkup config) then
                                     [ "body-markup"
                                     , "body-hyperlinks"] else [])
