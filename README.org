@@ -62,14 +62,14 @@ This snippet uses [[https://github.com/phuhl/notify-send.py][notify-send.py]], a
 
 Clear all notifications
 #+BEGIN_SRC sh
-# within the notification center
-notify-send.py a --hint boolean:deadd-notification-center:true \
-string:type:clearInCenter
+  # within the notification center
+  notify-send.py a --hint boolean:deadd-notification-center:true \
+                 string:type:clearInCenter
 
-# popups
-notify-send.py a --hint boolean:deadd-notification-center:true \
-string:type:clearPopups
-
+  # popups
+  notify-send.py a --hint boolean:deadd-notification-center:true \
+                 string:type:clearPopups
+#+END_SRC
 
 *** Example: Brightness indicator
 
