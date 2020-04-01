@@ -49,14 +49,27 @@ kill -s USR1 $(pidof deadd-notification-center)
 Set the state of a user defined button (in this example the first
 button, which has =id= 0):
 #+BEGIN_SRC sh
-# turn highlighting on
-notify-send.py a --hint boolean:deadd-notification-center:true int:id:0 boolean:state:true
+  # turn highlighting on
+  notify-send.py a --hint boolean:deadd-notification-center:true \
+                 int:id:0 boolean:state:true type:string:buttons
 
-# turn highlighting off
-notify-send.py a --hint boolean:deadd-notification-center:true int:id:0 boolean:state:false
+  # turn highlighting off
+  notify-send.py a --hint boolean:deadd-notification-center:true \
+                 int:id:0 boolean:state:false type:string:buttons
 #+END_SRC
 This snippet uses [[https://github.com/phuhl/notify-send.py][notify-send.py]], an improved version of libnotify
 (notify-send).
+
+Clear all notifications
+#+BEGIN_SRC sh
+# within the notification center
+notify-send.py a --hint boolean:deadd-notification-center:true \
+string:type:clearInCenter
+
+# popups
+notify-send.py a --hint boolean:deadd-notification-center:true \
+string:type:clearPopups
+
 
 *** Example: Brightness indicator
 

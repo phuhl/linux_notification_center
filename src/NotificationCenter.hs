@@ -120,6 +120,10 @@ startSetTimeThread' tState = do
   runAfterDelay delay (startSetTimeThread' tState)
   return ()
 
+deleteInCenter tState = do
+  displayList <- stDisplayingNotiList <$> readTVarIO tState
+  mapM (removeNoti tState) displayList
+  return ()
 
 createNotiCenter :: TVar State -> Config -> IO ()
 createNotiCenter tState config = do
@@ -144,10 +148,7 @@ createNotiCenter tState config = do
     replaceColors config style
 --  (Just mainWindowGDK) <- widgetGetParentWindow mainWindow
 
-  onButtonClicked deleteButton $ do
-    displayList <- stDisplayingNotiList <$> readTVarIO tState
-    mapM (removeNoti tState) displayList
-    return ()
+  onButtonClicked deleteButton $ deleteInCenter tState
   buttonSetLabel deleteButton $ Text.pack $ translate "Delete all"
 
   let buttons = zip
@@ -217,12 +218,9 @@ setNotificationCenterPosition mainWindow config = do
       marginRight = fromIntegral $ configRightMargin config
       width = fromIntegral $ configWidth config
 
-parseNotisForMe tState = do
+parseButtons myNotiHints tState = do
   state <- readTVarIO tState
-  -- do stuff
   let buttons = stUserButtons state
-      notisForMe = stNotisForMe state
-      myNotiHints = notiHints <$> notisForMe
       maybeIds = Map.lookup "id" <$> myNotiHints
       ids = join <$> map (\id' -> fromVariant <$> id') maybeIds :: [ Maybe Int32 ]
       ids' = map checkId ids
@@ -240,6 +238,26 @@ parseNotisForMe tState = do
   sequence $ map (\comb' -> sequence $
                     (\(button, state) ->
                            setButtonState button state) <$> comb') comb
+  return ()
+
+
+parseNotisForMe tState = do
+  state <- readTVarIO tState
+  -- do stuff
+  let notisForMe = stNotisForMe state
+      myNotiHints = notiHints <$> notisForMe
+  sequence $ map (\noti -> do
+          let maybeType = Map.lookup "type" noti
+            in case (maybeType >>= fromVariant) :: Maybe (String) of
+                 (Just "clearInCenter") -> do
+                   putStrLn "clearing in center"
+                   deleteInCenter tState
+                 (Just "clearPopups") -> do
+                   putStrLn "clearing popups"
+                   hideAllNotis $ stNotiState state
+                 (Just "buttons") -> parseButtons myNotiHints tState
+                 Nothing -> parseButtons myNotiHints tState
+      ) myNotiHints
   atomically $ modifyTVar' tState
     (\state -> state { stNotisForMe = [] })
   return False
