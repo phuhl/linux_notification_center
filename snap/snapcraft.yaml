@@ -1,9 +1,9 @@
-name: linux-notification-center
-grade: stable
+name: deadd-notification-center
 confinement: strict
 base: core18
-version: git
 summary: Linux Notification Center
+adopt-info: deadd-notification-center
+
 description: |
     A haskell-written notification center for users that like a desktop with style...
 
@@ -14,14 +14,14 @@ slots:
         name: org.freedesktop.Notifications
 
 apps:
-    linux-notification-center:
-        command: $SNAP/usr/bin/deadd-notification-center
+    deadd-notification-center:
+        command: usr/bin/deadd-notification-center
         extensions: [gnome-3-28]
         slots:
           - dbus-daemon
 
 parts:
-    linux-notification-center:
+    deadd-notification-center:
         plugin: make
         source: https://github.com/phuhl/linux_notification_center.git
         build-packages:
@@ -35,9 +35,16 @@ parts:
         build-environment:
           - PATH: "/root/.local/bin/$PATH"
         override-build: |
-          mkdir -p /root/parts/linux-notification-center/install/usr/share/locale/en/LC_MESSAGES
-          mkdir -p /root/parts/linux-notification-center/install/usr/share/locale/de/LC_MESSAGES
+          mkdir -p /root/parts/deadd-notification-center/install/usr/share/locale/en/LC_MESSAGES
+          mkdir -p /root/parts/deadd-notification-center/install/usr/share/locale/de/LC_MESSAGES
           curl -SSL https://get.haskellstack.org | sh -s - -f
           which stack
           snapcraftctl build
-
+        override-pull: |
+            snapcraftctl pull
+            version="$(git describe --always --tags | sed -e 's/-/+git/;y/-/./')"
+            [ -n "$(echo $version | grep "+git")" ] && grade=devel || grade=stable
+            snapcraftctl set-version "$version"
+            snapcraftctl set-grade "$grade"
+            echo "Version: ${version}"
+            echo "Grade: ${grade}"
