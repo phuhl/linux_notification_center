@@ -11,3 +11,4 @@ RestartSec=10
 
 [Install]
 WantedBy=default.target
+Alias=dbus-com.ph-uhl.deadd.notification.service
