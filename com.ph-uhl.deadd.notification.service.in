@@ -1,3 +1,4 @@
 [D-BUS Service]
 Name=org.freedesktop.Notifications
 Exec=##PREFIX##/bin/deadd-notification-center
+SystemdService=deadd-notification-center.service

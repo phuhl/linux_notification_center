@@ -2,12 +2,6 @@
 Description=Deadd Notification Center
 
 [Service]
-Environment="DISPLAY=:0"
-Environment="DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus"
-PIDFile=/run/notification-center.pid
+Type=dbus
+BusName=org.freedesktop.Notifications
 ExecStart=##PREFIX##/bin/deadd-notification-center
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
