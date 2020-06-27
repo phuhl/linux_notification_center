@@ -503,6 +503,7 @@ You can set the following parameters:
 - body
 - app
 - time
+- timeout (specified in milliseconds)
 - icon (does not do anything, currently)
 - transient (value has to be =true= or =false=)
 - noClosedMsg (value has to be =true= or =false=, if set to true it
