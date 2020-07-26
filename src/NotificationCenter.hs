@@ -332,15 +332,13 @@ updateNotis config tState = do
   let delNotis = filter (\nd -> (find (\n -> _dNotiId nd == notiId n)
                                 $ notiStList notiState) == Nothing)
                  $ stDisplayingNotiList state
-  when (not $ stPopupsPaused state) $
-    do
-      atomically $ modifyTVar' tState (
-        \state -> state { stDisplayingNotiList =
-                          newNotis' ++ stDisplayingNotiList state
-                        })
+  atomically $ modifyTVar' tState (
+    \state -> state { stDisplayingNotiList =
+                      newNotis' ++ stDisplayingNotiList state
+                    })
   setDeleteAllState tState
   mapM (removeNoti tState) $ delNotis
-  when (stCenterShown state) $
+  when (stCenterShown state || stPopupsPaused state) $
     do
       hideAllNotis $ stNotiState state
   return ()
