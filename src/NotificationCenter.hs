@@ -94,6 +94,7 @@ data State = State
   , stDisplayingNotiList :: [ DisplayingNotificationInCenter ]
   , stNotisForMe :: [ Notification ]
   , stCenterShown :: Bool
+  , stPopupsPaused :: Bool
   }
 
 
@@ -258,7 +259,8 @@ parseNotisForMe tState = do
                  (Just "pausePopups") -> do
                    putStrLn "pausing popups"
                    hideAllNotis $ stNotiState state
-                   -- TODO: set state var
+                   atomically $ modifyTVar' tState
+                     (\state -> state { stPopupsPaused = False })
                  (Just "buttons") -> parseButtons myNotiHints tState
                  Nothing -> parseButtons myNotiHints tState
       ) myNotiHints
@@ -369,7 +371,8 @@ setDeleteAllState tState = do
 getInitialState = do
   newTVarIO $ State
     { stDisplayingNotiList = []
-    , stCenterShown = False}
+    , stCenterShown = False
+    , stPopupsPaused = False}
 
 main' :: IO ()
 main' = do
