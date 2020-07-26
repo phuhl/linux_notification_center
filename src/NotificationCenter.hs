@@ -258,9 +258,12 @@ parseNotisForMe tState = do
                    hideAllNotis $ stNotiState state
                  (Just "pausePopups") -> do
                    putStrLn "pausing popups"
-                   hideAllNotis $ stNotiState state
                    atomically $ modifyTVar' tState
                      (\state -> state { stPopupsPaused = True })
+                 (Just "unpausePopups") -> do
+                   putStrLn "unpausing popups"
+                   atomically $ modifyTVar' tState
+                     (\state -> state { stPopupsPaused = False })
                  (Just "buttons") -> parseButtons myNotiHints tState
                  Nothing -> parseButtons myNotiHints tState
       ) myNotiHints
