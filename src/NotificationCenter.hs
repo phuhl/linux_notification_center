@@ -260,7 +260,7 @@ parseNotisForMe tState = do
                    putStrLn "pausing popups"
                    hideAllNotis $ stNotiState state
                    atomically $ modifyTVar' tState
-                     (\state -> state { stPopupsPaused = False })
+                     (\state -> state { stPopupsPaused = True })
                  (Just "buttons") -> parseButtons myNotiHints tState
                  Nothing -> parseButtons myNotiHints tState
       ) myNotiHints
@@ -329,11 +329,12 @@ updateNotis config tState = do
   let delNotis = filter (\nd -> (find (\n -> _dNotiId nd == notiId n)
                                 $ notiStList notiState) == Nothing)
                  $ stDisplayingNotiList state
-  -- TODO: check if popups are paused
-  atomically $ modifyTVar' tState (
-    \state -> state { stDisplayingNotiList =
-                      newNotis' ++ stDisplayingNotiList state
-                    })
+  when (not $ stPopupsPaused state)
+    do
+      atomically $ modifyTVar' tState (
+        \state -> state { stDisplayingNotiList =
+                          newNotis' ++ stDisplayingNotiList state
+                        })
   setDeleteAllState tState
   mapM (removeNoti tState) $ delNotis
   when (stCenterShown state) $
