@@ -332,7 +332,7 @@ updateNotis config tState = do
   let delNotis = filter (\nd -> (find (\n -> _dNotiId nd == notiId n)
                                 $ notiStList notiState) == Nothing)
                  $ stDisplayingNotiList state
-  when (not $ stPopupsPaused state)
+  when (not $ stPopupsPaused state) $
     do
       atomically $ modifyTVar' tState (
         \state -> state { stDisplayingNotiList =
