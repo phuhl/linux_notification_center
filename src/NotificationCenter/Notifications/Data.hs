@@ -50,6 +50,24 @@ data Notification = Notification
     -- ^ Should be called when an action is used
   }
 
+instance Show Notification where
+  show n = foldl (++) ""
+    [ "Notification { \n"
+    , "  notiAppName = " ++ (show $ notiAppName n) ++ ", \n"
+    , "  notiRepId = " ++ (show $ notiRepId n) ++ ", \n" 
+    , "  notiId = " ++ (show $ notiId n) ++ ", \n" 
+    , "  notiIcon = " ++ (show $ notiIcon n) ++ ", \n" 
+    , "  notiImg = " ++ (show $ notiImg n) ++ ", \n" 
+    , "  notiSummary = " ++ (show $ notiSummary n) ++ ", \n" 
+    , "  notiBody = " ++ (show $ notiBody n) ++ ", \n" 
+    , "  notiActions = " ++ (show $ notiActions n) ++ ", \n" 
+    , "  notiActionIcons = " ++ (show $ notiActionIcons n) ++ ", \n" 
+    , "  notiHints = " ++ (show $ notiHints n) ++ ", \n" 
+    , "  notiTimeout = " ++ (show $ notiTimeout n) ++ ", \n" 
+    , "  notiTime = " ++ (show $ notiTime n) ++ ", \n" 
+    , "  notiTransient = " ++ (show $ notiTransient n) ++ ", \n" 
+    , "  notiSendClosedMsg = " ++ (show $ notiSendClosedMsg n) ++ "\n" 
+    , " } " ]
 
 data Image = RawImg
   ( Int32 -- width
