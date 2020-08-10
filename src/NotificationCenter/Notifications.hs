@@ -32,7 +32,6 @@ import DBus.Client
        ( connectSession, AutoMethod(..), autoMethod, requestName, export
        , nameAllowReplacement, nameReplaceExisting, emit)
 import Data.Char (toLower)
-import qualified Data.Text.IO as TextIO ( putStrLn )
 import Data.Text (unpack, Text, pack )
 import qualified Data.Text as Text
 import Data.Word ( Word, Word8, Word32 )
@@ -231,7 +230,7 @@ notify config tState emit
         , notiId = 0
         , notiIcon = icon
         , notiImg = parseImg hints body
-        , notiSummary = summary
+        , notiSummary = htmlEntitiesStrip config summary
         , notiBody = htmlEntitiesStrip config $ xmlStrip config body
         , notiActions = actions
         , notiActionIcons = parseActionIcons hints
@@ -255,9 +254,6 @@ notify config tState emit
     else
     -- Noti has to be displayed
     do
-      putStrLn $ show newNotiWithoutId
-      -- TextIO.putStrLn $ Text.append "Body: " body
-      -- TextIO.putStrLn $ Text.append "Parsed Body: " $ notiBody newNotiWithoutId
       -- Apply modifications and run scripts for noti
       let matchingRules = filter (\(match, rep, com) -> match newNotiWithoutId)
             (configMatchingRules config)
