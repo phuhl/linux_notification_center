@@ -233,6 +233,11 @@ ignoreTransient = false
 # If true, markup (<u>, <i>, <b>, <a> , <img>) will be displayed properly
 useMarkup = true
 
+# If true, html entities (&#38; for &, &#37; for %, etc) will be parsed 
+# properly. This is useful for chromium-based apps, which tend to send 
+# these in notifications. 
+parseHtmlEntities = true
+
 # If set to true, the parameter noClosedMsg can be set on
 # notifications. If noClosedMsg is set to true on a notification,
 # DBUS NotificationClosed messages will not be send for this
