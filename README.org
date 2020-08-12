@@ -290,7 +290,7 @@ maxImageSize = 100
 dismissButton = mouse1
 
 # The mouse button for opening a popup with the default action.
-# Must be either "mouse1", "mouse2", "mouse3", "mouse4", or "mouse5".
+# Must be either "mouse1", "mouse2", "mouse3", "mouse4", or "mouse5"
 defaultActionButton = mouse3
 
 [colors]
