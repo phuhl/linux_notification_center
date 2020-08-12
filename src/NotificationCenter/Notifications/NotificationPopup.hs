@@ -29,6 +29,7 @@ import Data.List ( sortOn )
 import Control.Monad
 import DBus ( Variant (..) )
 
+import GI.Gdk (getEventButtonButton)
 import GI.Gtk (widgetGetPreferredHeightForWidth, widgetSetSizeRequest
               , widgetShowAll, onWidgetButtonPressEvent, windowMove
               , setWidgetWidthRequest, widgetDestroy)
@@ -105,10 +106,20 @@ showNotificationWindow config noti dispNotis onClose = do
      (configWidthNoti config + configDistanceRight config))
     hBefore
 
-  onWidgetButtonPressEvent mainWindow $ \(_) -> do
-    notiOnAction noti "default"
-    notiOnClosed noti $ User
-    onClose
+  -- TODO: Read Config
+  onWidgetButtonPressEvent mainWindow $ \eventButton -> do
+    mouseButton <- (++ "mouse") . show <$> getEventButtonButton eventButton
+    if mouseButton `elem` ["mouse1", "mouse2", "mouse3", "mouse4", "mouse5"]
+    then
+      let match mb = (mb == configPopupDismissButton config, mb == configPopupDefaultActionButton config)
+          dismiss = (True, False)
+          defaultAction = (False, True)
+      in case match mouseButton of
+           dismiss -> notiOnClosed noti $ User
+           defaultAction -> do 
+             notiOnAction noti "default"
+             notiOnClosed noti $ User
+    else putStrLn $ "Warning: Popup received unknown mouse input '" ++ (show mouseButton) ++ "'."
     return False
   widgetShowAll mainWindow
 
