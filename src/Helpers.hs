@@ -132,6 +132,7 @@ removeImgTag text =
 -- their representative characters. Only operates on entities in
 -- the ASCII Range. See the following for details:
 --
+-- <https://dev.w3.org/html5/html-author/charref>
 -- <https://www.freeformatter.com/html-entities.html>
 parseHtmlEntities :: String -> String
 parseHtmlEntities = 
