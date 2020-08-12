@@ -108,8 +108,8 @@ getConfig p =
   , configNotiFollowMouse = r'' False p nPopup "followMouse"
   , configImgSize = r 100 p nPopup "maxImageSize"
   , configIconSize = r 20 p nPopup "iconSize"
-  , configPopupDismissButton = r "mouse1" p nPopup "dismissButton"
-  , configPopupDefaultActionButton = r "mouse3" p nPopup "defaultActionButton"
+  , configPopupDismissButton = r' "mouse1" p nPopup "dismissButton"
+  , configPopupDefaultActionButton = r' "mouse3" p nPopup "defaultActionButton"
   
     -- buttons
   , configButtonsPerRow = r 5 p buttons "buttonsPerRow"
