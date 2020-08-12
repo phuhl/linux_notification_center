@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE OverloadedLabels #-}
 
@@ -106,23 +107,28 @@ showNotificationWindow config noti dispNotis onClose = do
      (configWidthNoti config + configDistanceRight config))
     hBefore
 
-  -- TODO: Read Config
   onWidgetButtonPressEvent mainWindow $ \eventButton -> do
     mouseButton <- (\n -> "mouse" ++ n) . show <$> getEventButtonButton eventButton
-    if mouseButton `elem` ["mouse1", "mouse2", "mouse3", "mouse4", "mouse5"]
-    then do
-      let match mb = (mb == configPopupDismissButton config, mb == configPopupDefaultActionButton config)
-          dismiss = (True, False)
-          defaultAction = (False, True)
-      case match mouseButton of
-        dismiss -> do
-          notiOnClosed noti $ User
-          onClose
-        defaultAction -> do 
-          notiOnAction noti "default"
-          notiOnClosed noti $ User
-          onClose
-    else putStrLn $ "Warning: Popup received unknown mouse input '" ++ (show mouseButton) ++ "'."
+    let validMouseButtons = ["mouse1", "mouse2", "mouse3", "mouse4", "mouse5"]
+        validInput = mouseButton `elem` validMouseButtons
+        validDismiss = configPopupDismissButton config `elem` validMouseButtons
+        validDefaultAction = configPopupDefaultActionButton config `elem` validMouseButtons
+        valid = validInput && validDismiss && validDefaultAction
+        dismiss = configPopupDismissButton config == mouseButton
+        defaultAction = configPopupDefaultActionButton config == mouseButton
+    if | valid && dismiss -> do
+           notiOnClosed noti $ User
+           onClose
+       | valid && defaultAction -> do 
+           notiOnAction noti "default"
+           notiOnClosed noti $ User
+           onClose
+       | not validDismiss -> 
+           putStrLn $ "Warning: Unknown mouse button '" ++ (show $ configPopupDismissButton config) ++ "'."
+       | not validDefaultAction ->
+           putStrLn $ "Warning: Unknown mouse button '" ++ (show $ configPopupDefaultActionButton config) ++ "'."
+       | not validInput ->
+           putStrLn $ "Warning: Popup received unknown mouse input '" ++ (show mouseButton) ++ "'."
     return False
   widgetShowAll mainWindow
 
