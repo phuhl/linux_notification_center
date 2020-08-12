@@ -134,14 +134,35 @@ removeImgTag text =
 --
 -- <https://www.freeformatter.com/html-entities.html>
 parseHtmlEntities :: String -> String
-parseHtmlEntities text = 
-  let (a, matched, c, ms) =
-        (text =~ "&#([0-9]{2,3});"
-         :: (String, String, String, [String]))
-      ascii = if length ms > 0 then (read $ head ms :: Int) else -1
-      repl = if 32 <= ascii && ascii <= 126 
-             then [chr ascii] else matched
-  in a ++ repl ++ (if length c > 0 then parseHtmlEntities c else "")
+parseHtmlEntities = 
+  let parseAsciiEntities text = 
+        let (a, matched, c, ms) =
+              (text =~ "&#([0-9]{2,3});"
+               :: (String, String, String, [String]))
+            ascii = if length ms > 0 then (read $ head ms :: Int) else -1
+            repl = if 32 <= ascii && ascii <= 126 
+                   then [chr ascii] else matched
+        in a ++ repl ++ (if length c > 0 then parseAsciiEntities c else "")
+      parseNamedEntities text = 
+        let (a, matched, c, ms) = 
+              (text =~ "&([A-Za-z0-9]+);"
+                :: (String, String, String, [String]))
+            name = if length ms > 0 then head ms else ""
+            repl = case name of
+                     "quot" -> "\""
+                     "apos" -> "'"
+                     "excl" -> "!"
+                     "num" -> "#"
+                     "amp" -> "&"
+                     "lpar" -> "("
+                     "rpar" -> ")"
+                     "lt" -> "<"
+                     "gt" -> ">"
+                     "" -> matched
+                     _ -> matched
+        in a ++ repl ++ (if length c > 0 then parseNamedEntities c else "")
+  in parseAsciiEntities . parseNamedEntities
+     
 
 findTagProps :: String -> [(String, String)]
 findTagProps match =
