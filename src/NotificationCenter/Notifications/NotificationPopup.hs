@@ -125,10 +125,16 @@ showNotificationWindow config noti dispNotis onClose = do
            onClose
        | not validDismiss -> 
            putStrLn $ "Warning: Unknown mouse button '" ++ (show $ configPopupDismissButton config) ++ "'."
+           notiOnClosed noti $ User
+           onClose
        | not validDefaultAction ->
            putStrLn $ "Warning: Unknown mouse button '" ++ (show $ configPopupDefaultActionButton config) ++ "'."
+           notiOnClosed noti $ User
+           onClose
        | not validInput ->
            putStrLn $ "Warning: Popup received unknown mouse input '" ++ (show mouseButton) ++ "'."
+           notiOnClosed noti $ User
+           onClose
     return False
   widgetShowAll mainWindow
 
