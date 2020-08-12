@@ -108,17 +108,20 @@ showNotificationWindow config noti dispNotis onClose = do
 
   -- TODO: Read Config
   onWidgetButtonPressEvent mainWindow $ \eventButton -> do
-    mouseButton <- (++ "mouse") . show <$> getEventButtonButton eventButton
+    mouseButton <- (\n -> "mouse" ++ n) . show <$> getEventButtonButton eventButton
     if mouseButton `elem` ["mouse1", "mouse2", "mouse3", "mouse4", "mouse5"]
-    then
+    then do
       let match mb = (mb == configPopupDismissButton config, mb == configPopupDefaultActionButton config)
           dismiss = (True, False)
           defaultAction = (False, True)
-      in case match mouseButton of
-           dismiss -> notiOnClosed noti $ User
-           defaultAction -> do 
-             notiOnAction noti "default"
-             notiOnClosed noti $ User
+      case match mouseButton of
+        dismiss -> do
+          notiOnClosed noti $ User
+          onClose
+        defaultAction -> do 
+          notiOnAction noti "default"
+          notiOnClosed noti $ User
+          onClose
     else putStrLn $ "Warning: Popup received unknown mouse input '" ++ (show mouseButton) ++ "'."
     return False
   widgetShowAll mainWindow
