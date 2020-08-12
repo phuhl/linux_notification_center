@@ -153,21 +153,8 @@ parseHtmlEntities =
                      "quot" -> "\""
                      "apos" -> "'"
                      "grave" -> "`"
-                     "excl" -> "!"
-                     "dollar" -> "$"
-                     "cent" -> "¢"
-                     "pound" -> "£"
-                     "curren" -> "¤"
-                     "yen" -> "¥"
-                     "percnt" -> "%"
-                     "num" -> "#"
                      "amp" -> "&"
                      "tilde" -> "~"
-                     "deg" -> "°"
-                     "lpar" -> "("
-                     "rpar" -> ")"
-                     "lt" -> "<"
-                     "gt" -> ">"
                      "" -> matched
                      _ -> matched
         in a ++ repl ++ (if length c > 0 then parseNamedEntities c else "")
