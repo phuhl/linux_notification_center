@@ -26,6 +26,7 @@ data Config = Config
   , configNotiCenterMonitor :: Int
   , configNotiCenterFollowMouse :: Bool
   , configNotiCenterNewFirst :: Bool
+  , configNotiCenterTimeTextSize :: String
   , configIgnoreTransient :: Bool
   , configMatchingRules :: [((Notification -> Bool), (Notification -> Notification), Maybe String)]
   , configNotiMarkup :: Bool
@@ -42,6 +43,9 @@ data Config = Config
   , configNotiMonitor :: Int
   , configImgSize :: Int
   , configIconSize :: Int
+  , configTitleTextSize :: String
+  , configAppNameTextSize :: String
+  , configTimeTextSize :: String
   , configPopupDismissButton :: String
   , configPopupDefaultActionButton :: String
 
@@ -91,8 +95,9 @@ getConfig p =
   , configWidth = r 500 p nCenter "width"
   , configStartupCommand = r' "" p nCenter "startupCommand"
   , configNotiCenterMonitor = r 0 p nCenter "monitor"
-  , configNotiCenterFollowMouse = r'' False p nPopup "followMouse"
+  , configNotiCenterFollowMouse = r'' False p nCenter "followMouse"
   , configNotiCenterNewFirst = r'' True p nCenter "newFirst"
+  , configNotiCenterTimeTextSize = r' "32px" p nCenter "notiCenterTimeTextSize"
   , configIgnoreTransient = r'' False p nCenter "ignoreTransient"
   , configMatchingRules = zip3 match (modify ++ repeat id) $ run ++ repeat Nothing -- run
   , configNotiMarkup = r'' True p nCenter "useMarkup"
@@ -109,6 +114,10 @@ getConfig p =
   , configNotiFollowMouse = r'' False p nPopup "followMouse"
   , configImgSize = r 100 p nPopup "maxImageSize"
   , configIconSize = r 20 p nPopup "iconSize"
+  , configTitleTextSize = r' "16px" p nPopup "titleTextSize"
+  , configAppNameTextSize = r' "12px" p nPopup "appNameTextSize"
+  , configTimeTextSize = r' "12px" p nPopup "timeTextSize"
+
   , configPopupDismissButton = r' "mouse1" p nPopup "dismissButton"
   , configPopupDefaultActionButton = r' "mouse3" p nPopup "defaultActionButton"
   
@@ -212,5 +221,9 @@ replaceColors config style =
   replace "replaceme0021" (configUserButtonState1Hover config) $
   replace "replaceme0022" (configUserButtonState2Hover config) $
   replace "replaceme0023" (configUserButtonState1HoverColor config) $
-  replace "replaceme0024" (configUserButtonState2HoverColor config) style
+  replace "replaceme0024" (configUserButtonState2HoverColor config) $
+  replace "replaceme0025" (configTitleTextSize config) $
+  replace "replaceme0026" (configAppNameTextSize config) $
+  replace "replaceme0027" (configNotiCenterTimeTextSize config) $
+  replace "replaceme0028" (configTimeTextSize config) style
 

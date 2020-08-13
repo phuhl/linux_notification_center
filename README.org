@@ -237,6 +237,9 @@ followMouse = false
 # bottom.
 newFirst = true
 
+# Text size for the time in the notification center
+timeTextSize = 32px
+
 # If true, the transient field in notifications will be ignored and
 # the notification will be persisted in the notifiction center anyways
 ignoreTransient = false
@@ -291,6 +294,15 @@ followMouse = false
 # The display size of the application icons in the notification 
 # pop-ups and in the notification center
 iconSize = 20
+
+# Text size for the title in the notification pop-ups
+titleTextSize = 16px
+
+# Text size for the app name in the notification pop-ups
+appNameTextSize = 12px
+
+# Text size for the time in the notification pop-ups
+timeTextSize = 12px
 
 # The maximal display size of images that are part of notifications
 # for notification pop-ups and in the notification center
