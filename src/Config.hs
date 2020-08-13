@@ -10,6 +10,7 @@ import Data.List.Split (splitOn)
 import Helpers (split, removeOuterLetters, readConfig, replace)
 import Data.Maybe (fromMaybe)
 import qualified Data.Text as Text
+import Data.Int ( Int32 )
 import NotificationCenter.Notifications.Data
   (notiSendClosedMsg, notiTransient, notiIcon, notiTime, notiAppName
   , notiBody, notiSummary, Notification(..))
@@ -45,6 +46,8 @@ data Config = Config
   , configTitleTextSize :: String
   , configAppNameTextSize :: String
   , configTimeTextSize :: String
+  , configPopupDismissButton :: String
+  , configPopupDefaultActionButton :: String
 
   -- buttons
   , configButtonsPerRow :: Int
@@ -115,6 +118,9 @@ getConfig p =
   , configAppNameTextSize = r' "12px" p nPopup "appNameTextSize"
   , configTimeTextSize = r' "12px" p nPopup "timeTextSize"
 
+  , configPopupDismissButton = r' "mouse1" p nPopup "dismissButton"
+  , configPopupDefaultActionButton = r' "mouse3" p nPopup "defaultActionButton"
+  
     -- buttons
   , configButtonsPerRow = r 5 p buttons "buttonsPerRow"
   , configButtonHeight = r 60 p buttons "buttonHeight"
@@ -180,6 +186,7 @@ getConfig p =
                                 | k == "body" = noti { notiBody = Text.pack v }
                                 | k == "app" = noti { notiAppName = Text.pack v }
                                 | k == "time" = noti { notiTime = Text.pack v }
+                                | k == "timeout" = noti { notiTimeout = read v :: Int32 }
 --                                | k == "icon" = noti { notiIcon = Text.pack v }
                                 | k == "transient" && v == "true" = noti { notiTransient = True }
                                 | k == "transient" && v == "false" = noti { notiTransient = False }
