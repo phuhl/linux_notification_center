@@ -71,6 +71,17 @@ Clear all notifications
                  string:type:clearPopups
 #+END_SRC
 
+Pause/Unpause popup notifications
+#+BEGIN_SRC sh
+  # pause popup notifications
+  notify-send.py a --hint boolean:deadd-notification-center:true \
+                   string:type:pausePopups
+
+  # unpause popup notifications
+  notify-send.py a --hint boolean:deadd-notification-center:true \
+                   string:type:unpausePopups
+#+END_SRC
+
 *** Example: Brightness indicator
 
 This snippet can be used to produce a brightness-indicator. It requires the 
