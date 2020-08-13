@@ -285,6 +285,14 @@ iconSize = 20
 # for notification pop-ups and in the notification center
 maxImageSize = 100
 
+# The mouse button for closing a popup. Must be either "mouse1", 
+# "mouse2", "mouse3", "mouse4", or "mouse5"
+dismissButton = mouse1
+
+# The mouse button for opening a popup with the default action.
+# Must be either "mouse1", "mouse2", "mouse3", "mouse4", or "mouse5"
+defaultActionButton = mouse3
+
 [colors]
 # Note about colors: Colors can be represented in (at least, I mean,
 # who knows...) three different ways:
