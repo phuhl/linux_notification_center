@@ -71,6 +71,17 @@ Clear all notifications
                  string:type:clearPopups
 #+END_SRC
 
+Pause/Unpause popup notifications
+#+BEGIN_SRC sh
+  # pause popup notifications
+  notify-send.py a --hint boolean:deadd-notification-center:true \
+                   string:type:pausePopups
+
+  # unpause popup notifications
+  notify-send.py a --hint boolean:deadd-notification-center:true \
+                   string:type:unpausePopups
+#+END_SRC
+
 *** Example: Brightness indicator
 
 This snippet can be used to produce a brightness-indicator. It requires the 
@@ -297,6 +308,14 @@ timeTextSize = 12px
 # for notification pop-ups and in the notification center
 maxImageSize = 100
 
+# The mouse button for closing a popup. Must be either "mouse1", 
+# "mouse2", "mouse3", "mouse4", or "mouse5"
+dismissButton = mouse1
+
+# The mouse button for opening a popup with the default action.
+# Must be either "mouse1", "mouse2", "mouse3", "mouse4", or "mouse5"
+defaultActionButton = mouse3
+
 [colors]
 # Note about colors: Colors can be represented in (at least, I mean,
 # who knows...) three different ways:
@@ -515,6 +534,7 @@ You can set the following parameters:
 - body
 - app
 - time
+- timeout (specified in milliseconds)
 - icon (does not do anything, currently)
 - transient (value has to be =true= or =false=)
 - noClosedMsg (value has to be =true= or =false=, if set to true it

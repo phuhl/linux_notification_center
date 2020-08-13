@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE OverloadedLabels #-}
 
@@ -29,6 +30,7 @@ import Data.List ( sortOn )
 import Control.Monad
 import DBus ( Variant (..) )
 
+import GI.Gdk (getEventButtonButton)
 import GI.Gtk (widgetGetPreferredHeightForWidth, widgetSetSizeRequest
               , widgetShowAll, onWidgetButtonPressEvent, windowMove
               , setWidgetWidthRequest, widgetDestroy)
@@ -105,10 +107,34 @@ showNotificationWindow config noti dispNotis onClose = do
      (configWidthNoti config + configDistanceRight config))
     hBefore
 
-  onWidgetButtonPressEvent mainWindow $ \(_) -> do
-    notiOnAction noti "default"
-    notiOnClosed noti $ User
-    onClose
+  onWidgetButtonPressEvent mainWindow $ \eventButton -> do
+    mouseButton <- (\n -> "mouse" ++ n) . show <$> getEventButtonButton eventButton
+    let validMouseButtons = ["mouse1", "mouse2", "mouse3", "mouse4", "mouse5"]
+        validInput = mouseButton `elem` validMouseButtons
+        validDismiss = configPopupDismissButton config `elem` validMouseButtons
+        validDefaultAction = configPopupDefaultActionButton config `elem` validMouseButtons
+        valid = validInput && validDismiss && validDefaultAction
+        dismiss = configPopupDismissButton config == mouseButton
+        defaultAction = configPopupDefaultActionButton config == mouseButton
+    if | valid && dismiss -> do
+           notiOnClosed noti $ User
+           onClose
+       | valid && defaultAction -> do 
+           notiOnAction noti "default"
+           notiOnClosed noti $ User
+           onClose
+       | not validDismiss -> do
+           putStrLn $ "Warning: Unknown mouse button '" ++ (show $ configPopupDismissButton config) ++ "'."
+           notiOnClosed noti $ User
+           onClose
+       | not validDefaultAction -> do
+           putStrLn $ "Warning: Unknown mouse button '" ++ (show $ configPopupDefaultActionButton config) ++ "'."
+           notiOnClosed noti $ User
+           onClose
+       | not validInput -> do
+           putStrLn $ "Warning: Popup received unknown mouse input '" ++ (show mouseButton) ++ "'."
+           notiOnClosed noti $ User
+           onClose
     return False
   widgetShowAll mainWindow
 
