@@ -10,6 +10,7 @@ import Data.List.Split (splitOn)
 import Helpers (split, removeOuterLetters, readConfig, replace)
 import Data.Maybe (fromMaybe)
 import qualified Data.Text as Text
+import Data.Int ( Int32 )
 import NotificationCenter.Notifications.Data
   (notiSendClosedMsg, notiTransient, notiIcon, notiTime, notiAppName
   , notiBody, notiSummary, Notification(..))
@@ -25,9 +26,11 @@ data Config = Config
   , configNotiCenterMonitor :: Int
   , configNotiCenterFollowMouse :: Bool
   , configNotiCenterNewFirst :: Bool
+  , configNotiCenterTimeTextSize :: String
   , configIgnoreTransient :: Bool
   , configMatchingRules :: [((Notification -> Bool), (Notification -> Notification), Maybe String)]
   , configNotiMarkup :: Bool
+  , configNotiParseHtmlEntities :: Bool
   , configSendNotiClosedDbusMessage :: Bool
   , configGuessIconFromAppname :: Bool
 
@@ -41,6 +44,11 @@ data Config = Config
   , configNotiMonitor :: Int
   , configImgSize :: Int
   , configIconSize :: Int
+  , configTitleTextSize :: String
+  , configAppNameTextSize :: String
+  , configTimeTextSize :: String
+  , configPopupDismissButton :: String
+  , configPopupDefaultActionButton :: String
 
   -- buttons
   , configButtonsPerRow :: Int
@@ -88,11 +96,13 @@ getConfig p =
   , configWidth = r 500 p nCenter "width"
   , configStartupCommand = r' "" p nCenter "startupCommand"
   , configNotiCenterMonitor = r 0 p nCenter "monitor"
-  , configNotiCenterFollowMouse = r'' False p nPopup "followMouse"
+  , configNotiCenterFollowMouse = r'' False p nCenter "followMouse"
   , configNotiCenterNewFirst = r'' True p nCenter "newFirst"
+  , configNotiCenterTimeTextSize = r' "32px" p nCenter "notiCenterTimeTextSize"
   , configIgnoreTransient = r'' False p nCenter "ignoreTransient"
   , configMatchingRules = zip3 match (modify ++ repeat id) $ run ++ repeat Nothing -- run
   , configNotiMarkup = r'' True p nCenter "useMarkup"
+  , configNotiParseHtmlEntities = r'' True p nCenter "parseHtmlEntities"
   , configSendNotiClosedDbusMessage = r'' False p nCenter "configSendNotiClosedDbusMessage"
   , configGuessIconFromAppname = r'' True p nCenter "guessIconFromAppname"
 
@@ -106,7 +116,13 @@ getConfig p =
   , configNotiFollowMouse = r'' False p nPopup "followMouse"
   , configImgSize = r 100 p nPopup "maxImageSize"
   , configIconSize = r 20 p nPopup "iconSize"
+  , configTitleTextSize = r' "16px" p nPopup "titleTextSize"
+  , configAppNameTextSize = r' "12px" p nPopup "appNameTextSize"
+  , configTimeTextSize = r' "12px" p nPopup "timeTextSize"
 
+  , configPopupDismissButton = r' "mouse1" p nPopup "dismissButton"
+  , configPopupDefaultActionButton = r' "mouse3" p nPopup "defaultActionButton"
+  
     -- buttons
   , configButtonsPerRow = r 5 p buttons "buttonsPerRow"
   , configButtonHeight = r 60 p buttons "buttonHeight"
@@ -172,6 +188,7 @@ getConfig p =
                                 | k == "body" = noti { notiBody = Text.pack v }
                                 | k == "app" = noti { notiAppName = Text.pack v }
                                 | k == "time" = noti { notiTime = Text.pack v }
+                                | k == "timeout" = noti { notiTimeout = read v :: Int32 }
 --                                | k == "icon" = noti { notiIcon = Text.pack v }
                                 | k == "transient" && v == "true" = noti { notiTransient = True }
                                 | k == "transient" && v == "false" = noti { notiTransient = False }
@@ -206,5 +223,9 @@ replaceColors config style =
   replace "replaceme0021" (configUserButtonState1Hover config) $
   replace "replaceme0022" (configUserButtonState2Hover config) $
   replace "replaceme0023" (configUserButtonState1HoverColor config) $
-  replace "replaceme0024" (configUserButtonState2HoverColor config) style
+  replace "replaceme0024" (configUserButtonState2HoverColor config) $
+  replace "replaceme0025" (configTitleTextSize config) $
+  replace "replaceme0026" (configAppNameTextSize config) $
+  replace "replaceme0027" (configNotiCenterTimeTextSize config) $
+  replace "replaceme0028" (configTimeTextSize config) style
 
