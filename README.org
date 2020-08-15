@@ -16,7 +16,7 @@ of the notification specification.
 
 The notification center can (optionally) show user-specified buttons
 in the bottom that can be in two states (highlighted/not highlighted)
-and that can run customable shell commands.
+and that can run customizable shell commands.
 
 _NEW:_ Notifications can contain markup and links. The notification
 center can display custom buttons in notifications.
@@ -69,6 +69,17 @@ Clear all notifications
   # popups
   notify-send.py a --hint boolean:deadd-notification-center:true \
                  string:type:clearPopups
+#+END_SRC
+
+Pause/Unpause popup notifications
+#+BEGIN_SRC sh
+  # pause popup notifications
+  notify-send.py a --hint boolean:deadd-notification-center:true \
+                   string:type:pausePopups
+
+  # unpause popup notifications
+  notify-send.py a --hint boolean:deadd-notification-center:true \
+                   string:type:unpausePopups
 #+END_SRC
 
 *** Example: Brightness indicator
@@ -144,7 +155,7 @@ Install from the AUR for Arch: [[https://aur.archlinux.org/packages/deadd-notifi
 *OR* 
 
 If you want to spare yourself the hassle of the
-build time there es a binary package available:
+build time there is a binary package available:
 [[https://aur.archlinux.org/packages/deadd-notification-center-bin/][deadd-notification-center-bin]].
 
 *OR*
@@ -184,7 +195,7 @@ sudo make install
 No configuration is necessary, the notification center comes with
 sensible defaults™.
 
-Nearly all colors and many sizes are customizable, as well well as the
+Nearly all colors and many sizes are customizable, as well as the
 default timeout for notifications and the optional buttons in the
 notification center. Below are possible configurable options shown.
 The configuration file must be located at
@@ -226,12 +237,20 @@ followMouse = false
 # bottom.
 newFirst = true
 
+# Text size for the time in the notification center
+timeTextSize = 32px
+
 # If true, the transient field in notifications will be ignored and
-# the notification will be persisted in the notifiction center anyways
+# the notification will be persisted in the notification center anyways
 ignoreTransient = false
 
 # If true, markup (<u>, <i>, <b>, <a> , <img>) will be displayed properly
 useMarkup = true
+
+# If true, html entities (&#38; for &, &#37; for %, etc) will be parsed 
+# properly. This is useful for chromium-based apps, which tend to send 
+# these in notifications. 
+parseHtmlEntities = true
 
 # If set to true, the parameter noClosedMsg can be set on
 # notifications. If noClosedMsg is set to true on a notification,
@@ -245,7 +264,7 @@ configSendNotiClosedDbusMessage = false
 # Default is true.
 guessIconFromAppname = true
 
-# See section "Notification based scripting" for an explenation
+# See section "Notification based scripting" for an explanation
 #match = "title=Abc;body=abc":"app=notify-send"
 #modify = "transient=false"
 #run = "":"killall notify-send"
@@ -281,16 +300,33 @@ followMouse = false
 # pop-ups and in the notification center
 iconSize = 20
 
+# Text size for the title in the notification pop-ups
+titleTextSize = 16px
+
+# Text size for the app name in the notification pop-ups
+appNameTextSize = 12px
+
+# Text size for the time in the notification pop-ups
+timeTextSize = 12px
+
 # The maximal display size of images that are part of notifications
 # for notification pop-ups and in the notification center
 maxImageSize = 100
+
+# The mouse button for closing a popup. Must be either "mouse1", 
+# "mouse2", "mouse3", "mouse4", or "mouse5"
+dismissButton = mouse1
+
+# The mouse button for opening a popup with the default action.
+# Must be either "mouse1", "mouse2", "mouse3", "mouse4", or "mouse5"
+defaultActionButton = mouse3
 
 [colors]
 # Note about colors: Colors can be represented in (at least, I mean,
 # who knows...) three different ways:
 #   1. #RGB with "R", "G" and "B" hexadecimal numbers (0-9, A-F or
 #      a-f).
-#   2. #RRGGBB with each occurence of "R", "G" and "B" are hexadecimal
+#   2. #RRGGBB with each occurrence of "R", "G" and "B" are hexadecimal
 #      numbers (0-9, A-F or a-f).
 #   3. rgba(R, G, B, A) where "R", "G" and "B" are between 0 and 255
 #      and A is a floating point number between 0 and 1 representing
@@ -326,7 +362,7 @@ criticalInCenterColor = #FFF
 # Global text color
 labelColor = #eae2e0
 
-### These button configurations are applied globaly (except they
+### These button configurations are applied globally (except they
 ### get overwritten in the [buttons] section. The buttons section
 ### only applies to the configurable buttons within the notification
 ### center, while these configs also apply to the buttons within
@@ -365,7 +401,7 @@ buttonHeight = 60
 # notification center (in pixels).
 buttonMargin = 2
 
-# Labels written on the buttons in the notification center.  Labels
+# Labels written on the buttons in the notification center. Labels
 # should be written between quotes and separated by a colon. For
 # example:
 # labels = "VPN":"Bluetooth":"Wifi":"Screensaver"
@@ -437,7 +473,7 @@ buttonState2HoverColor = #fee
 *** More styling
 
 In the file =.config/gtk-3.0/gtk.css= you can add styles that will
-effect the notification center.
+affect the notification center.
 
 The following class-names for labels are defined:
 - Notifications:
@@ -503,6 +539,7 @@ You can set the following parameters:
 - body
 - app
 - time
+- timeout (specified in milliseconds)
 - icon (does not do anything, currently)
 - transient (value has to be =true= or =false=)
 - noClosedMsg (value has to be =true= or =false=, if set to true it
