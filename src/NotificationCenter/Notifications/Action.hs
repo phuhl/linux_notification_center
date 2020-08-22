@@ -32,7 +32,7 @@ import GI.Gtk
        , onButtonClicked, windowGetScreen, boxNew, widgetSetValign
        , imageNewFromIconName)
 import GI.Gtk.Enums
-       (Orientation(..), PositionType(..), ReliefStyle(..), Align(..))
+       (Orientation(..), PositionType(..), ReliefStyle(..), Align(..), IconSize(..))
 
 import qualified GI.Gtk as Gtk (containerAdd, Box(..), Label(..), Button(..))
 import qualified Data.Text as Text
@@ -63,7 +63,7 @@ createAction config useIcons onAction width height command description = do
     onAction command
     return ()
   if useIcons then do
-    img <-imageNewFromIconName (Just $ Text.pack description) 10
+    img <-imageNewFromIconName (Just $ Text.pack description) (fromIntegral $ fromEnum IconSizeButton)
     Gtk.containerAdd button img
   else do
     label <- labelNew $ Just $ Text.pack description
