@@ -34,6 +34,7 @@ import GI.Gdk (getEventButtonButton)
 import GI.Gtk (widgetGetPreferredHeightForWidth, widgetSetSizeRequest
               , widgetShowAll, onWidgetButtonPressEvent, windowMove
               , setWidgetWidthRequest, widgetDestroy)
+import GI.Pango.Enums (EllipsizeMode(..))
 import qualified GI.Gtk as Gtk (Window(..), Label(..))
 
 
@@ -78,9 +79,19 @@ showNotificationWindow config noti dispNotis onClose = do
     , _dNotiDestroy = widgetDestroy mainWindow
     , _dpopupContent = DisplayingNotificationContent {} }
 
+
   let dispNoti = set dNotiGetHeight
         (getHeight (view dContainer dispNotiWithoutHeight) config)
         dispNotiWithoutHeight
+      lblBody = Gtk.labelSetEllipsize $ (flip view) dispNoti $ dLabelBody
+
+  Gtk.labelSetEllipsize lblBody EllipsizeModeEnd 
+    -- if configPopupEllipsizeBody config
+    -- then EllipsizeModeEnd
+    -- else EllipsizeModeNone
+
+  -- TODO: Integrate w/ config
+  Gtk.labelSetLines lblBody 5
 
   setWidgetWidthRequest mainWindow $ fromIntegral $ configWidthNoti config
 
