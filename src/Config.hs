@@ -109,8 +109,8 @@ getConfig p =
   , configNotiParseHtmlEntities = r'' True p nCenter "parseHtmlEntities"
   , configSendNotiClosedDbusMessage = r'' False p nCenter "configSendNotiClosedDbusMessage"
   , configGuessIconFromAppname = r'' True p nCenter "guessIconFromAppname"
-  , configNotiCenterMaxLinesInBody = r (0-1) p nCenter "maxLines"
-  , configNotiCenterEllipsizeBody = r'' False p nCenter "shortenBody"
+  , configNotiCenterMaxLinesInBody = r (-1) p nCenter "shortenBody"
+  , configNotiCenterEllipsizeBody = (r (-1) p nCenter "shortenBody") /= -1
 
     -- notification-center-notification-popup
   , configNotiDefaultTimeout = r 10000 p nPopup "notiDefaultTimeout"
@@ -125,8 +125,8 @@ getConfig p =
   , configTitleTextSize = r' "16px" p nPopup "titleTextSize"
   , configAppNameTextSize = r' "12px" p nPopup "appNameTextSize"
   , configTimeTextSize = r' "12px" p nPopup "timeTextSize"
-  , configPopupMaxLinesInBody = r 5 p nPopup "maxLines"
-  , configPopupEllipsizeBody = r'' True p nPopup "shortenBody"
+  , configPopupMaxLinesInBody = r 5 p nPopup "shortenBody"
+  , configPopupEllipsizeBody = (r 5 p nPopup "shortenBody") /= -1
   , configPopupDismissButton = r' "mouse1" p nPopup "dismissButton"
   , configPopupDefaultActionButton = r' "mouse3" p nPopup "defaultActionButton"
   
