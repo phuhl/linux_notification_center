@@ -47,6 +47,7 @@ data Config = Config
   , configTitleTextSize :: String
   , configAppNameTextSize :: String
   , configTimeTextSize :: String
+  , configPopupMaxLines :: Int
   , configPopupEllipsizeBody :: Bool
   , configPopupDismissButton :: String
   , configPopupDefaultActionButton :: String
@@ -120,6 +121,7 @@ getConfig p =
   , configTitleTextSize = r' "16px" p nPopup "titleTextSize"
   , configAppNameTextSize = r' "12px" p nPopup "appNameTextSize"
   , configTimeTextSize = r' "12px" p nPopup "timeTextSize"
+  , configPopupMaxLinesInBody = r 5 p nPopup "maxLines"
   , configPopupEllipsizeBody = r'' True p nPopup "shortenBody"
   , configPopupDismissButton = r' "mouse1" p nPopup "dismissButton"
   , configPopupDefaultActionButton = r' "mouse3" p nPopup "defaultActionButton"
