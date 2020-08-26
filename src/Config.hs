@@ -45,6 +45,7 @@ data Config = Config
   , configNotiFollowMouse :: Bool
   , configNotiMonitor :: Int
   , configImgSize :: Int
+  , configImgAlignment :: String
   , configIconSize :: Int
   , configTitleTextSize :: String
   , configAppNameTextSize :: String
@@ -121,6 +122,7 @@ getConfig p =
   , configNotiMonitor = r 0 p nPopup "monitor"
   , configNotiFollowMouse = r'' False p nPopup "followMouse"
   , configImgSize = r 100 p nPopup "maxImageSize"
+  , configImgAlignment = r' "center" p nPopup "imageAlignment"
   , configIconSize = r 20 p nPopup "iconSize"
   , configTitleTextSize = r' "16px" p nPopup "titleTextSize"
   , configAppNameTextSize = r' "12px" p nPopup "appNameTextSize"
