@@ -25,7 +25,7 @@ import Control.Lens.TH (makeClassy)
 import Control.Lens (view, set)
 
 import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
-              , labelSetText, labelSetMarkup, widgetSetSizeRequest
+              , widgetSetValign, labelSetText, labelSetMarkup, widgetSetSizeRequest
               , labelSetXalign, widgetGetPreferredHeightForWidth
               , onWidgetButtonPressEvent, imageSetFromPixbuf
               , imageSetFromIconName, setWidgetWidthRequest
@@ -38,6 +38,7 @@ import GI.GdkPixbuf (pixbufScaleSimple, pixbufGetHeight, pixbufGetWidth
 import qualified GI.Gtk as Gtk
   (IsWidget, Box(..), Label(..), Button(..), Window(..), Image(..)
   , Builder(..), containerAdd, containerRemove, containerGetChildren)
+import GI.Gtk.Enums (Align(..))
 
 data DisplayingNotificationContent = DisplayingNotificationContent
   { _dLabelTitel :: Gtk.Label
@@ -71,6 +72,14 @@ createNotification config builder noti dispNoti = do
   actions <- box objs "box_actions"
   imgAppIcon <- image objs "img_icon"
   imgImage <- image objs "img_img"
+
+  widgetSetValign imgImage
+    (case configImgAlignment config of
+       "center" -> AlignCenter
+       "top" -> AlignStart
+       "bottom" -> AlignEnd
+       "fill" -> AlignFill
+       _ -> AlignCenter)
 
   onWidgetButtonPressEvent container $ \(_) -> do
     putStrLn "NNOOOW"
