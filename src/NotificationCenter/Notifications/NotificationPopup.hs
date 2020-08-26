@@ -85,10 +85,10 @@ showNotificationWindow config noti dispNotis onClose = do
         dispNotiWithoutHeight
       lblBody = (flip view) dispNoti $ dLabelBody
 
-  labelSetEllipsize lblBody EllipsizeModeEnd 
-    -- if configPopupEllipsizeBody config
-    -- then EllipsizeModeEnd
-    -- else EllipsizeModeNone
+  labelSetEllipsize lblBody
+    (if configPopupEllipsizeBody config
+     then EllipsizeModeEnd
+     else EllipsizeModeNone)
 
   -- TODO: Integrate w/ config
   labelSetLines lblBody 5
