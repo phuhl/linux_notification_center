@@ -33,6 +33,8 @@ data Config = Config
   , configNotiParseHtmlEntities :: Bool
   , configSendNotiClosedDbusMessage :: Bool
   , configGuessIconFromAppname :: Bool
+  , configNotiCenterMaxLinesInBody :: Int
+  , configNotiCenterEllipsizeBody :: Bool
 
   -- notification-center-notification-popup
   , configNotiDefaultTimeout :: Int
@@ -47,7 +49,7 @@ data Config = Config
   , configTitleTextSize :: String
   , configAppNameTextSize :: String
   , configTimeTextSize :: String
-  , configPopupMaxLines :: Int
+  , configPopupMaxLinesInBody :: Int
   , configPopupEllipsizeBody :: Bool
   , configPopupDismissButton :: String
   , configPopupDefaultActionButton :: String
@@ -107,6 +109,8 @@ getConfig p =
   , configNotiParseHtmlEntities = r'' True p nCenter "parseHtmlEntities"
   , configSendNotiClosedDbusMessage = r'' False p nCenter "configSendNotiClosedDbusMessage"
   , configGuessIconFromAppname = r'' True p nCenter "guessIconFromAppname"
+  , configNotiCenterMaxLinesInBody = r (0-1) p nCenter "maxLines"
+  , configNotiCenterEllipsizeBody = r'' False p nCenter "shortenBody"
 
     -- notification-center-notification-popup
   , configNotiDefaultTimeout = r 10000 p nPopup "notiDefaultTimeout"
