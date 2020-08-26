@@ -90,8 +90,7 @@ showNotificationWindow config noti dispNotis onClose = do
      then EllipsizeModeEnd
      else EllipsizeModeNone)
 
-  -- TODO: Integrate w/ config
-  labelSetLines lblBody 5
+  labelSetLines lblBody $ fromIntegral $ configPopupMaxLinesInBody config
 
   setWidgetWidthRequest mainWindow $ fromIntegral $ configWidthNoti config
 
