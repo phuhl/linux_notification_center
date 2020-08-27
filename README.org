@@ -264,6 +264,11 @@ configSendNotiClosedDbusMessage = false
 # Default is true.
 guessIconFromAppname = true
 
+# Truncates notification bodies with '...' at the specified number of 
+# lines. If -1 is specified, the body text will not be truncated.
+# Applies only to notifications within the notification center. 
+shortenBody = -1
+
 # See section "Notification based scripting" for an explanation
 #match = "title=Abc;body=abc":"app=notify-send"
 #modify = "transient=false"
@@ -312,6 +317,15 @@ timeTextSize = 12px
 # The maximal display size of images that are part of notifications
 # for notification pop-ups and in the notification center
 maxImageSize = 100
+
+# Vertical image alignment. Can be either "top", "center", 
+# "bottom", or "fill". 
+imageAlignment = center
+
+# Truncates notification bodies with '...' at the specified number of 
+# lines. If -1 is specified, the body text will not be truncated.
+# Applies only to popup notifications
+shortenBody = 5
 
 # The mouse button for closing a popup. Must be either "mouse1", 
 # "mouse2", "mouse3", "mouse4", or "mouse5"
