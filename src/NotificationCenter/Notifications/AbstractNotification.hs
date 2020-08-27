@@ -25,10 +25,11 @@ import Control.Lens.TH (makeClassy)
 import Control.Lens (view, set)
 
 import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
-              , widgetSetValign, labelSetText, labelSetMarkup, widgetSetSizeRequest
-              , labelSetXalign, widgetGetPreferredHeightForWidth
-              , onWidgetButtonPressEvent, imageSetFromPixbuf
-              , imageSetFromIconName, setWidgetWidthRequest
+              , widgetSetValign, widgetSetMarginStart, widgetSetMarginEnd 
+              , widgetSetMarginTop, widgetSetMarginBottom, labelSetText 
+              , labelSetMarkup, widgetSetSizeRequest, labelSetXalign 
+              , widgetGetPreferredHeightForWidth, onWidgetButtonPressEvent
+              , imageSetFromPixbuf, imageSetFromIconName, setWidgetWidthRequest
               , setImagePixelSize, widgetSetMarginStart, widgetSetMarginEnd
               , catchGErrorJustDomain, GErrorMessage(..))
 import GI.GLib (FileError(..))
@@ -80,6 +81,18 @@ createNotification config builder noti dispNoti = do
        "bottom" -> AlignEnd
        "fill" -> AlignFill
        _ -> AlignCenter)
+
+  widgetSetMarginTop imgImage
+    (fromIntegral $ configImgMarginTop config)
+
+  widgetSetMarginBottom imgImage
+    (fromIntegral $ configImgMarginBottom config)
+
+  widgetSetMarginStart imgImage
+    (fromIntegral $ configImgMarginLeft config)
+
+  widgetSetMarginEnd imgImage
+    (fromIntegral $ configImgMarginRight config)
 
   onWidgetButtonPressEvent container $ \(_) -> do
     putStrLn "NNOOOW"
