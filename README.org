@@ -318,9 +318,16 @@ timeTextSize = 12px
 # for notification pop-ups and in the notification center
 maxImageSize = 100
 
+# The margin around the top, bottom, left, and right of notification
+# images.
+imageMarginTop = 15
+imageMarginBottom = 15
+imageMarginLeft = 15
+imageMarginRight = 0
+
 # Vertical image alignment. Can be either "top", "center", 
 # "bottom", or "fill". 
-imageAlignment = center
+imageAlignment = top
 
 # Truncates notification bodies with '...' at the specified number of 
 # lines. If -1 is specified, the body text will not be truncated.
