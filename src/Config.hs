@@ -130,8 +130,6 @@ getConfig p =
   , configImgMarginBottom = r 0 p nPopup "imageMarginBottom"
   , configImgMarginLeft = r 10 p nPopup "imageMarginLeft"
   , configImgMarginRight = r 0 p nPopup "imageMarginRight"
-  , configImgMarginBottom :: Int
-  , configImgMarginRight :: Int
   , configImgAlignment = r' "center" p nPopup "imageAlignment"
   , configIconSize = r 20 p nPopup "iconSize"
   , configTitleTextSize = r' "16px" p nPopup "titleTextSize"
