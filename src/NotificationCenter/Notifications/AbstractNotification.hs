@@ -18,11 +18,15 @@ import NotificationCenter.Notifications.Action
   (Action(..), createAction)
 import TransparentWindow (label, image, box, getObjs, addClass)
 
+import qualified Data.Text.IO as TIO
 import Data.Text as Text
 import Data.Int ( Int32 )
+import Data.Maybe
 
 import Control.Lens.TH (makeClassy)
 import Control.Lens (view, set)
+import Control.Monad (filterM)
+import Control.Monad.IO.Class (liftIO)
 
 import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , widgetSetValign, widgetSetMarginStart, widgetSetMarginEnd 
@@ -30,8 +34,8 @@ import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , labelSetMarkup, widgetSetSizeRequest, labelSetXalign 
               , widgetGetPreferredHeightForWidth, onWidgetButtonPressEvent
               , imageSetFromPixbuf, imageSetFromIconName, setWidgetWidthRequest
-              , setImagePixelSize, widgetSetMarginStart, widgetSetMarginEnd
-              , catchGErrorJustDomain, GErrorMessage(..))
+              , setImagePixelSize, catchGErrorJustDomain, GErrorMessage(..)
+              , widgetGetName, widgetIsVisible, widgetGetParent)
 import GI.GLib (FileError(..))
 import GI.GdkPixbuf (pixbufScaleSimple, pixbufGetHeight, pixbufGetWidth
                     , Pixbuf(..), pixbufNewFromFileAtScale
@@ -99,6 +103,8 @@ createNotification config builder noti dispNoti = do
     notiOnAction noti "default"
     return False
 
+  -- widgetGetName actions >>= TIO.putStrLn
+  -- (Gtk.containerGetChildren actions) >>= mapM_ (\c -> widgetGetName c >>= TIO.putStrLn) 
 
   return
     $ set dLabelTitel labelTitel
@@ -150,7 +156,37 @@ updateNotiContent config noti dNoti = do
   sequence $ Gtk.containerRemove (view dActions dNoti) <$> currentButtons
   sequence $ Gtk.containerAdd (view dActions dNoti) <$> actionButton <$> actionButtons
 
+  (Gtk.containerGetChildren (view dActions dNoti) 
+   >>= putStrLn . ((++) "Total number of action buttons: ") . (show . Prelude.length))
+
   widgetShowAll (view dActions dNoti)
+    
+  (Gtk.containerGetChildren (view dActions dNoti) 
+   >>= putStrLn . ((++) "Number of action buttons after `widgetShowAll`: ") . (show . Prelude.length))
+  
+  liftIO $ do 
+    children <- Gtk.containerGetChildren (view dActions dNoti)
+    children' <- filterM widgetIsVisible children
+    putStrLn $
+      "Number of *visible* action buttons after `widgetShowAll`: " ++ (show $ Prelude.length children')
+   
+  let getParent w  = liftIO $ do
+        mp <- widgetGetParent w
+        return $ fromJust mp
+      parentVisible w = liftIO $ do
+        p <- getParent w
+        widgetIsVisible p
+      showVisible p b = do
+        if b
+        then putStrLn $ p ++ "is visible!"
+        else putStrLn $ p ++ "is NOT visible!"
+
+
+  parentVisible (view dActions dNoti) >>= showVisible "Parent of `box_actions` "
+
+  getParent (view dActions dNoti) >>= parentVisible >>= showVisible "Grandparent of `box_actions` "
+
+  putStrLn "--------------------------"
 
   return ()
 
