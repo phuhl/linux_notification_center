@@ -540,6 +540,8 @@ You can set the following parameters:
 - app
 - time
 - timeout (specified in milliseconds)
+- right (overrides ~distanceRight~ from the configuration)
+- top (overrides ~distanceTop~ from the configuration)
 - icon (does not do anything, currently)
 - transient (value has to be =true= or =false=)
 - noClosedMsg (value has to be =true= or =false=, if set to true it

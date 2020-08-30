@@ -26,6 +26,7 @@ import Data.Word ( Word32 )
 import Data.Int ( Int32 )
 import qualified Data.Map as Map ( Map )
 import Data.List ( sortOn )
+import Data.Maybe ( fromMaybe )
 
 import Control.Monad
 import DBus ( Variant (..) )
@@ -59,8 +60,9 @@ showNotificationWindow :: Config -> Notification
   -> [DisplayingNotificationPopup] -> (IO ()) -> IO DisplayingNotificationPopup
 showNotificationWindow config noti dispNotis onClose = do
 
-  let distanceTop = configDistanceTop config
+  let distanceTop = fromMaybe (configDistanceTop config) (notiTop noti)
       distanceBetween = configDistanceBetween config
+      distanceRight = fromMaybe (configDistanceRight config) (notiRight noti)
 
   (objs, builder) <- createTransparentWindow (Text.pack glade)
     [ "main_window"
@@ -104,7 +106,7 @@ showNotificationWindow config noti dispNotis onClose = do
 
   windowMove mainWindow
     (screenW - fromIntegral
-     (configWidthNoti config + configDistanceRight config))
+     (configWidthNoti config + distanceRight))
     hBefore
 
   onWidgetButtonPressEvent mainWindow $ \eventButton -> do
