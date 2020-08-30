@@ -319,14 +319,15 @@ timeTextSize = 12px
 maxImageSize = 100
 
 # The margin around the top, bottom, left, and right of notification
-# images.
+# images. Applies to popup notifications and in-center notifications.
 imageMarginTop = 15
 imageMarginBottom = 15
 imageMarginLeft = 15
 imageMarginRight = 0
 
 # Vertical image alignment. Can be either "top", "center", 
-# "bottom", or "fill". 
+# "bottom", or "fill". Applies to popup notifications and in-center
+# notifications. 
 imageAlignment = top
 
 # Truncates notification bodies with '...' at the specified number of 
