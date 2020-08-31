@@ -10,7 +10,7 @@ import Data.List.Split (splitOn)
 import Helpers (split, removeOuterLetters, readConfig, replace)
 import Data.Maybe (fromMaybe)
 import qualified Data.Text as Text
-import Data.Int ( Int32 )
+import Data.Int ( Int32, Int )
 import NotificationCenter.Notifications.Data
   (notiSendClosedMsg, notiTransient, notiIcon, notiTime, notiAppName
   , notiBody, notiSummary, Notification(..))
@@ -189,6 +189,8 @@ getConfig p =
                                 | k == "app" = noti { notiAppName = Text.pack v }
                                 | k == "time" = noti { notiTime = Text.pack v }
                                 | k == "timeout" = noti { notiTimeout = read v :: Int32 }
+                                | k == "right" = noti { notiRight = Just . (read :: String -> Int) $ v }
+                                | k == "top" = noti { notiTop = Just . (read :: String -> Int) $ v }
 --                                | k == "icon" = noti { notiIcon = Text.pack v }
                                 | k == "transient" && v == "true" = noti { notiTransient = True }
                                 | k == "transient" && v == "false" = noti { notiTransient = False }

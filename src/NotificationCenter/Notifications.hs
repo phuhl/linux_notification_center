@@ -240,6 +240,8 @@ notify config tState emit
         , notiTime = time
         , notiTransient = parseTransient hints
         , notiSendClosedMsg = (configSendNotiClosedDbusMessage config)
+        , notiTop = Nothing
+        , notiRight = Nothing
         }
 
   if Map.member (pack "deadd-notification-center")

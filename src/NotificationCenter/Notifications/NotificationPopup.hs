@@ -25,7 +25,8 @@ import Data.Text as Text
 import Data.Word ( Word32 )
 import Data.Int ( Int32 )
 import qualified Data.Map as Map ( Map )
-import Data.List ( sortOn )
+import Data.List ( sortOn, filter )
+import Data.Maybe ( fromMaybe, isJust )
 
 import Control.Monad
 import DBus ( Variant (..) )
@@ -41,7 +42,6 @@ instance Eq DisplayingNotificationPopup where
   a == b = _dNotiId a == _dNotiId b
 
 
-
 data DisplayingNotificationPopup = DisplayingNotificationPopup
   { _dpopupContent :: DisplayingNotificationContent
   , _dNotiGetHeight :: IO Int32
@@ -50,17 +50,22 @@ data DisplayingNotificationPopup = DisplayingNotificationPopup
   , _dNotiDestroy :: IO ()
   , _dMainWindow :: Gtk.Window
   , _dLabelBG :: Gtk.Label
+  , _dHasCustomPosition :: Bool
   }
 makeClassy ''DisplayingNotificationPopup
 instance HasDisplayingNotificationContent DisplayingNotificationPopup where
   displayingNotificationContent = dpopupContent
 
+
 showNotificationWindow :: Config -> Notification
   -> [DisplayingNotificationPopup] -> (IO ()) -> IO DisplayingNotificationPopup
 showNotificationWindow config noti dispNotis onClose = do
 
-  let distanceTop = configDistanceTop config
+  let distanceTopFromConfig = configDistanceTop config
+      distanceTop = fromIntegral $ fromMaybe distanceTopFromConfig (notiTop noti)
       distanceBetween = configDistanceBetween config
+      distanceRight = fromMaybe (configDistanceRight config) (notiRight noti)
+      hasCustomPosition = (isJust $ notiTop noti) || (isJust $ notiRight noti)
 
   (objs, builder) <- createTransparentWindow (Text.pack glade)
     [ "main_window"
@@ -76,6 +81,7 @@ showNotificationWindow config noti dispNotis onClose = do
     , _dLabelBG = labelBG
     , _dNotiId = notiId noti
     , _dNotiDestroy = widgetDestroy mainWindow
+    , _dHasCustomPosition = hasCustomPosition
     , _dpopupContent = DisplayingNotificationContent {} }
 
   let dispNoti = set dNotiGetHeight
@@ -98,13 +104,16 @@ showNotificationWindow config noti dispNotis onClose = do
                                    (fromIntegral $ configNotiMonitor config)
 
   hBefores <- sortOn fst <$> mapM
-    (\n -> (,) (_dNotiTop n) <$> (_dNotiGetHeight n)) dispNotis
-  let hBefore = findBefore hBefores ((fromIntegral distanceTop) + screenY)
-                height (fromIntegral distanceBetween)
+    (\n -> (,) (_dNotiTop n) <$> (_dNotiGetHeight n)) (Data.List.filter (not . _dHasCustomPosition) dispNotis)
+  let hBefore = if hasCustomPosition then
+                  distanceTop
+                else
+                  findBefore hBefores (distanceTop + screenY)
+                  height (fromIntegral distanceBetween)
 
   windowMove mainWindow
     (screenW - fromIntegral
-     (configWidthNoti config + configDistanceRight config))
+     (configWidthNoti config + distanceRight))
     hBefore
 
   onWidgetButtonPressEvent mainWindow $ \eventButton -> do
