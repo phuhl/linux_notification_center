@@ -1,6 +1,6 @@
 # Maintainer: Philipp Uhl <philipp.uhl@rwth-aachen.de>
 
-_gitname="linux-notification-center-git"
+_gitname="linux_notification_center"
 pkgname=deadd-notification-center-git
 pkgver=1.7.2.r58.g6ff34b3
 pkgrel=1
