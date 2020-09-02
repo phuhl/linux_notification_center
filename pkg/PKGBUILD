@@ -7,12 +7,16 @@ pkgdesc="Customizable notification-daemon with notification center"
 url="https://github.com/phuhl/linux_notification_center"
 license=("BSD")
 arch=('x86_64')
+makedepends=('stack' 'cairo' 'pango' 'gobject-introspection')
 depends=('gobject-introspection-runtime' 'gtk3')
-conflicts=('deadd-notification-center-bin')
+provides=('deadd-notification-center')
+conflicts=('deadd-notification-center-bin' 'deadd-notification-center-git')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/phuhl/linux_notification_center/archive/${pkgver}.tar.gz")
+
 prepare() {
     tar -zxvf "${pkgname}-${pkgver}.tar.gz"
 }
+
 build() {
     cd "linux_notification_center-${pkgver}"
     make
