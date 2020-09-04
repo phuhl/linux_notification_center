@@ -74,23 +74,13 @@ createNotification config builder noti dispNoti = do
   imgAppIcon <- image objs "img_icon"
   imgImage <- image objs "img_img"
 
-  widgetSetValign imgImage
-    (case configImgAlignment config of
-       "center" -> AlignCenter
-       "top" -> AlignStart
-       "bottom" -> AlignEnd
-       "fill" -> AlignFill
-       _ -> AlignCenter)
-
+  -- set margins from config
   widgetSetMarginTop imgImage
     (fromIntegral $ configImgMarginTop config)
-
   widgetSetMarginBottom imgImage
     (fromIntegral $ configImgMarginBottom config)
-
   widgetSetMarginStart imgImage
     (fromIntegral $ configImgMarginLeft config)
-
   widgetSetMarginEnd imgImage
     (fromIntegral $ configImgMarginRight config)
 
