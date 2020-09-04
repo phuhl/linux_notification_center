@@ -325,11 +325,6 @@ imageMarginBottom = 15
 imageMarginLeft = 15
 imageMarginRight = 0
 
-# Vertical image alignment. Can be either "top", "center", 
-# "bottom", or "fill". Applies to popup notifications and in-center
-# notifications. 
-imageAlignment = top
-
 # Truncates notification bodies with '...' at the specified number of 
 # lines. If -1 is specified, the body text will not be truncated.
 # Applies only to popup notifications
