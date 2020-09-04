@@ -82,6 +82,27 @@ Pause/Unpause popup notifications
                    string:type:unpausePopups
 #+END_SRC
 
+*** Supported hints and features
+
+Action buttons with gtk icons
+#+BEGIN_SRC sh
+notify-send.py "And buttons" "Do you like buttons?" \
+               --hint boolean:action-icons:true \
+               --action yes:face-cool no:face-sick  
+#+END_SRC
+
+Notification images by gtk icon
+#+BEGIN_SRC sh
+notify-send.py "Icons are" "COOL" \
+               --hint string:image-path:face-cool
+#+END_SRC
+
+Notification images by file
+#+BEGIN_SRC sh
+notify-send.py "Images are" "COOL" \
+               --hint string:image-path:file://path/to/image/from/root.png
+#+END_SRC
+
 *** Example: Brightness indicator
 
 This snippet can be used to produce a brightness-indicator. It requires the 
@@ -540,6 +561,8 @@ You can set the following parameters:
 - app
 - time
 - timeout (specified in milliseconds)
+- right (overrides ~distanceRight~ from the configuration)
+- top (overrides ~distanceTop~ from the configuration)
 - icon (does not do anything, currently)
 - transient (value has to be =true= or =false=)
 - noClosedMsg (value has to be =true= or =false=, if set to true it
