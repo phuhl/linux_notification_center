@@ -10,7 +10,7 @@ module NotificationCenter.Notifications.Data
 
 import qualified Data.Text as Text
 import Data.Word ( Word32, Word8 )
-import Data.Int ( Int32 )
+import Data.Int ( Int32, Int )
 import qualified Data.ByteString as BS
 import Foreign.Marshal.Array (newArray)
 import Foreign.C.Types (CUChar(..))
@@ -44,6 +44,8 @@ data Notification = Notification
   , notiTransient :: Bool
   , notiSendClosedMsg :: Bool -- ^ If notiOnClosed should be ignored
   , notiOnClosed :: CloseType -> IO ()
+  , notiTop :: Maybe Int
+  , notiRight :: Maybe Int
     -- ^ Should be called when the notification is closed, either by
     --   timeout or by user
   , notiOnAction :: String -> IO ()
@@ -67,6 +69,8 @@ instance Show Notification where
     , "  notiTime = " ++ (show $ notiTime n) ++ ", \n" 
     , "  notiTransient = " ++ (show $ notiTransient n) ++ ", \n" 
     , "  notiSendClosedMsg = " ++ (show $ notiSendClosedMsg n) ++ "\n" 
+    , "  notiTop = " ++ (show $ notiTop n) ++ "\n"
+    , "  notiRight = " ++ (show $ notiRight n) ++ "\n"
     , " } " ]
 
 data Image = RawImg
