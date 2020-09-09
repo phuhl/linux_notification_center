@@ -8,9 +8,9 @@ url="https://github.com/phuhl/linux_notification_center"
 license=("BSD")
 arch=('x86_64')
 depends=('gobject-introspection-runtime' 'gtk3')
+makedepends=('stack' 'cairo' 'pango' 'gobject-introspection')
 provides=('deadd-notification-center')
 conflicts=('deadd-notification-center' 'deadd-notification-center-git')
-makedepends=('stack' 'cairo' 'pango' 'gobject-introspection')
 source=("${pkgname}-${pkgver}.tar.gz::https://github.com/phuhl/linux_notification_center/archive/${pkgver}.tar.gz")
 
 prepare() {
