@@ -1,0 +1,31 @@
+# Maintainer: Philipp Uhl <philipp.uhl@rwth-aachen.de>
+
+_gitname="linux_notification_center"
+pkgname=deadd-notification-center-git
+pkgver=1.7.2.r58.g6ff34b3
+pkgrel=1
+pkgdesc="Customizable notification-daemon with notification center"
+url="https://github.com/phuhl/linux_notification_center"
+license=("BSD")
+arch=('x86_64')
+depends=('gobject-introspection-runtime' 'gtk3')
+makedepends=('stack' 'cairo' 'pango' 'gobject-introspection')
+provides=('deadd-notification-center')
+conflicts=('deadd-notification-center-bin' 'deadd-notification-center')
+source=("git+${url}.git#branch=master")
+md5sums=("SKIP")
+
+pkgver() {
+  cd "${srcdir}/${_gitname}"
+  git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+build() {
+  cd "${srcdir}/${_gitname}"
+  make
+}
+
+package() {
+  cd "${srcdir}/${_gitname}"
+  make DESTDIR="$pkgdir" install
+}
