@@ -223,7 +223,7 @@ The configuration file must be located at
 =~/.config/deadd/deadd.conf= (or, if configured differently on your
 system: =${XDG_CONFIG_HOME}/deadd/deadd.conf=).
 
-#+BEGIN_EXAMPLE
+#+BEGIN_SRC ini
 [notification-center]
 
 # Margin at the top of the notification center in pixels. This can be
@@ -285,6 +285,11 @@ configSendNotiClosedDbusMessage = false
 # Default is true.
 guessIconFromAppname = true
 
+# Truncates notification bodies with '...' at the specified number of 
+# lines. If -1 is specified, the body text will not be truncated.
+# Applies only to notifications within the notification center. 
+shortenBody = -1
+
 # See section "Notification based scripting" for an explanation
 #match = "title=Abc;body=abc":"app=notify-send"
 #modify = "transient=false"
@@ -333,6 +338,18 @@ timeTextSize = 12px
 # The maximal display size of images that are part of notifications
 # for notification pop-ups and in the notification center
 maxImageSize = 100
+
+# The margin around the top, bottom, left, and right of notification
+# images. Applies to popup notifications and in-center notifications.
+imageMarginTop = 15
+imageMarginBottom = 15
+imageMarginLeft = 15
+imageMarginRight = 0
+
+# Truncates notification bodies with '...' at the specified number of 
+# lines. If -1 is specified, the body text will not be truncated.
+# Applies only to popup notifications
+shortenBody = 5
 
 # The mouse button for closing a popup. Must be either "mouse1", 
 # "mouse2", "mouse3", "mouse4", or "mouse5"
@@ -489,7 +506,7 @@ buttonState2Hover = rgba(0, 20, 20, 0.3)
 # center when the button is clicked and not yet set to a new value via
 # the method as described in Section Usage
 buttonState2HoverColor = #fee
-#+END_EXAMPLE
+#+END_SRC
 
 *** More styling
 
@@ -577,12 +594,12 @@ _Running Commands:_
 
 Not implemented, yet.
 
-#+BEGIN_EXAMPLE
+#+BEGIN_SRC ini
 [notification-center]
 match = "title=Abc;body=abc":"app=notify-send"
 modify = "transient=false"
 run = "":"killall notify-send"
-#+END_EXAMPLE
+#+END_SRC
 
 ** Issues and goals
 
