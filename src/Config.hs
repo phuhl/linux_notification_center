@@ -33,6 +33,8 @@ data Config = Config
   , configNotiParseHtmlEntities :: Bool
   , configSendNotiClosedDbusMessage :: Bool
   , configGuessIconFromAppname :: Bool
+  , configNotiCenterMaxLinesInBody :: Int
+  , configNotiCenterEllipsizeBody :: Bool
 
   -- notification-center-notification-popup
   , configNotiDefaultTimeout :: Int
@@ -43,10 +45,16 @@ data Config = Config
   , configNotiFollowMouse :: Bool
   , configNotiMonitor :: Int
   , configImgSize :: Int
+  , configImgMarginTop :: Int
+  , configImgMarginLeft :: Int
+  , configImgMarginBottom :: Int
+  , configImgMarginRight :: Int
   , configIconSize :: Int
   , configTitleTextSize :: String
   , configAppNameTextSize :: String
   , configTimeTextSize :: String
+  , configPopupMaxLinesInBody :: Int
+  , configPopupEllipsizeBody :: Bool
   , configPopupDismissButton :: String
   , configPopupDefaultActionButton :: String
 
@@ -105,6 +113,8 @@ getConfig p =
   , configNotiParseHtmlEntities = r'' True p nCenter "parseHtmlEntities"
   , configSendNotiClosedDbusMessage = r'' False p nCenter "configSendNotiClosedDbusMessage"
   , configGuessIconFromAppname = r'' True p nCenter "guessIconFromAppname"
+  , configNotiCenterMaxLinesInBody = r (-1) p nCenter "shortenBody"
+  , configNotiCenterEllipsizeBody = (r (-1) p nCenter "shortenBody") /= -1
 
     -- notification-center-notification-popup
   , configNotiDefaultTimeout = r 10000 p nPopup "notiDefaultTimeout"
@@ -115,11 +125,16 @@ getConfig p =
   , configNotiMonitor = r 0 p nPopup "monitor"
   , configNotiFollowMouse = r'' False p nPopup "followMouse"
   , configImgSize = r 100 p nPopup "maxImageSize"
+  , configImgMarginTop = r 15 p nPopup "imageMarginTop"
+  , configImgMarginBottom = r 15 p nPopup "imageMarginBottom"
+  , configImgMarginLeft = r 15 p nPopup "imageMarginLeft"
+  , configImgMarginRight = r 0 p nPopup "imageMarginRight"
   , configIconSize = r 20 p nPopup "iconSize"
   , configTitleTextSize = r' "16px" p nPopup "titleTextSize"
   , configAppNameTextSize = r' "12px" p nPopup "appNameTextSize"
   , configTimeTextSize = r' "12px" p nPopup "timeTextSize"
-
+  , configPopupMaxLinesInBody = r 5 p nPopup "shortenBody"
+  , configPopupEllipsizeBody = (r 5 p nPopup "shortenBody") /= -1
   , configPopupDismissButton = r' "mouse1" p nPopup "dismissButton"
   , configPopupDefaultActionButton = r' "mouse3" p nPopup "defaultActionButton"
   
