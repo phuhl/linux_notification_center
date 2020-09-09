@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.2 -->
+<!-- Generated with glade 3.36.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <!-- interface-css-provider-path style.css -->
@@ -9,10 +9,9 @@
     <property name="hexpand">False</property>
     <property name="vexpand">True</property>
     <property name="type">popup</property>
+    <property name="role">notification</property>
     <property name="resizable">False</property>
-    <child type="titlebar">
-      <placeholder/>
-    </child>
+    <property name="type_hint">notification</property>
     <child>
       <object class="GtkOverlay">
         <property name="visible">True</property>
@@ -193,6 +192,9 @@
           </object>
         </child>
       </object>
+    </child>
+    <child type="titlebar">
+      <placeholder/>
     </child>
     <style>
       <class name="blurredBG"/>
