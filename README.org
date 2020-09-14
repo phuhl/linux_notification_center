@@ -265,7 +265,7 @@ timeTextSize = 32px
 # the notification will be persisted in the notification center anyways
 ignoreTransient = false
 
-# If true, markup (<u>, <i>, <b>, <a> , <img>) will be displayed properly
+# If true, markup (<u>, <i>, <b>, <a>) will be displayed properly
 useMarkup = true
 
 # If true, html entities (&#38; for &, &#37; for %, etc) will be parsed 
