@@ -155,6 +155,8 @@ parseHtmlEntities =
                      "grave" -> "`"
                      "amp" -> "&"
                      "tilde" -> "~"
+                     "lt" -> "<"
+                     "gt" -> ">"
                      "" -> matched
                      _ -> matched
         in a ++ repl ++ (if length c > 0 then parseNamedEntities c else "")
