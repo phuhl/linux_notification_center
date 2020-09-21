@@ -59,19 +59,19 @@ service:
 
 install-stack:
 	mkdir -p ${DESTDIR}${PREFIX}/bin
-	install -m755 .out/deadd-notification-center ${DESTDIR}${PREFIX}/bin
+	install -Dm755 .out/deadd-notification-center ${DESTDIR}${PREFIX}/bin
 	mkdir -p ${DESTDIR}${MANPREFIX}/man1
-	install -m644 docs/linux-notification-center.man ${DESTDIR}${MANPREFIX}/man1/deadd-notification-center.1
+	install -Dm644 docs/linux-notification-center.man ${DESTDIR}${MANPREFIX}/man1/deadd-notification-center.1
 	install -Dm644 LICENSE ${DESTDIR}${PREFIX}/share/licenses/deadd-notification-center/LICENSE
 
 install-service: service
 	mkdir -p ${DESTDIR}${SERVICEDIR_DBUS}
-	install -m644 com.ph-uhl.deadd.notification.service ${DESTDIR}${SERVICEDIR_DBUS}
+	install -Dm644 com.ph-uhl.deadd.notification.service ${DESTDIR}${SERVICEDIR_DBUS}
 ifneq (0,${SYSTEMD})
 install-service: install-service-systemd
 install-service-systemd:
 	mkdir -p ${DESTDIR}${SERVICEDIR_SYSTEMD}
-	install -m644 deadd-notification-center.service ${DESTDIR}${SERVICEDIR_SYSTEMD}
+	install -Dm644 deadd-notification-center.service ${DESTDIR}${SERVICEDIR_SYSTEMD}
 endif
 
 
@@ -80,8 +80,8 @@ endif
 install-lang:
 	mkdir -p ${DESTDIR}${PREFIX}/share/locale/de/LC_MESSAGES
 	mkdir -p ${DESTDIR}${PREFIX}/share/locale/en/LC_MESSAGES
-	install -m644 translation/de/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/de/LC_MESSAGES/deadd-notification-center.mo
-	install -m644 translation/en/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/en/LC_MESSAGES/deadd-notification-center.mo
+	install -Dm644 translation/de/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/de/LC_MESSAGES/deadd-notification-center.mo
+	install -Dm644 translation/en/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/en/LC_MESSAGES/deadd-notification-center.mo
 
 install: install-stack install-service install-lang
 
