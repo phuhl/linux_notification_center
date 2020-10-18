@@ -181,6 +181,12 @@ build time there is a binary package available:
 
 *OR*
 
+If you don't want to wait for me to publish the next stable release: Use the new AUR git-package.
+
+[[https://aur.archlinux.org/packages/deadd-notification-center-git/][deadd-notification-center-git]].
+
+*OR*
+
 On Ubuntu, Debian, everything... Replace 1.7.2 with the current-most release from the 
 [[https://github.com/phuhl/linux_notification_center/releases][release section]].
 
