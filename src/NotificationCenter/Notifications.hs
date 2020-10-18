@@ -104,7 +104,6 @@ emitNotificationClosed doSend onClose id ctype =
 
 emitAction :: (Signal -> IO ()) -> Int -> String -> IO ()
 emitAction onAction id key = do
-  putStrLn key
   onAction $ (signal "/org/freedesktop/Notifications"
                "org.freedesktop.Notifications"
                "ActionInvoked")
@@ -133,7 +132,6 @@ parseTransient hints =
 
 getDesktopFile :: String -> IO (Maybe String)
 getDesktopFile name = do
-  putStrLn name
   [try1, try2, try3] <- sequence [ getIt "~/.local/share/applications/"
                                  , getIt "/usr/local/share/applications/"
                                  , getIt "/usr/share/applications/"]
@@ -215,7 +213,6 @@ notify config tState emit
   state <- readTVarIO tState
   time <- getTime
   icon <- parseIcon config hints icon appName
-  putStrLn $ show $ parseImg hints body
   let newNotiWithoutId = Notification
         { notiAppName = appName
         , notiRepId = replaceId
