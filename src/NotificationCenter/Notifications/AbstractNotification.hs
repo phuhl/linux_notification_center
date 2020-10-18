@@ -25,10 +25,11 @@ import Control.Lens.TH (makeClassy)
 import Control.Lens (view, set)
 
 import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
-              , labelSetText, labelSetMarkup, widgetSetSizeRequest
-              , labelSetXalign, widgetGetPreferredHeightForWidth
-              , onWidgetButtonPressEvent, imageSetFromPixbuf
-              , imageSetFromIconName, setWidgetWidthRequest
+              , widgetSetValign, widgetSetMarginStart, widgetSetMarginEnd 
+              , widgetSetMarginTop, widgetSetMarginBottom, labelSetText 
+              , labelSetMarkup, widgetSetSizeRequest, labelSetXalign 
+              , widgetGetPreferredHeightForWidth, onWidgetButtonPressEvent
+              , imageSetFromPixbuf, imageSetFromIconName, setWidgetWidthRequest
               , setImagePixelSize, widgetSetMarginStart, widgetSetMarginEnd
               , catchGErrorJustDomain, GErrorMessage(..))
 import GI.GLib (FileError(..))
@@ -38,6 +39,7 @@ import GI.GdkPixbuf (pixbufScaleSimple, pixbufGetHeight, pixbufGetWidth
 import qualified GI.Gtk as Gtk
   (IsWidget, Box(..), Label(..), Button(..), Window(..), Image(..)
   , Builder(..), containerAdd, containerRemove, containerGetChildren)
+import GI.Gtk.Enums (Align(..))
 
 data DisplayingNotificationContent = DisplayingNotificationContent
   { _dLabelTitel :: Gtk.Label
@@ -71,6 +73,16 @@ createNotification config builder noti dispNoti = do
   actions <- box objs "box_actions"
   imgAppIcon <- image objs "img_icon"
   imgImage <- image objs "img_img"
+
+  -- set margins from config
+  widgetSetMarginTop imgImage
+    (fromIntegral $ configImgMarginTop config)
+  widgetSetMarginBottom imgImage
+    (fromIntegral $ configImgMarginBottom config)
+  widgetSetMarginStart imgImage
+    (fromIntegral $ configImgMarginLeft config)
+  widgetSetMarginEnd imgImage
+    (fromIntegral $ configImgMarginRight config)
 
   onWidgetButtonPressEvent container $ \(_) -> do
     notiOnAction noti "default"

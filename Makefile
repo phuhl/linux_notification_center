@@ -78,7 +78,8 @@ endif
 
 
 install-lang:
-	mkdir -p ${DESTDIR}${PREFIX}/share/locale/{de,en}/LC_MESSAGES
+	mkdir -p ${DESTDIR}${PREFIX}/share/locale/de/LC_MESSAGES
+	mkdir -p ${DESTDIR}${PREFIX}/share/locale/en/LC_MESSAGES
 	install -m644 translation/de/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/de/LC_MESSAGES/deadd-notification-center.mo
 	install -m644 translation/en/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/en/LC_MESSAGES/deadd-notification-center.mo
 
