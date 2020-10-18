@@ -8,6 +8,7 @@ import Data.Functor (fmap)
 
 import Text.Regex.TDFA
 import qualified Data.Text as Text
+import Data.Char ( chr )
 import Text.I18N.GetText (textDomain, bindTextDomain, getText)
 import System.Locale.SetLocale (setLocale, Category(LC_ALL))
 import System.IO.Unsafe (unsafePerformIO)
@@ -127,6 +128,38 @@ removeImgTag text =
   in ((a ++ (if length ms > 0 then fst $ removeImgTag c else c))
      , fromMaybe [] $ findTagProps <$> atMay ms 0)
 
+-- | Parses HTML Entities in the given string and replaces them with
+-- their representative characters. Only operates on entities in
+-- the ASCII Range. See the following for details:
+--
+-- <https://dev.w3.org/html5/html-author/charref>
+-- <https://www.freeformatter.com/html-entities.html>
+parseHtmlEntities :: String -> String
+parseHtmlEntities = 
+  let parseAsciiEntities text = 
+        let (a, matched, c, ms) =
+              (text =~ "&#([0-9]{2,3});"
+               :: (String, String, String, [String]))
+            ascii = if length ms > 0 then (read $ head ms :: Int) else -1
+            repl = if 32 <= ascii && ascii <= 126 
+                   then [chr ascii] else matched
+        in a ++ repl ++ (if length c > 0 then parseAsciiEntities c else "")
+      parseNamedEntities text = 
+        let (a, matched, c, ms) = 
+              (text =~ "&([A-Za-z0-9]+);"
+                :: (String, String, String, [String]))
+            name = if length ms > 0 then head ms else ""
+            repl = case name of
+                     "quot" -> "\""
+                     "apos" -> "'"
+                     "grave" -> "`"
+                     "amp" -> "&"
+                     "tilde" -> "~"
+                     "" -> matched
+                     _ -> matched
+        in a ++ repl ++ (if length c > 0 then parseNamedEntities c else "")
+  in parseAsciiEntities . parseNamedEntities
+     
 
 findTagProps :: String -> [(String, String)]
 findTagProps match =

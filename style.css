@@ -104,13 +104,17 @@ button.buttonState2:hover {
 
 .title {
     font-weight: bold;
-    font-size: 16px;
+    font-size: replaceme0025;
 }
 
-.appname, .time {
-    font-size: 12px;
+.appname {
+    font-size: replaceme0026;
+}
+
+.time {
+    font-size: replaceme0028;
 }
 
 .noti-center.time {
-    font-size: 32px;
+    font-size: replaceme0027;
 }
