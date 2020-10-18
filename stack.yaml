@@ -85,3 +85,13 @@ extra-package-dbs: []
 #
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
+
+nix:
+    packages:
+      - cairo
+      - gobject-introspection
+      - gtk3
+      - libxml2
+      - pango
+      - pkgconfig
+      - zlib
