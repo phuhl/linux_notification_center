@@ -218,26 +218,19 @@ setNotificationCenterPosition mainWindow config = do
       marginRight = fromIntegral $ configRightMargin config
       width = fromIntegral $ configWidth config
 
-parseButtons myNotiHints tState = do
+parseButtons noti tState = do
   state <- readTVarIO tState
   let buttons = stUserButtons state
-      maybeIds = Map.lookup "id" <$> myNotiHints
-      ids = join <$> map (\id' -> fromVariant <$> id') maybeIds :: [ Maybe Int32 ]
-      ids' = map checkId ids
+      maybeId = (Map.lookup "id" noti >>= fromVariant) :: Maybe Int32
+      id = checkId maybeId
         where
           checkId (Just id)
             | id < (fromIntegral $ length buttons) = Just id
             | otherwise = Nothing
           checkId Nothing = Nothing
-      maybeStates = Map.lookup "state" <$> myNotiHints
-      states = join <$> map (\id' -> fromVariant <$> id') maybeStates :: [ Maybe Bool ]
-      comb = sequenceT <$> (zip
-                            (map
-                             (\id -> (!!) buttons <$> (fromIntegral <$> id))
-                             ids') states) :: [ Maybe (Button, Bool) ]
-  sequence $ map (\comb' -> sequence $
-                    (\(button, state) ->
-                           setButtonState button state) <$> comb') comb
+      maybeState = Map.lookup "state" noti >>= fromVariant :: Maybe Bool
+      maybeButton = (!!) buttons <$> (fromIntegral <$> id)
+  fromMaybe (return ()) $ setButtonState <$> maybeButton <*> maybeState
   return ()
 
 
@@ -246,6 +239,8 @@ parseNotisForMe tState = do
   -- do stuff
   let notisForMe = stNotisForMe state
       myNotiHints = notiHints <$> notisForMe
+  atomically $ modifyTVar' tState
+    (\state -> state { stNotisForMe = [] })
   sequence $ map (\noti -> do
           let maybeType = Map.lookup "type" noti
             in case (maybeType >>= fromVariant) :: Maybe (String) of
@@ -255,11 +250,9 @@ parseNotisForMe tState = do
                  (Just "clearPopups") -> do
                    putStrLn "clearing popups"
                    hideAllNotis $ stNotiState state
-                 (Just "buttons") -> parseButtons myNotiHints tState
-                 Nothing -> parseButtons myNotiHints tState
+                 (Just "buttons") -> parseButtons noti tState
+                 Nothing -> parseButtons noti tState
       ) myNotiHints
-  atomically $ modifyTVar' tState
-    (\state -> state { stNotisForMe = [] })
   return False
 
 hideNotiCenter tState = do

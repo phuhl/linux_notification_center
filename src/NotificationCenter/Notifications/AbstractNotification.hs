@@ -73,7 +73,6 @@ createNotification config builder noti dispNoti = do
   imgImage <- image objs "img_img"
 
   onWidgetButtonPressEvent container $ \(_) -> do
-    putStrLn "NNOOOW"
     notiOnAction noti "default"
     return False
 
