@@ -22,6 +22,7 @@ build() {
 
 package() {
     cd "linux_notification_center-${pkgver}"
+    make service
     make DESTDIR="$pkgdir" install
 }
 
