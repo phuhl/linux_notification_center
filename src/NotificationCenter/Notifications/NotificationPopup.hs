@@ -97,7 +97,7 @@ showNotificationWindow config noti dispNotis onClose = do
   numLines <- layoutGetLineCount <$> labelGetLayout lblBody
   let maxLines = (configPopupMaxLinesInBody config) 
       ellipsizeBody = configPopupEllipsizeBody config
-  if numLines > maxLines && ellipsieBody then do
+  if numLines > maxLines && ellipsizeBody then do
     lines <- layoutGetLines <$> labelGetLayout lblbody
     let lastLine = lines !! (maxLines - 1)
     len <- getLayoutLineLength lastLine
