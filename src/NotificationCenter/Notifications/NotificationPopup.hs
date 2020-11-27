@@ -91,15 +91,21 @@ showNotificationWindow config noti dispNotis onClose = do
         dispNotiWithoutHeight
       lblBody = (flip view) dispNoti $ dLabelBody
 
-  labelSetEllipsize lblBody
-    (if configPopupEllipsizeBody config
-     then EllipsizeModeEnd
-     else EllipsizeModeNone)
-
-  labelSetLines lblBody $ fromIntegral $ configPopupMaxLinesInBody config
-
   setWidgetWidthRequest mainWindow $ fromIntegral $ configWidthNoti config
 
+  -- Ellipsization of Body
+  numLines <- layoutGetLineCount <$> labelGetLayout lblBody
+  let maxLines = (configPopupMaxLinesInBody config) 
+      ellipsizeBody = configPopupEllipsizeBody config
+  if numLines > maxLines && ellipsieBody then do
+    lines <- layoutGetLines <$> labelGetLayout lblbody
+    let lastLine = lines !! (maxLines - 1)
+    len <- getLayoutLineLength lastLine
+    startOffset <- getLayoutLineStartIndex lastLine
+    bodyText <- labelGetText lblBody
+    let truncatedBody = T.take (len - 4 + startOffset) $ bodyText
+        ellipsizedBody = T.append truncatedBody "..."
+    labelSetText lblBody ellipsizedBody
   setUrgencyLevel (notiUrgency noti) [mainWindow]
   setUrgencyLevel (notiUrgency noti)
     $ (flip view) dispNoti <$> [dLabelTitel, dLabelBody, dLabelAppname]
