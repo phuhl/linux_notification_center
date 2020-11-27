@@ -34,8 +34,11 @@ import DBus ( Variant (..) )
 import GI.Gdk (getEventButtonButton)
 import GI.Gtk (widgetGetPreferredHeightForWidth, widgetSetSizeRequest
               , widgetShowAll, onWidgetButtonPressEvent, windowMove
-              , setWidgetWidthRequest, widgetDestroy, labelSetLines, labelSetEllipsize)
+              , setWidgetWidthRequest, widgetDestroy , labelGetText
+              , labelSetText, labelGetLayout)
 import GI.Pango.Enums (EllipsizeMode(..))
+import GI.Pango.Objects.Layout (layoutGetLinesReadonly, layoutGetLineCount)
+import GI.Pango.Structs.LayoutLine (getLayoutLineLength, getLayoutLineStartIndex)
 import qualified GI.Gtk as Gtk (Window(..), Label(..))
 
 
@@ -85,7 +88,6 @@ showNotificationWindow config noti dispNotis onClose = do
     , _dHasCustomPosition = hasCustomPosition
     , _dpopupContent = DisplayingNotificationContent {} }
 
-
   let dispNoti = set dNotiGetHeight
         (getHeight (view dContainer dispNotiWithoutHeight) config)
         dispNotiWithoutHeight
@@ -94,18 +96,20 @@ showNotificationWindow config noti dispNotis onClose = do
   setWidgetWidthRequest mainWindow $ fromIntegral $ configWidthNoti config
 
   -- Ellipsization of Body
-  numLines <- layoutGetLineCount <$> labelGetLayout lblBody
+  numLines <- fromIntegral <$> (layoutGetLineCount =<< labelGetLayout lblBody)
   let maxLines = (configPopupMaxLinesInBody config) 
       ellipsizeBody = configPopupEllipsizeBody config
   if numLines > maxLines && ellipsizeBody then do
-    lines <- layoutGetLines <$> labelGetLayout lblbody
+    lines <- layoutGetLinesReadonly =<< labelGetLayout lblBody
     let lastLine = lines !! (maxLines - 1)
-    len <- getLayoutLineLength lastLine
-    startOffset <- getLayoutLineStartIndex lastLine
+    len <- fromIntegral <$> getLayoutLineLength lastLine
+    startOffset <- fromIntegral <$> getLayoutLineStartIndex lastLine
     bodyText <- labelGetText lblBody
-    let truncatedBody = T.take (len - 4 + startOffset) $ bodyText
-        ellipsizedBody = T.append truncatedBody "..."
+    let truncatedBody = Text.take (len - 4 + startOffset) $ bodyText
+        ellipsizedBody = Text.append truncatedBody "..."
     labelSetText lblBody ellipsizedBody
+  else return ()
+
   setUrgencyLevel (notiUrgency noti) [mainWindow]
   setUrgencyLevel (notiUrgency noti)
     $ (flip view) dispNoti <$> [dLabelTitel, dLabelBody, dLabelAppname]
