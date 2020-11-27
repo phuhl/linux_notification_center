@@ -95,26 +95,33 @@ showNotificationWindow config noti dispNotis onClose = do
 
   setWidgetWidthRequest mainWindow $ fromIntegral $ configWidthNoti config
 
-  -- Ellipsization of Body
-  numLines <- fromIntegral <$> (layoutGetLineCount =<< labelGetLayout lblBody)
-  let maxLines = (configPopupMaxLinesInBody config) 
-      ellipsizeBody = configPopupEllipsizeBody config
-  if numLines > maxLines && ellipsizeBody then do
-    lines <- layoutGetLinesReadonly =<< labelGetLayout lblBody
-    let lastLine = lines !! (maxLines - 1)
-    len <- fromIntegral <$> getLayoutLineLength lastLine
-    startOffset <- fromIntegral <$> getLayoutLineStartIndex lastLine
-    bodyText <- labelGetText lblBody
-    let truncatedBody = Text.take (len - 4 + startOffset) $ bodyText
-        ellipsizedBody = Text.append truncatedBody "..."
-    labelSetText lblBody ellipsizedBody
-  else return ()
-
   setUrgencyLevel (notiUrgency noti) [mainWindow]
   setUrgencyLevel (notiUrgency noti)
     $ (flip view) dispNoti <$> [dLabelTitel, dLabelBody, dLabelAppname]
 
   height <- updateNoti' config onClose noti dispNoti
+
+  -- Ellipsization of Body
+  numLines <- fromIntegral <$> (layoutGetLineCount =<< labelGetLayout lblBody)
+  let maxLines = (configPopupMaxLinesInBody config) 
+      ellipsizeBody = configPopupEllipsizeBody config
+  height <-
+    if numLines > maxLines && ellipsizeBody then do
+      lines <- layoutGetLinesReadonly =<< labelGetLayout lblBody
+      let lastLine = lines !! (maxLines - 1)
+      len <- fromIntegral <$> getLayoutLineLength lastLine
+      startOffset <- fromIntegral <$> getLayoutLineStartIndex lastLine
+      bodyText <- labelGetText lblBody
+      let lenOfTruncatedBody = len - 4 + startOffset + (maxLines - 1)
+      let truncatedBody = Text.take lenOfTruncatedBody $ bodyText
+          ellipsizedBody = Text.append truncatedBody "..."
+      labelSetText lblBody ellipsizedBody
+      -- re-request height to reflect ellipsized body
+      height' <- getHeight (view dContainer dispNoti) config
+      widgetSetSizeRequest (_dLabelBG dispNoti) (-1) height'
+      return height'
+    else
+      return height
 
   (screenW, screenY, screenH) <- if configNotiFollowMouse config then
                                    getMouseActiveScreenPos mainWindow
@@ -165,6 +172,7 @@ showNotificationWindow config noti dispNotis onClose = do
            notiOnClosed noti $ User
            onClose
     return False
+
   widgetShowAll mainWindow
 
   return $ dispNoti { _dNotiTop = hBefore }
