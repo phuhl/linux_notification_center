@@ -62,7 +62,7 @@ createAction config useIcons onAction width height command description = do
   onButtonClicked button $ do
     onAction command Nothing
     return ()
-  if useIcons then do
+  if useIcons And configActionIcons config then do
     img <-imageNewFromIconName (Just $ Text.pack description) (fromIntegral $ fromEnum IconSizeButton)
     Gtk.containerAdd button img
   else do
