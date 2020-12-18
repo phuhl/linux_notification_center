@@ -5,6 +5,8 @@ PREFIX ?= /usr
 MANPREFIX = ${PREFIX}/share/man
 PKG_CONFIG ?= pkg-config
 SYSTEMCTL ?= systemctl
+XDG_CONFIG_HOME ?= ${HOME}/.config
+
 
 ifeq (,${SYSTEMD})
 # Check for systemctl to avoid discrepancies on systems, where
@@ -48,7 +50,8 @@ clean: clean-stack
 distclean: clean clean-config
 
 clean-config:
-	rm -f ${HOME}/.config/deadd/deadd.conf
+	rm -f ${XDG_CONFIG_HOME}/deadd/deadd.css
+	rm -f ${XDG_CONFIG_HOME}/deadd/deadd.conf
 
 doc:
 	stack haddock
@@ -63,6 +66,18 @@ install-stack:
 	mkdir -p ${DESTDIR}${MANPREFIX}/man1
 	install -Dm644 docs/linux-notification-center.man ${DESTDIR}${MANPREFIX}/man1/deadd-notification-center.1
 	install -Dm644 LICENSE ${DESTDIR}${PREFIX}/share/licenses/deadd-notification-center/LICENSE
+
+CSS_CONFIG_FILE = ${XDG_CONFIG_HOME}/deadd/deadd.css
+install-config:
+	mkdir -p ${XDG_CONFIG_HOME}/deadd/
+ifneq ("$(wildcard $(CSS_CONFIG_FILE))","")
+	install -Dm644 style.css ${XDG_CONFIG_HOME}/deadd/deadd.css_new
+	$(warning Warning: $(XDG_CONFIG_HOME)/deadd/deadd.css exists. Instead of overwriting, created $(XDG_CONFIG_HOME)/deadd.css_new)
+else
+	install -Dm644 style.css ${XDG_CONFIG_HOME}/deadd/deadd.css
+endif
+
+
 
 install-service: service
 	mkdir -p ${DESTDIR}${SERVICEDIR_DBUS}

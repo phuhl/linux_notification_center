@@ -1,17 +1,17 @@
 .blurredBG, #main_window, .blurredBG.low, .blurredBG.normal {
-    background: replaceme0000;
+    background: rgba(255, 255, 255, 0.5);
 }
 
 .blurredBG.notification {
-    background: replaceme0010;
+    background:  rgba(255, 255, 255, 0.4);
 }
 
 .blurredBG.notification.critical {
-    background: replaceme0001;
+    background: rgba(255, 0, 0, 0.5);
 }
 
 .notificationInCenter.critical {
-    background: replaceme0002;
+    background: rgba(155, 0, 20, 0.5);
 }
 
 .undershoot.top, .undershoot.right, .undershoot.bottom,
@@ -21,100 +21,109 @@
 
 
 button {
-    background: replaceme0006;
-    color: replaceme0003;
-    border-radius: 0;
-    border-width: 0;
-    background-position: 0 0;
+    background: transparent;
+    color: #322;
+    border-radius: 3px;
+    border-width: 0px;
+    background-position: 0px 0px;
     text-shadow: none;
 }
 
 label {
-    color: replaceme0007;
+    color: #322;
 }
 
 label.notification {
-    color: replaceme0011;
+    color: #322;
 }
 
 label.critical {
-    color: replaceme0008;
+    color: #000;
 }
 .notificationInCenter label.critical {
-    color: replaceme0009;
+    color: #000;
 }
 
 button:hover {
-    border-radius: 0px;
-    background: replaceme0004;
-    border-width: 0;
+    border-radius: 3px;
+    background: rgba(0, 20, 20, 0.2);
+    border-width: 0px;
     border-top: transparent;
     border-color: #f00;
-    color: replaceme0005;
+    color: #fee;
 }
 
 .userbutton {
-    background: replaceme0013;
+    background: rgba(20,0,0, 0.15);
 }
 
 .userbutton:hover {
-    background: replaceme0015;
+    background: rgba(20, 0, 0, 0.2);
 }
 
 .userbuttonlabel {
-    color: replaceme0014;
-    font-size: replaceme0012;
+    color: #222;
+    font-size: 12px;
 }
 
 .userbuttonlabel:hover {
-    color: replaceme0016;
+    color: #111;
 }
 
 button.buttonState1 {
-    background: replaceme0017;
+    background: rgba(20,0,0,0.5);
 }
 
 button.buttonState2 {
-    background: replaceme0018;
+    background: rgba(255,255,255,0.3);
 }
 
 .userbuttonlabel.buttonState1 {
-    color: replaceme0019;
+    color: #fff;
 }
 
 .userbuttonlabel.buttonState2 {
-    color: replaceme0020;
+    color: #111;
 }
 
 button.buttonState1:hover {
-    background: replaceme0021;
+    background: rgba(20,0,0, 0.4);
 }
 
 button.buttonState2:hover {
-    background: replaceme0022;
+    background: rgba(20,0,0, 0.3);
 }
 
 .userbuttonlabel.buttonState1:hover {
-    color: replaceme0023;
+    color: #111;
 }
 
 .userbuttonlabel.buttonState2:hover {
-    color: replaceme0024;
+    color: #000;
 }
 
 .title {
     font-weight: bold;
-    font-size: replaceme0025;
+    font-size: 16px;
 }
 
 .appname {
-    font-size: replaceme0026;
+    font-size: 12px;
 }
 
 .time {
-    font-size: replaceme0028;
+    font-size: 12px;
 }
 
 .noti-center.time {
-    font-size: replaceme0027;
+    font-size: 32px;
+}
+
+container.deadd-noti-center.notification {
+    border: 5px solid #000;
+    background-color: #000;
+}
+
+image.deadd-noti-center.notification.image {
+    margin-left: 20px;
 }
