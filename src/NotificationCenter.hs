@@ -4,13 +4,13 @@
 module NotificationCenter where
 
 import Config
-  (replaceColors,getConfig,Config(..))
+  (getConfig,Config(..))
 import NotificationCenter.NotificationInCenter
   (DisplayingNotificationInCenter(..), showNotification, updateNoti)
 import NotificationCenter.Notifications
   (NotifyState(..), startNotificationDaemon, hideAllNotis)
 import NotificationCenter.Notifications.Data (Notification(..))
-import NotificationCenter.Glade (glade, style)
+import NotificationCenter.Glade (glade)
 import NotificationCenter.Button
   (Button(..), createButton, setButtonState)
 import TransparentWindow
@@ -21,6 +21,7 @@ import Prelude
 import Text.I18N.GetText
 import System.Locale.SetLocale
 import System.IO.Unsafe
+import System.IO (readFile)
 
 import Data.Int (Int32(..))
 import Data.Tuple.Sequence (sequenceT)
@@ -126,8 +127,8 @@ deleteInCenter tState = do
   mapM (removeNoti tState) displayList
   return ()
 
-createNotiCenter :: TVar State -> Config -> IO ()
-createNotiCenter tState config = do
+createNotiCenter :: TVar State -> String -> Config -> IO ()
+createNotiCenter tState style config = do
   (objs, _) <- createTransparentWindow (Text.pack glade)
     [ "main_window"
     , "label_time"
@@ -145,8 +146,7 @@ createNotiCenter tState config = do
   deleteButton <- button objs "button_deleteAll"
 
   screen <- windowGetScreen mainWindow
-  setStyle screen $ BS.pack $
-    replaceColors config style
+  setStyle screen $ BS.pack $ style
 --  (Just mainWindowGDK) <- widgetGetParentWindow mainWindow
 
   onButtonClicked deleteButton $ deleteInCenter tState
@@ -376,7 +376,8 @@ main' = do
   homeDir <- getXdgDirectory XdgConfig ""
   config <- getConfig <$> (readConfigFile
                             (homeDir ++ "/deadd/deadd.conf"))
-
+  style <- readFile (homeDir ++ "/deadd/deadd.css")
+ 
   initI18n
 
   istate <- getInitialState
@@ -385,7 +386,7 @@ main' = do
 
   atomically $ modifyTVar' istate $
     \istate' -> istate' { stNotiState = notiState }
-  createNotiCenter istate config
+  createNotiCenter istate style config
 
   unixSignalAdd PRIORITY_HIGH (fromIntegral sigUSR1)
     (showNotiCenter istate notiState config)
