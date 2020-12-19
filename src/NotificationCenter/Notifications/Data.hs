@@ -5,7 +5,8 @@ module NotificationCenter.Notifications.Data
   , CloseType (..)
   , Notification(..)
   , Image(..)
-  , parseImageString, rawImgToPixBuf
+  , parseImageString
+  , rawImgToPixBuf
   ) where
 
 import qualified Data.Text as Text
