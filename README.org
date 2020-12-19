@@ -517,22 +517,24 @@ In the file =${XDG_CONFIG_HOME}/deadd/deadd.css= (usually
 
 The following class-names for labels are defined:
 - Notifications:
-  - =label.deadd-noti-center.notification.appname=
-  - =label.deadd-noti-center.notification.body=
-  - =label.deadd-noti-center.notification.title=
-  - =image.deadd-noti-center.notification.image=
-  - =image.deadd-noti-center.notification.icon=
+  - =label.deadd-noti-center.notification.appname= :: Appname
+  - =label.deadd-noti-center.notification.body= :: Textbody
+  - =label.deadd-noti-center.notification.title= :: Notification title
+  - =image.deadd-noti-center.notification.image= :: Image of a notification
+  - =image.deadd-noti-center.notification.icon= :: Appicon
 - Notifications in the notification center:
-  - =label.deadd-noti-center.in-center.appname=
-  - =label.deadd-noti-center.in-center.body=
-  - =label.deadd-noti-center.in-center.title=
-  - =label.deadd-noti-center.in-center.time=
-  - =image.deadd-noti-center.in-center.image=
-  - =image.deadd-noti-center.in-center.icon=
-  - =button.deadd-noti-center.in-center.button-close=
+  - =label.deadd-noti-center.in-center.appname= :: Appname
+  - =label.deadd-noti-center.in-center.body= :: Textbody
+  - =label.deadd-noti-center.in-center.title= :: Notification title
+  - =label.deadd-noti-center.in-center.time= :: Notification time
+  - =image.deadd-noti-center.in-center.image= :: Image of a notification
+  - =image.deadd-noti-center.in-center.icon= :: Appicon
+  - =button.deadd-noti-center.in-center.button-close= :: Close button on notification
+
 - Notification-center:
-  - =label.deadd-noti-center.noti-center.time=
-  - =label.deadd-noti-center.noti-center.date=
+  - =label.deadd-noti-center.noti-center.time= :: The big time at the top
+  - =label.deadd-noti-center.noti-center.date= :: The date text
+  - =label.deadd-noti-center.noti-center.delete-all= :: "Delete all" Button
 
 _Examples:_
 

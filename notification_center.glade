@@ -99,6 +99,7 @@
                     <property name="relief">none</property>
                     <style>
                       <class name="deadd-noti-center"/>
+                      <class name="delete-all"/>
                     </style>
                   </object>
                   <packing>
