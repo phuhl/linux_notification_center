@@ -23,24 +23,24 @@ and that can run customizable shell commands.
 
 
 
-          ▙              █  █ ████████████  ███▙                  █   ▄██████▄    
-          ███▄           █  █ ████        █  ███▙                █    ████    ██  
-          ▜█████▄        █  █ ████         █  ███▙              █   █  ████    ▜█ 
-            ▜██████▄     █  █ ████          █  ███▙      ▙     █     █  ████      
-          █▄   ▜██████▄  █  █ ████████████   █  ███▙    ██▙   █       █  ████     
-          █ ▜█▄   ▜█████▄█  █ ████            █  ███▙   ███▙ █         █  ████    
-          █    ▜█▄   ▜████  █ ████             █  ███▙█  ████           █  ████   
-          █       ▜█▄   ▜█  █ ████              █  ███ █  ██       █▙    █  ████  
-          █          ▜█▄    █ ████               █  █   █           █▙    █  ████ 
-          █             ▜▄  █ ████████████        █      █           ▜████▛  ██▛  
-           
+          ▙              █  █ ████████████  ███▙                  █   ▄██████▄
+          ███▄           █  █ ████        █  ███▙                █    ████    ██
+          ▜█████▄        █  █ ████         █  ███▙              █   █  ████    ▜█
+            ▜██████▄     █  █ ████          █  ███▙      ▙     █     █  ████
+          █▄   ▜██████▄  █  █ ████████████   █  ███▙    ██▙   █       █  ████
+          █ ▜█▄   ▜█████▄█  █ ████            █  ███▙   ███▙ █         █  ████
+          █    ▜█▄   ▜████  █ ████             █  ███▙█  ████           █  ████
+          █       ▜█▄   ▜█  █ ████              █  ███ █  ██       █▙    █  ████
+          █          ▜█▄    █ ████               █  █   █           █▙    █  ████
+          █             ▜▄  █ ████████████        █      █           ▜████▛  ██▛
+
 
      ▄▇▇▀▀▀▀█▌        ▄▄▄▄▄▀▀██▇█▄▄▀▀▀▀▀    ▄▄▄▄▄▄      ▄▄█▇██▀▀▄▄▄▄▄        ▐█▀▀▀▀▇▇▄
     ▐██▌   ▀▀    ▄▄▄████████▄▄█▀        ▄█████▀▀▀███▄      ▀█▄▄████████▄▄▄    ▀▀   ▐██▌
     ████▄  ▄▄▄██████████▀▀   ▀▀▀█▄     ▇████▀    ▀▀██▌   ▄█▀▀▀   ▀▀██████████▄▄▄  ▄████
      ▀███████████████▀▀         ▐█▌   ██████    ▄ ▐███  ▐█▌         ▀▀███████████████▀
-        ▀▀▀▀██████▀             ▀▀   ▐██▐▇▇     ▀▀▀▀      ▀▀             ▀██████▀▀▀▀ 
-        ▄▄██████▀                     ██ ██▌         ▄                     ▀██████▄▄ 
+        ▀▀▀▀██████▀             ▀▀   ▐██▐▇▇     ▀▀▀▀      ▀▀             ▀██████▀▀▀▀
+        ▄▄██████▀                     ██ ██▌         ▄                     ▀██████▄▄
       ▄███████▀                      █▀██ ▀█▄▄      ▄▄                       ▀███████▄
      ▄███████                          ▀██▄▄█████████▀                         ███████▄
      ██████                               ▀▀█████▀▀▀                            ███████
@@ -48,66 +48,66 @@ and that can run customizable shell commands.
        ███▄▄▄▄▄▌                                                             ▐▄▄▄▄▄███
         ▀▀▀▀▀▀                                                                 ▀▀▀▀▀▀
 
-                                          
+
                                       ╒══════╕
                                   NEW │ 2021 │ Update:
                                       ╘══════╛
-                                          
+
                                    Customize all CSS
                                    ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
-                                          
+
                            New deadd.css configuration file
                               Style all elements yourself
-                                          
+
                              Reload CSS styling on the fly
-                                          
+
                     Use CSS transitions when loading a new clorotheme
                                and smoothly change the mood
-                                          
+
                (might [probably will] brake your current styling settings)
              (more information on this in the file updateyourconfig2021.org)
-                                          
-                                          
+
+
                               More notification scripting
                               ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
-                                          
+
                                 Icons can be changed
-                                          
+
                                 Images can be changed
-                                          
+
                             Action buttons can be removed
-                                          
-                                          
+
+
                                     Some Bugfixes
                                     ┈┈┈┈┈┈┈┈┈┈┈┈┈
-                                          
+
                  Too wide notifications don't push out buttons anymore
-                                          
+
                        Notification area is always full height now
-                                          
+
                                       Many more
-                                          
-                                          
+
+
                            Additional new Features from 2020
                            ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
-                                          
+
                               More configuration options
-                                          
+
                                    Git AUR package
-                                          
+
                                    Text ellipsation
-                                          
+
                                  Better html parsing
-                                          
+
                                      Pause poups
-                                          
+
                                       Much more
-                                          
-                                          
+
+
             2020 has been a rough year for many. The DNC did make some progress
             anyways, especially due to many new contributors:
-                                          
-                                                                            
+
+
        (¯`·.¸¸.·´                                                     `·.¸¸.·´¯)
        ( \                                                                     / )
       ( \ )        mitchell-gil96 balsoft resolritter trk9001 rbowden91       ( / )
@@ -115,24 +115,23 @@ and that can run customizable shell commands.
       ( / )     ahmubashshir CobaltSpace woutervb avdv lierdakil MyriaCore    ( \ )
        ( /                                                                     \ )
         (_.·´¯`·.¸                                                    ¸.·´¯`·.¸_)
-                                          
-                                          
+
+
                                  Thank you very much!
-                                          
-                                                                             
+
+
             Special thanks to MyriaCore who created many high quality PRs and was
             very active in the issue tracker.
-                                                                             
+
             Finally, thank you to everyone who created issues, commented, and
             helped to further this project.
-                                           
-                                                                                         ▝                       
+
+                                                                                         ▝
                                                                                          ▝
 ▖                                                                                        ▐
 ▖                                                                                        ▐
 ▌                                                       Further news in releasenotes.org ▐
 ▙▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▟
-
 
 #+END_EXAMPLE
 
