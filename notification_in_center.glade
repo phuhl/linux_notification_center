@@ -60,7 +60,7 @@
             </child>
             <child>
               <object class="GtkButton" id="button_close">
-                <property name="label" translatable="yes">x</property>
+                <property name="label" translatable="yes">✕</property>
                 <property name="width-request">15</property>
                 <property name="height-request">15</property>
                 <property name="visible">True</property>
