@@ -12,7 +12,7 @@ import qualified Data.Text as Text
 import Data.Int ( Int32, Int )
 import NotificationCenter.Notifications.Data
   (notiSendClosedMsg, notiTransient, notiIcon, notiTime, notiAppName
-  , notiBody, notiSummary, Notification(..))
+  , notiBody, notiSummary, Notification(..), parseImageString )
 
 data Config = Config
   {
@@ -144,7 +144,7 @@ getConfig p =
                                 | k == "timeout" = noti { notiTimeout = read v :: Int32 }
                                 | k == "right" = noti { notiRight = Just . (read :: String -> Int) $ v }
                                 | k == "top" = noti { notiTop = Just . (read :: String -> Int) $ v }
---                                | k == "icon" = noti { notiIcon = Text.pack v }
+                                | k == "icon" = noti { notiIcon = parseImageString $ Text.pack v }
                                 | k == "transient" && v == "true" = noti { notiTransient = True }
                                 | k == "transient" && v == "false" = noti { notiTransient = False }
                                 | k == "noClosedMsg" && v == "true" = noti { notiSendClosedMsg = False }
