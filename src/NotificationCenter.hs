@@ -127,8 +127,16 @@ deleteInCenter tState = do
   mapM (removeNoti tState) displayList
   return ()
 
-createNotiCenter :: TVar State -> String -> Config -> IO ()
-createNotiCenter tState style config = do
+setWindowStyle tState = do
+  state <- readTVarIO tState
+  homeDir <- getXdgDirectory XdgConfig ""
+  style <- readFile (homeDir ++ "/deadd/deadd.css")
+  screen <- windowGetScreen $ stMainWindow state
+  setStyle screen $ BS.pack $ style
+  return False
+
+createNotiCenter :: TVar State -> Config -> IO ()
+createNotiCenter tState config = do
   (objs, _) <- createTransparentWindow (Text.pack glade)
     [ "main_window"
     , "label_time"
@@ -144,10 +152,6 @@ createNotiCenter tState style config = do
   timeL <- label objs "label_time"
   timeD <- label objs "label_date"
   deleteButton <- button objs "button_deleteAll"
-
-  screen <- windowGetScreen mainWindow
-  setStyle screen $ BS.pack $ style
---  (Just mainWindowGDK) <- widgetGetParentWindow mainWindow
 
   onButtonClicked deleteButton $ deleteInCenter tState
   buttonSetLabel deleteButton $ Text.pack $ translate "Delete all"
@@ -184,6 +188,8 @@ createNotiCenter tState style config = do
                       , stDeleteAll = deleteButton
                       , stNotisForMe = []
                       , stUserButtons = buttons' }
+
+  setWindowStyle tState
 
   startSetTimeThread tState
 
@@ -261,6 +267,10 @@ parseNotisForMe tState = do
                    putStrLn "unpausing popups"
                    atomically $ modifyTVar' tState
                      (\state -> state { stPopupsPaused = False })
+                 (Just "reloadStyle") -> do
+                   putStrLn "Reloading Style"
+                   addSource $ setWindowStyle tState
+                   return ()
       ) myNotiHints
   return False
 
@@ -376,8 +386,7 @@ main' = do
   homeDir <- getXdgDirectory XdgConfig ""
   config <- getConfig <$> (readConfigFile
                             (homeDir ++ "/deadd/deadd.conf"))
-  style <- readFile (homeDir ++ "/deadd/deadd.css")
- 
+
   initI18n
 
   istate <- getInitialState
@@ -386,7 +395,7 @@ main' = do
 
   atomically $ modifyTVar' istate $
     \istate' -> istate' { stNotiState = notiState }
-  createNotiCenter istate style config
+  createNotiCenter istate config
 
   unixSignalAdd PRIORITY_HIGH (fromIntegral sigUSR1)
     (showNotiCenter istate notiState config)
