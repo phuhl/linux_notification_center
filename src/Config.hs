@@ -164,6 +164,8 @@ getConfig p =
                                 = noti { notiTransient = False }
                                 | k == "noClosedMsg" && v == "true"
                                 = noti { notiSendClosedMsg = False }
+                                | k == "removeActions"
+                                = noti { notiActions = [] }
                                 | otherwise = noti
 
         run = [Nothing]
