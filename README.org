@@ -585,7 +585,9 @@ You can set the following parameters:
 - right (overrides ~distanceRight~ from the configuration)
 - top (overrides ~distanceTop~ from the configuration)
 - icon (overrides the app-icon, value must be either empty, a path to
-  an icon or a gtk-icon-name)
+  an image or a gtk-icon-name)
+- image (overrides the image of the notification, value must be either
+  empty, a path to an image or a gtk-icon-name)
 - transient (value has to be =true= or =false=)
 - noClosedMsg (value has to be =true= or =false=, if set to true it
   will prevent that a DBUS =NotificationClosed= message will be send
