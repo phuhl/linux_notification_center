@@ -50,7 +50,7 @@ and that can run customizable shell commands.
                                                              ╘══════╛
 
                                                           Customize all CSS
-                                                          ┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉
+                                                          ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
                                                   New deadd.css configuration file
                                                      Style all elements yourself
@@ -62,6 +62,17 @@ and that can run customizable shell commands.
 
                                       (might [probably will] brake your current styling settings)
                                     (more information on this in the file updateyourconfig2021.org)
+
+
+                                                     More notification scripting
+                                                     ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+                                                       Icons can be changed
+
+                                                       Images can be changed
+
+                                                   Action buttons can be removed
+
 
                                                            Some Bugfixes
                                                            ┈┈┈┈┈┈┈┈┈┈┈┈┈
@@ -593,6 +604,8 @@ You can set the following parameters:
   will prevent that a DBUS =NotificationClosed= message will be send
   for this notification. Only applies if the configuration parameter
   =configSendNotiClosedDbusMessage= is set to =true=)
+- removeActions (value can be anything, if used, no action buttons
+  will be displayed on the notifications)
 
 If you want to set more than one parameter you can concatenate them
 with =;= like this: =app=Crashmaster 2000;time=4:20=.
