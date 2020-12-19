@@ -51,6 +51,8 @@ data Notification = Notification
     --   timeout or by user
   , notiOnAction :: String -> IO ()
     -- ^ Should be called when an action is used
+  , notiPercentage :: Maybe Double
+    -- ^ The percentage that should be shown in a percentage bar
   }
 
 instance Show Notification where

@@ -240,7 +240,9 @@ notify config tState emit
         , notiSendClosedMsg = (configSendNotiClosedDbusMessage config)
         , notiTop = Nothing
         , notiRight = Nothing
-        }
+        , notiPercentage = fromIntegral
+          <$> (fromVariant =<< Map.lookup "has-percentage" hints :: Maybe Int32)
+}
 
   if Map.member (pack "deadd-notification-center")
     $ notiHints newNotiWithoutId
