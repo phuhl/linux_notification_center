@@ -56,7 +56,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="margin-start">15</property>
-                <property name="margin-end">10</property>
+                <property name="margin-end">15</property>
                 <property name="vexpand">True</property>
                 <property name="orientation">vertical</property>
                 <property name="baseline-position">bottom</property>
@@ -104,6 +104,18 @@
                   </packing>
                 </child>
                 <child>
+                  <object class="GtkProgressBar" id="progressbar">
+                    <property name="can-focus">False</property>
+                    <property name="margin-top">5</property>
+                    <property name="margin-bottom">5</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkBox" id="box_actions">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -121,7 +133,7 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">2</property>
+                    <property name="position">3</property>
                   </packing>
                 </child>
                 <child>
@@ -174,7 +186,7 @@
                     <property name="expand">False</property>
                     <property name="fill">False</property>
                     <property name="padding">8</property>
-                    <property name="position">3</property>
+                    <property name="position">4</property>
                   </packing>
                 </child>
               </object>

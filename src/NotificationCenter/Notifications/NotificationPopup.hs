@@ -32,7 +32,7 @@ import Control.Monad
 import DBus ( Variant (..) )
 
 import GI.Gdk (getEventButtonButton)
-import GI.Gtk (widgetGetPreferredHeightForWidth, widgetSetSizeRequest
+import GI.Gtk (widgetShow, widgetGetPreferredHeightForWidth, widgetSetSizeRequest
               , widgetShowAll, onWidgetButtonPressEvent, windowMove
               , setWidgetWidthRequest, widgetDestroy, labelSetLines, labelSetEllipsize)
 import GI.Pango.Enums (EllipsizeMode(..))
@@ -155,7 +155,8 @@ showNotificationWindow config noti dispNotis onClose = do
            notiOnClosed noti $ User
            onClose
     return False
-  widgetShowAll mainWindow
+
+  widgetShow mainWindow
 
   return $ dispNoti { _dNotiTop = hBefore }
 

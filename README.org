@@ -78,6 +78,10 @@ and that can run customizable shell commands.
                             Action buttons can be removed
 
 
+                             Progress bar in notifications
+                             ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+
                                     Some Bugfixes
                                     ┈┈┈┈┈┈┈┈┈┈┈┈┈
 
@@ -144,8 +148,9 @@ Some applications, notification:
 Notification Center opened:
 [[file:README.org.img/org_20200223_193345_VhlbOf.jpg]]
 
-Link, Markup and Action support:
-[[file:README.org.img/org_20200223_200131_4WWV2Y.jpg]]
+Link, Markup, Progressbar, and Action support:
+[[file:README.org.img/org_20201220_000601_9V037T.jpg]]
+
 
 ** Usage
 
@@ -232,6 +237,12 @@ notify-send.py "Images are" "COOL" \
                --hint string:image-path:file://path/to/image/from/root.png
 #+END_SRC
 
+Notification with progress bar
+#+BEGIN_SRC sh
+notify-send.py "This notification has a progressbar" "33%" \
+                         --hint int:has-percentage:33)
+#+END_SRC
+
 *** Example: Brightness indicator
 
 This snippet can be used to produce a brightness-indicator. It requires the 
@@ -251,6 +262,7 @@ fi
 BRIGHTNESS=$(xbacklight -get)
 NOTI_ID=$(notify-send.py "Bildschirmhelligkeit" "$BRIGHTNESS/100" \
                          --hint string:image-path:video-display boolean:transient:true \
+                                int:has-percentage:$BRIGHTNESS \
                          --replaces-process "brightness-popup")
 #+END_SRC
 
@@ -294,6 +306,7 @@ fi
 
 NOTI_ID=$(notify-send.py "Lautstärke" "$VOLUME/100" \
                          --hint string:image-path:$ICON boolean:transient:true \
+                                int:has-percentage:$VOLUME \
                          --replaces-process "volume-popup")
 #+END_SRC
 

@@ -12,6 +12,7 @@ module TransparentWindow
   , box
   , button
   , image
+  , progressbar
   , getObjs
   , getScreenPos
   , getMouseActiveScreenPos
@@ -60,7 +61,7 @@ import GI.Gtk
        , cssProviderLoadFromData, cssProviderNew, styleContextAddClass
        , widgetGetStyleContext, CssProvider(..))
 import qualified GI.Gtk as Gtk
-  (DrawingArea(..), unsafeCastTo, Window(..), IsWidget(..)
+  (ProgressBar(..), DrawingArea(..), unsafeCastTo, Window(..), IsWidget(..)
   , builderGetObject, builderAddFromString
   , builderNew, Builder(..), Label(..), Box(..), Button(..), Image(..))
 import GI.Gtk.Constants
@@ -99,6 +100,7 @@ label = gObjLookup (Gtk.unsafeCastTo Gtk.Label)
 box = gObjLookup (Gtk.unsafeCastTo Gtk.Box)
 button = gObjLookup (Gtk.unsafeCastTo Gtk.Button)
 image  = gObjLookup (Gtk.unsafeCastTo Gtk.Image)
+progressbar = gObjLookup (Gtk.unsafeCastTo Gtk.ProgressBar)
 
 
 getObjs :: Gtk.Builder -> [Text.Text] -> IO ObjDict

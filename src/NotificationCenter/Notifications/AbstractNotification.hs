@@ -16,13 +16,15 @@ import NotificationCenter.Notifications.Data
   (Urgency(..), CloseType(..), Notification(..), Image(..), rawImgToPixBuf)
 import NotificationCenter.Notifications.Action
   (Action(..), createAction)
-import TransparentWindow (label, image, box, getObjs, addClass)
+import TransparentWindow (label, image, box, getObjs, addClass, progressbar)
 
 import Data.Text as Text
 import Data.Int ( Int32 )
+import Data.Maybe (fromMaybe)
 
 import Control.Lens.TH (makeClassy)
 import Control.Lens (view, set)
+import Control.Monad (when)
 
 import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , widgetSetValign, widgetSetMarginStart, widgetSetMarginEnd 
@@ -31,13 +33,14 @@ import GI.Gtk (widgetShowAll, widgetHide, windowMove, widgetDestroy
               , widgetGetPreferredHeightForWidth, onWidgetButtonPressEvent
               , imageSetFromPixbuf, imageSetFromIconName, setWidgetWidthRequest
               , setImagePixelSize, widgetSetMarginStart, widgetSetMarginEnd
+              , progressBarSetFraction, widgetSetVisible
               , catchGErrorJustDomain, GErrorMessage(..))
 import GI.GLib (FileError(..))
 import GI.GdkPixbuf (pixbufScaleSimple, pixbufGetHeight, pixbufGetWidth
                     , Pixbuf(..), pixbufNewFromFileAtScale
                     , InterpType(..), PixbufError(..))
 import qualified GI.Gtk as Gtk
-  (IsWidget, Box(..), Label(..), Button(..), Window(..), Image(..)
+  (ProgressBar, IsWidget, Box(..), Label(..), Button(..), Window(..), Image(..)
   , Builder(..), containerAdd, containerRemove, containerGetChildren)
 import GI.Gtk.Enums (Align(..))
 
@@ -49,6 +52,7 @@ data DisplayingNotificationContent = DisplayingNotificationContent
   , _dImgImage :: Gtk.Image
   , _dContainer :: Gtk.Box
   , _dActions :: Gtk.Box
+  , _dProgressbar :: Gtk.ProgressBar
   }
 makeClassy ''DisplayingNotificationContent
 
@@ -64,7 +68,8 @@ createNotification config builder noti dispNoti = do
                           , "img_icon"
                           , "img_img"
                           , "box_container"
-                          , "box_actions"]
+                          , "box_actions"
+                          , "progressbar" ]
 
   labelTitel <- label objs "label_titel"
   labelBody <- label objs "label_body"
@@ -73,6 +78,7 @@ createNotification config builder noti dispNoti = do
   actions <- box objs "box_actions"
   imgAppIcon <- image objs "img_icon"
   imgImage <- image objs "img_img"
+  progressBar <- progressbar objs "progressbar"
 
   -- set margins from config
   widgetSetMarginTop imgImage
@@ -97,6 +103,7 @@ createNotification config builder noti dispNoti = do
     $ set dImgImage imgImage
     $ set dContainer container
     $ set dActions actions
+    $ set dProgressbar progressBar
     dispNoti
 
 setUrgencyLevel :: Gtk.IsWidget widget => Urgency -> [widget] -> IO ()
@@ -140,6 +147,15 @@ updateNotiContent config noti dNoti = do
   sequence $ Gtk.containerAdd (view dActions dNoti) <$> actionButton <$> actionButtons
 
   widgetShowAll (view dActions dNoti)
+
+
+  if (notiPercentage noti /= Nothing) then do
+    progressBarSetFraction (view dProgressbar dNoti)
+      ((fromMaybe 0 $ notiPercentage noti) / 100.0)
+    widgetSetVisible (view dProgressbar dNoti) True
+    return ()
+    else do
+    widgetSetVisible (view dProgressbar dNoti) False
 
   return ()
 
