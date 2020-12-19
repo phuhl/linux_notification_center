@@ -191,6 +191,12 @@ Reload CSS Styling file
 #+END_SRC
 
 
+Send notifications that only show up in the notification center but do
+not produce a popup:
+#+BEGIN_SRC sh
+notify-send.py "Does not pop up" -t 1
+#+END_SRC
+
 *** Supported hints and features
 
 Action buttons with gtk icons

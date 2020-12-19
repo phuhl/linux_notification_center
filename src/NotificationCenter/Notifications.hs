@@ -20,6 +20,7 @@ import TransparentWindow
 import Config (Config(..))
 import NotificationCenter.Notifications.Data
 
+import Control.Monad (when)
 import Control.Applicative ((<|>))
 import Control.Concurrent (forkIO)
 import Control.Concurrent.STM
@@ -298,6 +299,7 @@ notify config tState emit
                else (newNoti:notis')
 
 
+replaceNoti:: Notification -> TVar NotifyState -> IO ()
 replaceNoti newNoti tState = do
   addSource $ do
     atomically $ modifyTVar tState $ \state ->
@@ -313,23 +315,27 @@ replaceNoti newNoti tState = do
            newNoti) notis
     notiStOnUpdate state
     return False
-      where repId = fromIntegral (notiRepId newNoti)
+  return ()
+ where repId = fromIntegral (notiRepId newNoti)
 
+insertNewNoti :: Notification -> TVar NotifyState -> IO ()
 insertNewNoti newNoti tState = do
   addSource $ do
     state <- readTVarIO tState
     -- new noti-window
-    dnoti <- showNotificationWindow
-      (notiConfig state)
-      newNoti
-      (notiDisplayingList state)
-      (removeNotiFromDistList tState $ notiId newNoti)
-    atomically $ modifyTVar' tState $ \state ->
-      state { notiDisplayingList = dnoti : notiDisplayingList state }
+    when ((fromIntegral $ notiTimeout newNoti) /= 1) $ do
+      dnoti <- showNotificationWindow
+        (notiConfig state)
+        newNoti
+        (notiDisplayingList state)
+        (removeNotiFromDistList tState $ notiId newNoti)
+      atomically $ modifyTVar' tState $ \state ->
+        state { notiDisplayingList = dnoti : notiDisplayingList state }
+      return ()
     -- trigger update in noti-center
     notiStOnUpdate state
     return False
-
+  return ()
 
 removeNotiFromDistList' :: TVar NotifyState -> Word32 -> IO ()
 removeNotiFromDistList' tState id =
