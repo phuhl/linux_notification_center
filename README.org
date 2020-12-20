@@ -243,6 +243,13 @@ notify-send.py "This notification has a progressbar" "33%" \
                          --hint int:has-percentage:33)
 #+END_SRC
 
+Notification with slider
+#+BEGIN_SRC sh
+notify-send.py "This notification has a slider" "33%" \
+                         --hint int:has-percentage:33
+                         --action changeValue:abc)
+#+END_SRC
+
 *** Example: Brightness indicator
 
 This snippet can be used to produce a brightness-indicator. It requires the 

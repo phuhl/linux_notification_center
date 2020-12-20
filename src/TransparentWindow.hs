@@ -13,6 +13,7 @@ module TransparentWindow
   , button
   , image
   , progressbar
+  , scale
   , getObjs
   , getScreenPos
   , getMouseActiveScreenPos
@@ -61,7 +62,7 @@ import GI.Gtk
        , cssProviderLoadFromData, cssProviderNew, styleContextAddClass
        , widgetGetStyleContext, CssProvider(..))
 import qualified GI.Gtk as Gtk
-  (ProgressBar(..), DrawingArea(..), unsafeCastTo, Window(..), IsWidget(..)
+  (ProgressBar(..), Scale(..), DrawingArea(..), unsafeCastTo, Window(..), IsWidget(..)
   , builderGetObject, builderAddFromString
   , builderNew, Builder(..), Label(..), Box(..), Button(..), Image(..))
 import GI.Gtk.Constants
@@ -79,7 +80,7 @@ import GI.GLib.Constants
 import GI.Cairo ()
 import Graphics.Rendering.Cairo
        (fill, restore, save, stroke, arc, setDash, setLineWidth, rotate
-       , rectangle, setSourceRGBA, setSourceRGB, newPath, scale, translate
+       , rectangle, setSourceRGBA, setSourceRGB, newPath, translate
        , lineTo, moveTo, Render)
 import Graphics.Rendering.Cairo.Types (Cairo(..))
 import Graphics.Rendering.Cairo.Internal (Render(..))
@@ -101,6 +102,7 @@ box = gObjLookup (Gtk.unsafeCastTo Gtk.Box)
 button = gObjLookup (Gtk.unsafeCastTo Gtk.Button)
 image  = gObjLookup (Gtk.unsafeCastTo Gtk.Image)
 progressbar = gObjLookup (Gtk.unsafeCastTo Gtk.ProgressBar)
+scale= gObjLookup (Gtk.unsafeCastTo Gtk.Scale)
 
 
 getObjs :: Gtk.Builder -> [Text.Text] -> IO ObjDict
