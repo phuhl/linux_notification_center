@@ -3,6 +3,11 @@
 <interface>
   <requires lib="gtk+" version="3.24"/>
   <!-- interface-css-provider-path style.css -->
+  <object class="GtkAdjustment" id="adjustment1">
+    <property name="upper">100</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
+  </object>
   <object class="GtkWindow" id="main_window">
     <property name="width-request">300</property>
     <property name="can-focus">False</property>
@@ -108,11 +113,35 @@
                     <property name="can-focus">False</property>
                     <property name="margin-top">5</property>
                     <property name="margin-bottom">5</property>
+                    <style>
+                      <class name="notification"/>
+                      <class name="deadd-noti-center"/>
+                      <class name="progressbar"/>
+                    </style>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
                     <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkScale" id="scale">
+                    <property name="can-focus">True</property>
+                    <property name="adjustment">adjustment1</property>
+                    <property name="restrict-to-fill-level">False</property>
+                    <property name="round-digits">1</property>
+                    <property name="draw-value">False</property>
+                    <style>
+                      <class name="deadd-noti-center"/>
+                      <class name="notification"/>
+                      <class name="scale"/>
+                    </style>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">3</property>
                   </packing>
                 </child>
                 <child>
@@ -133,7 +162,7 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">3</property>
+                    <property name="position">4</property>
                   </packing>
                 </child>
                 <child>
@@ -186,7 +215,7 @@
                     <property name="expand">False</property>
                     <property name="fill">False</property>
                     <property name="padding">8</property>
-                    <property name="position">4</property>
+                    <property name="position">5</property>
                   </packing>
                 </child>
               </object>

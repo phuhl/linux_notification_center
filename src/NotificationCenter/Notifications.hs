@@ -103,13 +103,18 @@ emitNotificationClosed doSend onClose id ctype =
                                    _ -> 4 :: Word32)] }
   else return ()
 
-emitAction :: (Signal -> IO ()) -> Int -> String -> IO ()
-emitAction onAction id key = do
+emitAction :: (Signal -> IO ()) -> Int -> String -> Maybe String -> IO ()
+emitAction onAction id key mParam = do
   onAction $ (signal "/org/freedesktop/Notifications"
                "org.freedesktop.Notifications"
                "ActionInvoked")
     { signalBody = [ toVariant (fromIntegral id :: Word32)
-                   , toVariant key] }
+                   , toVariant key]
+                   ++ if mParam == Nothing then
+                        []
+                      else
+                        [toVariant $ fromMaybe "" mParam]
+        }
 
 
 parseActionIcons hints =
@@ -277,7 +282,7 @@ notify config tState emit
                { notiId = notiStNextId state
                , notiOnClosed = emitNotificationClosed (notiSendClosedMsg newNoti)
                  emit (notiStNextId state)
-               , notiOnAction = emitAction
+                              , notiOnAction = emitAction
                                 emit (notiStNextId state) })
               (fromIntegral (notiRepId newNoti))
           })

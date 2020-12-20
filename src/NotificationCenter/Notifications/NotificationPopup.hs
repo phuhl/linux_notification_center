@@ -139,7 +139,7 @@ showNotificationWindow config noti dispNotis onClose = do
            notiOnClosed noti $ User
            onClose
        | valid && defaultAction -> do 
-           notiOnAction noti "default"
+           notiOnAction noti "default" Nothing
            notiOnClosed noti $ User
            onClose
        | not validDismiss -> do

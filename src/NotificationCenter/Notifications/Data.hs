@@ -49,7 +49,7 @@ data Notification = Notification
   , notiRight :: Maybe Int
     -- ^ Should be called when the notification is closed, either by
     --   timeout or by user
-  , notiOnAction :: String -> IO ()
+  , notiOnAction :: String -> Maybe String -> IO ()
     -- ^ Should be called when an action is used
   , notiPercentage :: Maybe Double
     -- ^ The percentage that should be shown in a percentage bar
