@@ -7,7 +7,8 @@ import qualified Control.Monad.Except as Error
 import Control.Applicative ((<|>))
 import Data.Maybe (fromMaybe)
 import Data.Functor (fmap)
-import Text.HTML.TagSoup
+import Text.HTML.TagSoup (Tag(..), renderTags
+                         , canonicalizeTags, parseTags, isTagCloseName)
 
 import Text.Regex.TDFA
 import qualified Data.Text as Text
@@ -105,23 +106,26 @@ splitEvery n as = (take n as) : (splitEvery n $ tailAt n as)
     tailAt n (a:as) = tailAt (n - 1) as
     tailAt _ [] = []
 
-markupify :: Text.Text -> Text.Text
-markupify = renderTags . filterTags . canonicalizeTags . parseTags
-
 atMay :: [a] -> Int -> Maybe a
 atMay ls i = if length ls > i then
   Just $ ls !! i else Nothing
 
--- The following tags should be supported:
--- <b> ... </b> 	Bold
--- <i> ... </i> 	Italic
--- <u> ... </u> 	Underline
--- <a href="..."> ... </a> 	Hyperlink
-supportedTags = ["b", "i", "u", "a"]
 
-filterTags :: [Tag Text.Text] -> [Tag Text.Text]
-filterTags [] = []
-filterTags (tag : rest) = case tag of
+removeAllTags :: Text.Text -> Text.Text
+removeAllTags = renderTags . (filterTags []) . canonicalizeTags . parseTags
+
+-- The following tags should be supported:
+-- <b> ... </b>              Bold
+-- <i> ... </i>              Italic
+-- <u> ... </u>              Underline
+-- <a href="..."> ... </a>   Hyperlink
+markupify :: Text.Text -> Text.Text
+markupify = renderTags . (filterTags ["b", "i", "u", "a"])
+  . canonicalizeTags . parseTags
+
+filterTags :: [Text.Text] -> [Tag Text.Text] -> [Tag Text.Text]
+filterTags supportedTags [] = []
+filterTags supportedTags (tag : rest) = case tag of
   TagText _        -> keep
   TagOpen "img" _  -> process "img" skip
   TagOpen name _   ->
@@ -132,30 +136,56 @@ filterTags (tag : rest) = case tag of
     isSupported name = elem name supportedTags
 
     keep = tag : next
-    next = filterTags rest
+    next = filterTags supportedTags rest
 
     skip _ = []
-    strip  = filterTags
-    enclose name i = tag : (filterTags i) ++ [TagClose name]
+    strip  = filterTags supportedTags
+    enclose name i = tag : (filterTags supportedTags i) ++ [TagClose name]
 
     process name conversion =
       let
         (inner, endTagRest) = break (isTagCloseName name) rest
-      in (conversion inner) ++ (filterTags endTagRest)
+      in (conversion inner) ++ (filterTags supportedTags endTagRest)
+
+
+getImgTagAttrs :: Text.Text -> [(Text.Text, Text.Text)]
+getImgTagAttrs text = getImg $ canonicalizeTags $ parseTags text
+  where
+    getImg [] = []
+    getImg (tag : rest) = case tag of
+      TagOpen "img" attr  -> attr
+      otherwise        -> getImg rest
 
 
 
-removeImgTag :: String -> (String, [(String, String)])
-removeImgTag text =
-  let (a, _, c, ms) =
-        (text =~ "<img([^>]*)/>"
-         :: (String, String, String, [String]))
-  in ((a ++ (if length ms > 0 then fst $ removeImgTag c else c))
-     , fromMaybe [] $ findTagProps <$> atMay ms 0)
-
-findTagProps :: String -> [(String, String)]
-findTagProps match =
-  let (_, _, rest, keys) = (match =~ "([^ =]+)=\"([^\"]*)\""
-                             :: (String, String, String, [String]))
-  in if length keys > 0 then [(keys !! 0, keys !! 1)] ++ (findTagProps rest) else []
-
+-- | Parses HTML Entities in the given string and replaces them with
+-- their representative characters. Only operates on entities in
+-- the ASCII Range. See the following for details:
+--
+-- <https://dev.w3.org/html5/html-author/charref>
+-- <https://www.freeformatter.com/html-entities.html>
+parseHtmlEntities :: String -> String
+parseHtmlEntities =
+  let parseAsciiEntities text =
+        let (a, matched, c, ms) =
+              (text =~ ("&#([0-9]{2,3});" :: String)
+               :: (String, String, String, [String]))
+            ascii = if length ms > 0 then (read $ head ms :: Int) else -1
+            repl = if 32 <= ascii && ascii <= 126
+                   then [chr ascii] else matched
+        in a ++ repl ++ (if length c > 0 then parseAsciiEntities c else "")
+      parseNamedEntities text =
+        let (a, matched, c, ms) =
+              (text =~ ("&([A-Za-z0-9]+);" :: String)
+                :: (String, String, String, [String]))
+            name = if length ms > 0 then head ms else ""
+            repl = case name of
+                     "quot" -> "\""
+                     "apos" -> "'"
+                     "grave" -> "`"
+                     "amp" -> "&"
+                     "tilde" -> "~"
+                     "" -> matched
+                     _ -> matched
+        in a ++ repl ++ (if length c > 0 then parseNamedEntities c else "")
+  in parseAsciiEntities . parseNamedEntities
