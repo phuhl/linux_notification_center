@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
+<!-- Generated with glade 3.38.2 -->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
+  <requires lib="gtk+" version="3.24"/>
   <!-- interface-css-provider-path style.css -->
   <object class="GtkWindow" id="main_window">
-    <property name="can_focus">False</property>
+    <property name="can-focus">False</property>
+    <property name="hexpand">False</property>
     <property name="type">popup</property>
+    <property name="role">notification-center</property>
     <property name="resizable">False</property>
     <property name="decorated">False</property>
     <property name="gravity">north-east</property>
-    <child type="titlebar">
-      <placeholder/>
-    </child>
     <child>
       <object class="GtkOverlay">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
+        <property name="can-focus">False</property>
+        <property name="hexpand">False</property>
         <child>
           <object class="GtkDrawingArea" id="main_bg">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
           </object>
           <packing>
             <property name="index">-1</property>
@@ -28,23 +28,24 @@
         <child type="overlay">
           <object class="GtkBox">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="margin_left">10</property>
-            <property name="margin_right">5</property>
-            <property name="margin_bottom">5</property>
+            <property name="can-focus">False</property>
+            <property name="margin-start">10</property>
+            <property name="margin-end">5</property>
+            <property name="margin-bottom">5</property>
+            <property name="hexpand">False</property>
             <property name="orientation">vertical</property>
             <child>
               <object class="GtkBox">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="margin_bottom">20</property>
+                <property name="can-focus">False</property>
+                <property name="margin-bottom">20</property>
                 <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkLabel" id="label_time">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <property name="halign">start</property>
-                    <property name="margin_top">5</property>
+                    <property name="margin-top">5</property>
                     <property name="label" translatable="yes">01:31</property>
                     <style>
                       <class name="deadd-noti-center"/>
@@ -61,7 +62,7 @@
                 <child>
                   <object class="GtkLabel" id="label_date">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <property name="halign">start</property>
                     <property name="label" translatable="yes">Sonntag, 09.04.2017</property>
                     <style>
@@ -85,17 +86,20 @@
             <child>
               <object class="GtkBox">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
+                <property name="hexpand">False</property>
+                <property name="vexpand">True</property>
                 <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkButton" id="button_deleteAll">
                     <property name="label" translatable="yes">Alle Löschen</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">True</property>
                     <property name="halign">end</property>
                     <property name="relief">none</property>
                     <style>
                       <class name="deadd-noti-center"/>
+                      <class name="delete-all"/>
                     </style>
                   </object>
                   <packing>
@@ -107,21 +111,24 @@
                 <child>
                   <object class="GtkScrolledWindow">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="hscrollbar_policy">never</property>
-                    <property name="min_content_height">312</property>
-                    <property name="propagate_natural_width">True</property>
-                    <property name="propagate_natural_height">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="hexpand">False</property>
+                    <property name="vexpand">True</property>
+                    <property name="hscrollbar-policy">never</property>
+                    <property name="min-content-height">312</property>
                     <child>
                       <object class="GtkViewport">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="valign">start</property>
-                        <property name="shadow_type">none</property>
+                        <property name="can-focus">False</property>
+                        <property name="hexpand">False</property>
+                        <property name="vexpand">True</property>
+                        <property name="shadow-type">none</property>
                         <child>
                           <object class="GtkBox" id="box_notis">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
+                            <property name="can-focus">False</property>
+                            <property name="hexpand">False</property>
+                            <property name="vexpand">True</property>
                             <property name="orientation">vertical</property>
                             <property name="spacing">20</property>
                             <child>
@@ -140,7 +147,7 @@
                 </child>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">1</property>
               </packing>
@@ -148,7 +155,7 @@
             <child>
               <object class="GtkBox" id="box_buttons">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
                 <child>
                   <placeholder/>
@@ -157,7 +164,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="pack_type">end</property>
+                <property name="pack-type">end</property>
                 <property name="position">2</property>
               </packing>
             </child>

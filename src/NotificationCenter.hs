@@ -4,13 +4,13 @@
 module NotificationCenter where
 
 import Config
-  (replaceColors,getConfig,Config(..))
+  (getConfig,Config(..))
 import NotificationCenter.NotificationInCenter
   (DisplayingNotificationInCenter(..), showNotification, updateNoti)
 import NotificationCenter.Notifications
   (NotifyState(..), startNotificationDaemon, hideAllNotis)
 import NotificationCenter.Notifications.Data (Notification(..))
-import NotificationCenter.Glade (glade, style)
+import NotificationCenter.Glade (glade)
 import NotificationCenter.Button
   (Button(..), createButton, setButtonState)
 import TransparentWindow
@@ -21,6 +21,7 @@ import Prelude
 import Text.I18N.GetText
 import System.Locale.SetLocale
 import System.IO.Unsafe
+import System.IO (readFile)
 
 import Data.Int (Int32(..))
 import Data.Tuple.Sequence (sequenceT)
@@ -94,6 +95,7 @@ data State = State
   , stDisplayingNotiList :: [ DisplayingNotificationInCenter ]
   , stNotisForMe :: [ Notification ]
   , stCenterShown :: Bool
+  , stPopupsPaused :: Bool
   }
 
 
@@ -120,6 +122,18 @@ startSetTimeThread' tState = do
   runAfterDelay delay (startSetTimeThread' tState)
   return ()
 
+deleteInCenter tState = do
+  displayList <- stDisplayingNotiList <$> readTVarIO tState
+  mapM (removeNoti tState) displayList
+  return ()
+
+setWindowStyle tState = do
+  state <- readTVarIO tState
+  homeDir <- getXdgDirectory XdgConfig ""
+  style <- readFile (homeDir ++ "/deadd/deadd.css")
+  screen <- windowGetScreen $ stMainWindow state
+  setStyle screen $ BS.pack $ style
+  return False
 
 createNotiCenter :: TVar State -> Config -> IO ()
 createNotiCenter tState config = do
@@ -139,15 +153,7 @@ createNotiCenter tState config = do
   timeD <- label objs "label_date"
   deleteButton <- button objs "button_deleteAll"
 
-  screen <- windowGetScreen mainWindow
-  setStyle screen $ BS.pack $
-    replaceColors config style
---  (Just mainWindowGDK) <- widgetGetParentWindow mainWindow
-
-  onButtonClicked deleteButton $ do
-    displayList <- stDisplayingNotiList <$> readTVarIO tState
-    mapM (removeNoti tState) displayList
-    return ()
+  onButtonClicked deleteButton $ deleteInCenter tState
   buttonSetLabel deleteButton $ Text.pack $ translate "Delete all"
 
   let buttons = zip
@@ -183,6 +189,8 @@ createNotiCenter tState config = do
                       , stNotisForMe = []
                       , stUserButtons = buttons' }
 
+  setWindowStyle tState
+
   startSetTimeThread tState
 
 
@@ -198,8 +206,11 @@ createNotiCenter tState config = do
   return ()
 
 setNotificationCenterPosition mainWindow config = do
-  (screenW, screenY, screenH) <- getScreenPos mainWindow
-    (fromIntegral $ configNotiCenterMonitor config)
+
+  (screenW, screenY, screenH) <- if configNotiCenterFollowMouse config then
+    getMouseActiveScreenPos mainWindow (fromIntegral $ configNotiMonitor config)
+    else
+    getScreenPos mainWindow (fromIntegral $ configNotiCenterMonitor config)
 
   windowSetDefaultSize mainWindow
     width -- w
@@ -214,31 +225,53 @@ setNotificationCenterPosition mainWindow config = do
       marginRight = fromIntegral $ configRightMargin config
       width = fromIntegral $ configWidth config
 
-parseNotisForMe tState = do
+parseButtons noti tState = do
   state <- readTVarIO tState
-  -- do stuff
   let buttons = stUserButtons state
-      notisForMe = stNotisForMe state
-      myNotiHints = notiHints <$> notisForMe
-      maybeIds = Map.lookup "id" <$> myNotiHints
-      ids = join <$> map (\id' -> fromVariant <$> id') maybeIds :: [ Maybe Int32 ]
-      ids' = map checkId ids
+      maybeId = (Map.lookup "id" noti >>= fromVariant) :: Maybe Int32
+      id = checkId maybeId
         where
           checkId (Just id)
             | id < (fromIntegral $ length buttons) = Just id
             | otherwise = Nothing
           checkId Nothing = Nothing
-      maybeStates = Map.lookup "state" <$> myNotiHints
-      states = join <$> map (\id' -> fromVariant <$> id') maybeStates :: [ Maybe Bool ]
-      comb = sequenceT <$> (zip
-                            (map
-                             (\id -> (!!) buttons <$> (fromIntegral <$> id))
-                             ids') states) :: [ Maybe (Button, Bool) ]
-  sequence $ map (\comb' -> sequence $
-                    (\(button, state) ->
-                           setButtonState button state) <$> comb') comb
+      maybeState = Map.lookup "state" noti >>= fromVariant :: Maybe Bool
+      maybeButton = (!!) buttons <$> (fromIntegral <$> id)
+  fromMaybe (return ()) $ setButtonState <$> maybeButton <*> maybeState
+  return ()
+
+
+parseNotisForMe tState = do
+  state <- readTVarIO tState
+  -- do stuff
+  let notisForMe = stNotisForMe state
+      myNotiHints = notiHints <$> notisForMe
   atomically $ modifyTVar' tState
     (\state -> state { stNotisForMe = [] })
+  sequence $ map (\noti -> do
+          let maybeType = Map.lookup "type" noti
+            in case (maybeType >>= fromVariant) :: Maybe (String) of
+                 (Just "clearInCenter") -> do
+                   putStrLn "clearing in center"
+                   deleteInCenter tState
+                 (Just "clearPopups") -> do
+                   putStrLn "clearing popups"
+                   hideAllNotis $ stNotiState state
+                 (Just "buttons") -> parseButtons noti tState
+                 Nothing -> parseButtons noti tState
+                 (Just "pausePopups") -> do
+                   putStrLn "pausing popups"
+                   atomically $ modifyTVar' tState
+                     (\state -> state { stPopupsPaused = True })
+                 (Just "unpausePopups") -> do
+                   putStrLn "unpausing popups"
+                   atomically $ modifyTVar' tState
+                     (\state -> state { stPopupsPaused = False })
+                 (Just "reloadStyle") -> do
+                   putStrLn "Reloading Style"
+                   addSource $ setWindowStyle tState
+                   return ()
+      ) myNotiHints
   return False
 
 hideNotiCenter tState = do
@@ -308,7 +341,7 @@ updateNotis config tState = do
                     })
   setDeleteAllState tState
   mapM (removeNoti tState) $ delNotis
-  when (stCenterShown state) $
+  when (stCenterShown state || stPopupsPaused state) $
     do
       hideAllNotis $ stNotiState state
   return ()
@@ -343,7 +376,8 @@ setDeleteAllState tState = do
 getInitialState = do
   newTVarIO $ State
     { stDisplayingNotiList = []
-    , stCenterShown = False}
+    , stCenterShown = False
+    , stPopupsPaused = False}
 
 main' :: IO ()
 main' = do

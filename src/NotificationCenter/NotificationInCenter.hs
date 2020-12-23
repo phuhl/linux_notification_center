@@ -28,10 +28,11 @@ import Control.Monad
 import Control.Concurrent.STM
   ( readTVarIO, modifyTVar, TVar(..), atomically, newTVarIO )
 
-
+import GI.Pango.Enums (EllipsizeMode(..))
 import qualified GI.Gtk as Gtk
   (widgetShowAll, onButtonClicked, boxReorderChild, containerAdd
   , builderAddFromString, widgetDestroy, labelSetText
+  , labelSetEllipsize, labelSetLines
   , builderNew, Button(..), Label(..), Box(..))
 
 data DisplayingNotificationInCenter = DisplayingNotificationInCenter
@@ -75,6 +76,7 @@ showNotification config mainBox dNoti tNState closeNotification = do
 
   let dispNoti = set dNotiDestroy
         (Gtk.widgetDestroy (view dContainer dispNoti)) dispNotiWithoutDestroy
+      lblBody = (flip view) dispNoti $ dLabelBody
 
   setUrgencyLevel (notiUrgency noti) [view dContainer dispNoti]
   setUrgencyLevel (notiUrgency noti)
@@ -86,6 +88,13 @@ showNotification config mainBox dNoti tNState closeNotification = do
 
   Gtk.onButtonClicked buttonClose $ do
     closeNotification dispNoti
+
+  Gtk.labelSetEllipsize lblBody
+    (if configNotiCenterEllipsizeBody config
+     then EllipsizeModeEnd
+     else EllipsizeModeNone)
+
+  Gtk.labelSetLines lblBody $ fromIntegral $ configNotiCenterMaxLinesInBody config
 
   Gtk.widgetShowAll (view dContainer dispNoti)
   return dispNoti

@@ -5,12 +5,13 @@ module NotificationCenter.Notifications.Data
   , CloseType (..)
   , Notification(..)
   , Image(..)
-  , parseImageString, rawImgToPixBuf
+  , parseImageString
+  , rawImgToPixBuf
   ) where
 
 import qualified Data.Text as Text
 import Data.Word ( Word32, Word8 )
-import Data.Int ( Int32 )
+import Data.Int ( Int32, Int )
 import qualified Data.ByteString as BS
 import Foreign.Marshal.Array (newArray)
 import Foreign.C.Types (CUChar(..))
@@ -44,12 +45,36 @@ data Notification = Notification
   , notiTransient :: Bool
   , notiSendClosedMsg :: Bool -- ^ If notiOnClosed should be ignored
   , notiOnClosed :: CloseType -> IO ()
+  , notiTop :: Maybe Int
+  , notiRight :: Maybe Int
     -- ^ Should be called when the notification is closed, either by
     --   timeout or by user
-  , notiOnAction :: String -> IO ()
+  , notiOnAction :: String -> Maybe String -> IO ()
     -- ^ Should be called when an action is used
+  , notiPercentage :: Maybe Double
+    -- ^ The percentage that should be shown in a percentage bar
   }
 
+instance Show Notification where
+  show n = foldl (++) ""
+    [ "Notification { \n"
+    , "  notiAppName = " ++ (show $ notiAppName n) ++ ", \n"
+    , "  notiRepId = " ++ (show $ notiRepId n) ++ ", \n" 
+    , "  notiId = " ++ (show $ notiId n) ++ ", \n" 
+    , "  notiIcon = " ++ (show $ notiIcon n) ++ ", \n" 
+    , "  notiImg = " ++ (show $ notiImg n) ++ ", \n" 
+    , "  notiSummary = " ++ (show $ notiSummary n) ++ ", \n" 
+    , "  notiBody = " ++ (show $ notiBody n) ++ ", \n" 
+    , "  notiActions = " ++ (show $ notiActions n) ++ ", \n" 
+    , "  notiActionIcons = " ++ (show $ notiActionIcons n) ++ ", \n" 
+    , "  notiHints = " ++ (show $ notiHints n) ++ ", \n" 
+    , "  notiTimeout = " ++ (show $ notiTimeout n) ++ ", \n" 
+    , "  notiTime = " ++ (show $ notiTime n) ++ ", \n" 
+    , "  notiTransient = " ++ (show $ notiTransient n) ++ ", \n" 
+    , "  notiSendClosedMsg = " ++ (show $ notiSendClosedMsg n) ++ "\n" 
+    , "  notiTop = " ++ (show $ notiTop n) ++ "\n"
+    , "  notiRight = " ++ (show $ notiRight n) ++ "\n"
+    , " } " ]
 
 data Image = RawImg
   ( Int32 -- width

@@ -32,7 +32,7 @@ import GI.Gtk
        , onButtonClicked, windowGetScreen, boxNew, widgetSetValign
        , imageNewFromIconName)
 import GI.Gtk.Enums
-       (Orientation(..), PositionType(..), ReliefStyle(..), Align(..))
+       (Orientation(..), PositionType(..), ReliefStyle(..), Align(..), IconSize(..))
 
 import qualified GI.Gtk as Gtk (containerAdd, Box(..), Label(..), Button(..))
 import qualified Data.Text as Text
@@ -45,7 +45,7 @@ data Action = Action
     -- ^ Shell command to execute
   }
 
-createAction :: Config -> Bool -> (String -> IO ()) -> Int -> Int -> String -> String -> IO Action
+createAction :: Config -> Bool -> (String -> Maybe String -> IO ()) -> Int -> Int -> String -> String -> IO Action
 createAction config useIcons onAction width height command description = do
   button <- buttonNew
   widgetSetSizeRequest button (fromIntegral width) (fromIntegral height)
@@ -60,10 +60,10 @@ createAction config useIcons onAction width height command description = do
         { actionButton = button
         , actionCommand = command }
   onButtonClicked button $ do
-    onAction command
+    onAction command Nothing
     return ()
   if useIcons then do
-    img <-imageNewFromIconName (Just $ Text.pack description) 10
+    img <-imageNewFromIconName (Just $ Text.pack description) (fromIntegral $ fromEnum IconSizeButton)
     Gtk.containerAdd button img
   else do
     label <- labelNew $ Just $ Text.pack description
