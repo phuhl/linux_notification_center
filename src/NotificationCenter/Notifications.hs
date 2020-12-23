@@ -7,7 +7,7 @@ module NotificationCenter.Notifications
   ) where
 
 import Helpers (trim, isPrefix, splitOn, atMay, eitherToMaybe
-               , removeImgTag, removeAllTags, parseHtmlEntities )
+               , getImgTagAttrs, removeAllTags, parseHtmlEntities )
 
 import NotificationCenter.Notifications.NotificationPopup
   ( showNotificationWindow
@@ -183,7 +183,7 @@ parseImg hints text =
   fromMaybe NoImage
   $ fromBody <|> fromImageData <|> fromImagePath <|> fromIcon
   where
-    fromBody = ImagePath <$> lookup "src" (snd $ removeImgTag (unpack text))
+    fromBody = ImagePath <$> unpack <$> lookup (pack "src") (getImgTagAttrs text)
     fromIcon = RawImg <$> (fromVariant =<< Map.lookup "icon_data" hints)
     fromImageData = RawImg <$> (fromVariant =<< Map.lookup "image-data" hints)
     fromImagePath = parseImageString <$> (fromVariant =<< Map.lookup "image-path" hints)
@@ -195,7 +195,7 @@ getTime = do
   return $ format "%H:%M"
 
 htmlEntitiesStrip :: Config -> Text -> Text
-htmlEntitiesStrip config text = 
+htmlEntitiesStrip config text =
   if configNotiParseHtmlEntities config
   then Text.pack $ parseHtmlEntities $ unpack text
   else text
@@ -203,8 +203,8 @@ htmlEntitiesStrip config text =
 xmlStrip :: Config -> Text -> Text
 xmlStrip config text = do
   if configNotiMarkup config then
-    Text.pack $ fst $ removeImgTag $ unpack text
-    else Text.pack $ removeAllTags $ unpack text
+    text
+    else removeAllTags text
 
 
 notify :: Config
