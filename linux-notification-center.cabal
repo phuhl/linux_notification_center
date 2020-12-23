@@ -34,12 +34,14 @@ library
                      , TransparentWindow
                      , Helpers
   build-depends:       base >= 4.7 && < 5
+                     , regex-tdfa
                      , gtk3 >= 0.15.4
                      , transformers
                      , cairo
                      , haskell-gi
                      , haskell-gi-base
                      , gi-cairo
+                     , gi-pango
                      , gi-glib >= 2.0.17
                      , gi-gdk
                      , gi-gdkpixbuf

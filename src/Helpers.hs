@@ -3,14 +3,15 @@
 module Helpers where
 
 import qualified Data.ConfigFile as CF
-import qualified Control.Monad.Error as Error
+import qualified Control.Monad.Except as Error
 import Control.Applicative ((<|>))
 import Data.Maybe (fromMaybe)
 import Data.Functor (fmap)
---import Data.Sequence (drop)
 import Text.HTML.TagSoup
 
+import Text.Regex.TDFA
 import qualified Data.Text as Text
+import Data.Char ( chr )
 import Text.I18N.GetText (textDomain, bindTextDomain, getText)
 import System.Locale.SetLocale (setLocale, Category(LC_ALL))
 import System.IO.Unsafe (unsafePerformIO)
@@ -33,7 +34,7 @@ translate = unsafePerformIO . getText
 
 readConfig :: CF.Get_C a => a -> CF.ConfigParser -> String -> String -> a
 readConfig defaultVal conf sec opt = fromEither defaultVal
-  $ fromEither (Right defaultVal) $ Error.runErrorT $ CF.get conf sec opt
+  $ fromEither (Right defaultVal) $ Error.runExceptT $ CF.get conf sec opt
 
 readConfigFile :: String -> IO CF.ConfigParser
 readConfigFile path = do
@@ -43,6 +44,8 @@ readConfigFile path = do
         return $ return CF.emptyCP)
   let c1 = fromEither CF.emptyCP c
   return c1
+
+fth (_, _, _, a) = a
 
 fromEither :: a -> Either b a -> a
 fromEither a e = case e of
@@ -139,3 +142,20 @@ filterTags (tag : rest) = case tag of
       let
         (inner, endTagRest) = break (isTagCloseName name) rest
       in (conversion inner) ++ (filterTags endTagRest)
+
+
+
+removeImgTag :: String -> (String, [(String, String)])
+removeImgTag text =
+  let (a, _, c, ms) =
+        (text =~ "<img([^>]*)/>"
+         :: (String, String, String, [String]))
+  in ((a ++ (if length ms > 0 then fst $ removeImgTag c else c))
+     , fromMaybe [] $ findTagProps <$> atMay ms 0)
+
+findTagProps :: String -> [(String, String)]
+findTagProps match =
+  let (_, _, rest, keys) = (match =~ "([^ =]+)=\"([^\"]*)\""
+                             :: (String, String, String, [String]))
+  in if length keys > 0 then [(keys !! 0, keys !! 1)] ++ (findTagProps rest) else []
+

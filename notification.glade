@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
+<!-- Generated with glade 3.38.2 -->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
+  <requires lib="gtk+" version="3.24"/>
   <!-- interface-css-provider-path style.css -->
+  <object class="GtkAdjustment" id="adjustment1">
+    <property name="upper">100</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
+  </object>
   <object class="GtkWindow" id="main_window">
-    <property name="width_request">300</property>
-    <property name="can_focus">False</property>
+    <property name="width-request">300</property>
+    <property name="can-focus">False</property>
     <property name="hexpand">False</property>
     <property name="vexpand">True</property>
     <property name="type">popup</property>
+    <property name="role">notification</property>
     <property name="resizable">False</property>
-    <child type="titlebar">
-      <placeholder/>
-    </child>
+    <property name="type-hint">notification</property>
     <child>
       <object class="GtkOverlay">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
+        <property name="can-focus">False</property>
         <property name="vexpand">True</property>
         <child>
           <object class="GtkLabel" id="label_background">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="vexpand">True</property>
           </object>
           <packing>
@@ -31,14 +35,14 @@
         <child type="overlay">
           <object class="GtkBox" id="box_container">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <child>
               <object class="GtkImage" id="img_img">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="valign">start</property>
                 <property name="vexpand">True</property>
-                <property name="pixel_size">185</property>
+                <property name="pixel-size">185</property>
                 <property name="icon_size">0</property>
                 <style>
                   <class name="deadd-noti-center"/>
@@ -55,22 +59,22 @@
             <child>
               <object class="GtkBox">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="margin_left">15</property>
-                <property name="margin_right">10</property>
+                <property name="can-focus">False</property>
+                <property name="margin-start">15</property>
+                <property name="margin-end">15</property>
                 <property name="vexpand">True</property>
                 <property name="orientation">vertical</property>
-                <property name="baseline_position">bottom</property>
+                <property name="baseline-position">bottom</property>
                 <child>
                   <object class="GtkLabel" id="label_titel">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <property name="halign">start</property>
                     <property name="valign">start</property>
-                    <property name="margin_top">10</property>
+                    <property name="margin-top">10</property>
                     <property name="label" translatable="yes">Titel</property>
                     <property name="wrap">True</property>
-                    <property name="wrap_mode">word-char</property>
+                    <property name="wrap-mode">word-char</property>
                     <style>
                       <class name="notification"/>
                       <class name="title"/>
@@ -86,11 +90,12 @@
                 <child>
                   <object class="GtkLabel" id="label_body">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <property name="halign">start</property>
                     <property name="valign">start</property>
-                    <property name="use_markup">True</property>
+                    <property name="use-markup">True</property>
                     <property name="wrap">True</property>
+                    <property name="wrap-mode">char</property>
                     <style>
                       <class name="notification"/>
                       <class name="body"/>
@@ -104,9 +109,45 @@
                   </packing>
                 </child>
                 <child>
+                  <object class="GtkProgressBar" id="progressbar">
+                    <property name="can-focus">False</property>
+                    <property name="margin-top">5</property>
+                    <property name="margin-bottom">5</property>
+                    <style>
+                      <class name="notification"/>
+                      <class name="deadd-noti-center"/>
+                      <class name="progressbar"/>
+                    </style>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkScale" id="scale">
+                    <property name="can-focus">True</property>
+                    <property name="adjustment">adjustment1</property>
+                    <property name="restrict-to-fill-level">False</property>
+                    <property name="round-digits">1</property>
+                    <property name="draw-value">False</property>
+                    <style>
+                      <class name="deadd-noti-center"/>
+                      <class name="notification"/>
+                      <class name="scale"/>
+                    </style>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkBox" id="box_actions">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <property name="halign">center</property>
                     <child>
                       <placeholder/>
@@ -121,23 +162,23 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">2</property>
+                    <property name="position">4</property>
                   </packing>
                 </child>
                 <child>
                   <object class="GtkBox">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <property name="halign">end</property>
                     <child>
                       <object class="GtkImage" id="img_icon">
-                        <property name="width_request">10</property>
-                        <property name="height_request">10</property>
+                        <property name="width-request">10</property>
+                        <property name="height-request">10</property>
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="halign">end</property>
                         <property name="valign">end</property>
-                        <property name="margin_right">10</property>
+                        <property name="margin-right">10</property>
                         <property name="icon_size">0</property>
                         <style>
                           <class name="deadd-noti-center"/>
@@ -154,7 +195,7 @@
                     <child>
                       <object class="GtkLabel" id="label_appname">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="halign">end</property>
                         <property name="label" translatable="yes">Appname</property>
                         <style>
@@ -174,17 +215,22 @@
                     <property name="expand">False</property>
                     <property name="fill">False</property>
                     <property name="padding">8</property>
-                    <property name="position">3</property>
+                    <property name="position">5</property>
                   </packing>
                 </child>
               </object>
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="pack_type">end</property>
+                <property name="pack-type">end</property>
                 <property name="position">1</property>
               </packing>
             </child>
+            <style>
+              <class name="deadd-noti-center"/>
+              <class name="notification"/>
+              <class name="container"/>
+            </style>
           </object>
         </child>
       </object>

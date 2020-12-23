@@ -12,8 +12,11 @@ module TransparentWindow
   , box
   , button
   , image
+  , progressbar
+  , scale
   , getObjs
   , getScreenPos
+  , getMouseActiveScreenPos
   -- * General
   , getScreenProportions
   , runAfterDelay
@@ -24,6 +27,7 @@ module TransparentWindow
   -- * Colors
   ) where
 
+import Data.Int ( Int32 )
 import Data.Word ( Word32 )
 import Data.Maybe
 import Data.List (elem)
@@ -58,11 +62,16 @@ import GI.Gtk
        , cssProviderLoadFromData, cssProviderNew, styleContextAddClass
        , widgetGetStyleContext, CssProvider(..))
 import qualified GI.Gtk as Gtk
-  (DrawingArea(..), unsafeCastTo, Window(..), IsWidget(..)
+  (ProgressBar(..), Scale(..), DrawingArea(..), unsafeCastTo, Window(..), IsWidget(..)
   , builderGetObject, builderAddFromString
   , builderNew, Builder(..), Label(..), Box(..), Button(..), Image(..))
 import GI.Gtk.Constants
-import GI.Gdk (getRectangleHeight, getRectangleWidth, getRectangleY, getRectangleX, Monitor, monitorGetGeometry, displayGetMonitor, screenGetDisplay, screenGetHeight, screenGetWidth, Screen (..))
+import GI.Gdk (getRectangleHeight, getRectangleWidth, getRectangleY
+              , getRectangleX, Monitor, monitorGetGeometry, displayGetMonitor
+              , screenGetDisplay, screenGetHeight, screenGetWidth, Screen (..)
+              , displayGetPointer, displayGetDefault, displayGetDefaultSeat
+              , deviceGetPosition, seatGetPointer, displayGetMonitorAtPoint)
+
 import GI.GObject.Objects (IsObject(..), Object(..))
 
 import GI.GLib (idleSourceNew, sourceSetCallback, sourceAttach
@@ -71,7 +80,7 @@ import GI.GLib.Constants
 import GI.Cairo ()
 import Graphics.Rendering.Cairo
        (fill, restore, save, stroke, arc, setDash, setLineWidth, rotate
-       , rectangle, setSourceRGBA, setSourceRGB, newPath, scale, translate
+       , rectangle, setSourceRGBA, setSourceRGB, newPath, translate
        , lineTo, moveTo, Render)
 import Graphics.Rendering.Cairo.Types (Cairo(..))
 import Graphics.Rendering.Cairo.Internal (Render(..))
@@ -92,6 +101,8 @@ label = gObjLookup (Gtk.unsafeCastTo Gtk.Label)
 box = gObjLookup (Gtk.unsafeCastTo Gtk.Box)
 button = gObjLookup (Gtk.unsafeCastTo Gtk.Button)
 image  = gObjLookup (Gtk.unsafeCastTo Gtk.Image)
+progressbar = gObjLookup (Gtk.unsafeCastTo Gtk.ProgressBar)
+scale= gObjLookup (Gtk.unsafeCastTo Gtk.Scale)
 
 
 getObjs :: Gtk.Builder -> [Text.Text] -> IO ObjDict
@@ -162,15 +173,47 @@ removeClass w clazz = do
   context <- widgetGetStyleContext w
   styleContextRemoveClass context clazz
 
-getScreenPos :: Gtk.Window -> GHC.Int.Int32 -> IO (GHC.Int.Int32, GHC.Int.Int32, GHC.Int.Int32)
+getScreenPos :: Gtk.Window -> GHC.Int.Int32
+  -> IO (GHC.Int.Int32, GHC.Int.Int32, GHC.Int.Int32)
 getScreenPos window number = do
   screen <- window `get` #screen
   display <- screenGetDisplay screen
   monitor <- fromMaybe (error "Unknown screen")
     <$> displayGetMonitor display number
+  getMonitorProps monitor
+
+getMouseActiveScreenPos :: Gtk.Window -> GHC.Int.Int32
+  -> IO (GHC.Int.Int32, GHC.Int.Int32, GHC.Int.Int32)
+getMouseActiveScreenPos window number = do
+  screen <- window `get` #screen
+  display <- screenGetDisplay screen
+  mPointerPos <- getPointerPos
+  monitor <- case mPointerPos of
+               Just (x, y) -> displayGetMonitorAtPoint display x y
+               Nothing -> fromMaybe (error "Unknown screen")
+                          <$> displayGetMonitor display number
+  getMonitorProps monitor
+
+getMonitorProps :: Monitor -> IO (GHC.Int.Int32, GHC.Int.Int32, GHC.Int.Int32)
+getMonitorProps monitor = do
   monitorGeometry <- monitorGetGeometry monitor
   monitorX <- getRectangleX monitorGeometry
   monitorY <- getRectangleY monitorGeometry
   monitorWidth <- getRectangleWidth monitorGeometry
   monitorHeight <- getRectangleHeight monitorGeometry
   return (monitorX + monitorWidth, monitorY, monitorHeight)
+
+
+getPointerPos :: IO (Maybe (Int32, Int32))
+getPointerPos = do
+  mDisplay <- displayGetDefault
+  mSeat <- sequence $ displayGetDefaultSeat <$> mDisplay
+  case mSeat of
+    Just (seat) -> do
+      mPointer <- seatGetPointer seat
+      case mPointer of
+        Just (pointer) -> do
+          (screen, x, y) <- deviceGetPosition pointer
+          return $ Just (x, y)
+        Nothing -> return Nothing
+    Nothing -> return Nothing

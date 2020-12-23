@@ -1,0 +1,42 @@
+The new CSS configuration file makes some configuration options from
+the =deadd.conf= obsolete. These are no longer in use:
+
+- timeTextSize
+- titleTextSize
+- appNameTextSize
+- timeTextSize
+
+From [colors] section:
+- background
+- notiBackground
+- notiColor
+- critical
+- criticalColor
+- criticalInCenter
+- criticalInCenterColor
+- labelColor
+- buttonColor
+- buttonHover
+- buttonHoverColor
+- buttonBackground
+- buttonColor
+- buttonBackground
+- buttonHover
+- buttonHoverColor
+- buttonTextSize
+- buttonState1
+- buttonState1Color
+- buttonState1Hover
+- buttonState1HoverColor
+- buttonState2
+- buttonState2Color
+- buttonState2Hover
+- buttonState2HoverColor
+
+
+All these colors can now be set directly in the =deadd.css= file which
+resides in the =${XDG_CONFIG_HOME}/deadd/= folder (usually
+=.config/deadd/=).
+
+
+Changes to =gtk.css= are now longer required.

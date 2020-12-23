@@ -5,6 +5,8 @@ PREFIX ?= /usr
 MANPREFIX = ${PREFIX}/share/man
 PKG_CONFIG ?= pkg-config
 SYSTEMCTL ?= systemctl
+XDG_CONFIG_HOME ?= ${HOME}/.config
+
 
 ifeq (,${SYSTEMD})
 # Check for systemctl to avoid discrepancies on systems, where
@@ -48,7 +50,8 @@ clean: clean-stack
 distclean: clean clean-config
 
 clean-config:
-	rm -f ${HOME}/.config/deadd/deadd.conf
+	rm -f ${XDG_CONFIG_HOME}/deadd/deadd.css
+	rm -f ${XDG_CONFIG_HOME}/deadd/deadd.conf
 
 doc:
 	stack haddock
@@ -59,28 +62,41 @@ service:
 
 install-stack:
 	mkdir -p ${DESTDIR}${PREFIX}/bin
-	install -m755 .out/deadd-notification-center ${DESTDIR}${PREFIX}/bin
+	install -Dm755 .out/deadd-notification-center ${DESTDIR}${PREFIX}/bin
 	mkdir -p ${DESTDIR}${MANPREFIX}/man1
-	install -m644 docs/linux-notification-center.man ${DESTDIR}${MANPREFIX}/man1/deadd-notification-center.1
+	install -Dm644 docs/linux-notification-center.man ${DESTDIR}${MANPREFIX}/man1/deadd-notification-center.1
 	install -Dm644 LICENSE ${DESTDIR}${PREFIX}/share/licenses/deadd-notification-center/LICENSE
+
+CSS_CONFIG_FILE = ${XDG_CONFIG_HOME}/deadd/deadd.css
+install-config:
+	mkdir -p ${XDG_CONFIG_HOME}/deadd/
+ifneq ("$(wildcard $(CSS_CONFIG_FILE))","")
+	install -Dm644 style.css ${XDG_CONFIG_HOME}/deadd/deadd.css_new
+	$(warning Warning: $(XDG_CONFIG_HOME)/deadd/deadd.css exists. Instead of overwriting, created $(XDG_CONFIG_HOME)/deadd.css_new)
+else
+	install -Dm644 style.css ${XDG_CONFIG_HOME}/deadd/deadd.css
+endif
+
+
 
 install-service: service
 	mkdir -p ${DESTDIR}${SERVICEDIR_DBUS}
-	install -m644 com.ph-uhl.deadd.notification.service ${DESTDIR}${SERVICEDIR_DBUS}
+	install -Dm644 com.ph-uhl.deadd.notification.service ${DESTDIR}${SERVICEDIR_DBUS}
 ifneq (0,${SYSTEMD})
 install-service: install-service-systemd
 install-service-systemd:
 	mkdir -p ${DESTDIR}${SERVICEDIR_SYSTEMD}
-	install -m644 deadd-notification-center.service ${DESTDIR}${SERVICEDIR_SYSTEMD}
+	install -Dm644 deadd-notification-center.service ${DESTDIR}${SERVICEDIR_SYSTEMD}
 endif
 
 
 
 
 install-lang:
-	mkdir -p ${DESTDIR}${PREFIX}/share/locale/{de,en}/LC_MESSAGES
-	install -m644 translation/de/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/de/LC_MESSAGES/deadd-notification-center.mo
-	install -m644 translation/en/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/en/LC_MESSAGES/deadd-notification-center.mo
+	mkdir -p ${DESTDIR}${PREFIX}/share/locale/de/LC_MESSAGES
+	mkdir -p ${DESTDIR}${PREFIX}/share/locale/en/LC_MESSAGES
+	install -Dm644 translation/de/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/de/LC_MESSAGES/deadd-notification-center.mo
+	install -Dm644 translation/en/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/en/LC_MESSAGES/deadd-notification-center.mo
 
 install: install-stack install-service install-lang
 
