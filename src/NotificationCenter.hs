@@ -194,10 +194,11 @@ createNotiCenter tState config = do
   startSetTimeThread tState
 
 
-
-  onWidgetLeaveNotifyEvent mainWindow $ \(_) -> do
-    hideNotiCenter tState
-    return True
+  when (configNotiCenterHideOnMouseLeave config) $ do
+    onWidgetLeaveNotifyEvent mainWindow $ \(_) -> do
+      hideNotiCenter tState
+      return True
+    return ()
 
   setNotificationCenterPosition mainWindow config
 

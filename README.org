@@ -389,6 +389,9 @@ from the =deadd.css= file by using the command described in the section
 #+BEGIN_SRC ini
 [notification-center]
 
+# Hide the notification center when the mouse leaves the window
+hideOnMouseLeave = True
+
 # Margin at the top of the notification center in pixels. This can be
 # used to avoid overlap between the notification center and bars such
 # as polybar or i3blocks.
