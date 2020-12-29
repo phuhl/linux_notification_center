@@ -43,7 +43,7 @@ import Control.Concurrent.STM
   ( readTVarIO, modifyTVar', TVar(..), atomically, newTVarIO )
 
 import System.Process (runCommand)
-import System.Locale.Read
+import System.Locale.Current
 import System.Posix.Signals (sigUSR1)
 import System.Posix.Daemonize (serviced, daemonize)
 import System.Directory (getXdgDirectory, XdgDirectory(..))
@@ -103,7 +103,7 @@ setTime :: TVar State -> IO Bool
 setTime tState = do
   state <- readTVarIO tState
   now <- zonedTimeToLocalTime <$> getZonedTime
-  zone <- System.Locale.Read.getCurrentLocale
+  zone <- System.Locale.Current.currentLocale
   let format = Text.pack . flip (formatTime zone) now
   labelSetText (stTimeLabel state) $ format "%H:%M"
   labelSetText (stDateLabel state) $ format "%A, %x"
