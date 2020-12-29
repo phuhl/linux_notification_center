@@ -47,7 +47,7 @@ import Data.Time
 import Data.Time.LocalTime
 import Data.Maybe (fromMaybe)
 
-import System.Locale.Read
+import System.Locale.Current
 import System.IO (readFile)
 import System.IO.Error (tryIOError)
 import Data.GI.Base.GError (catchGErrorJust)
@@ -194,7 +194,7 @@ parseImg hints text =
 
 getTime = do
   now <- zonedTimeToLocalTime <$> getZonedTime
-  zone <- System.Locale.Read.getCurrentLocale
+  zone <- System.Locale.Current.currentLocale
   let format = pack . flip (formatTime zone) now
   return $ format "%H:%M"
 

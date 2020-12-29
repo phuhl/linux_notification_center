@@ -48,7 +48,7 @@ library
                      , gi-gtk >= 3.0.19
                      , gi-gio
                      , time
-                     , system-locale
+                     , env-locale
                      , gi-gobject
                      , text
                      , bytestring
