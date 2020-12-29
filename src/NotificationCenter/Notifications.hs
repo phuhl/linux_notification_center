@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE CPP #-}
 
 module NotificationCenter.Notifications
   ( startNotificationDaemon
@@ -31,6 +32,9 @@ import DBus (Variant(..), Structure(..), fromVariant, signal, toVariant, variant
 import DBus.Internal.Message (Signal(..))
 import DBus.Client
        ( connectSession, AutoMethod(..), autoMethod, requestName, export
+#if MIN_VERSION_dbus(1,0,0)
+       , defaultInterface, interfaceName, interfaceMethods
+#endif
        , nameAllowReplacement, nameReplaceExisting, emit)
 import Data.Char (toLower)
 import Data.Text (unpack, Text, pack )
@@ -382,6 +386,17 @@ notificationDaemon config onNote onCloseNote = do
   client <- connectSession
   _ <- requestName client "org.freedesktop.Notifications"
        [nameAllowReplacement, nameReplaceExisting]
+#if MIN_VERSION_dbus(1,0,0)
+  export client "/org/freedesktop/Notifications" defaultInterface
+    { interfaceName = "org.freedesktop.Notifications"
+    , interfaceMethods =
+      [ autoMethod "GetServerInformation" getServerInformation
+      , autoMethod "GetCapabilities" (getCapabilities config)
+      , autoMethod "CloseNotification" onCloseNote
+      , autoMethod "Notify" (onNote (emit client))
+      ]
+    }
+#else
   export client "/org/freedesktop/Notifications"
     [ autoMethod "org.freedesktop.Notifications"
       "GetServerInformation" getServerInformation
@@ -392,6 +407,7 @@ notificationDaemon config onNote onCloseNote = do
     , autoMethod "org.freedesktop.Notifications"
       "Notify" (onNote (emit client))
     ]
+#endif
 
 startNotificationDaemon :: Config -> IO () ->  IO () ->  IO (TVar NotifyState)
 startNotificationDaemon config onUpdate onUpdateForMe = do
