@@ -34,8 +34,6 @@ data Config = Config
   , configNotiParseHtmlEntities :: Bool
   , configSendNotiClosedDbusMessage :: Bool
   , configGuessIconFromAppname :: Bool
-  , configNotiCenterMaxLinesInBody :: Int
-  , configNotiCenterEllipsizeBody :: Bool
   , configNotiCenterHideOnMouseLeave :: Bool
 
   -- notification-center-notification-popup
@@ -84,8 +82,6 @@ getConfig p =
   , configNotiParseHtmlEntities = r'' True p nCenter "parseHtmlEntities"
   , configSendNotiClosedDbusMessage = r'' False p nCenter "configSendNotiClosedDbusMessage"
   , configGuessIconFromAppname = r'' True p nCenter "guessIconFromAppname"
-  , configNotiCenterMaxLinesInBody = r (-1) p nCenter "shortenBody"
-  , configNotiCenterEllipsizeBody = (r (-1) p nCenter "shortenBody") /= -1
   , configNotiCenterHideOnMouseLeave = r'' True p nCenter "hideOnMouseLeave"
 
     -- notification-center-notification-popup
