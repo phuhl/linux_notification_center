@@ -241,6 +241,9 @@ Notification with progress bar
 #+BEGIN_SRC sh
 notify-send.py "This notification has a progressbar" "33%" \
                          --hint int:has-percentage:33)
+#or
+notify-send.py "This notification has a progressbar" "33%" \
+                         --hint int:value:33)
 #+END_SRC
 
 Notification with slider
