@@ -7,7 +7,7 @@ module NotificationCenter.Notifications
   ) where
 
 import Helpers (trim, isPrefix, splitOn, atMay, eitherToMaybe
-               , removeImgTag, removeAllTags, parseHtmlEntities )
+               , getImgTagAttrs, removeAllTags, parseHtmlEntities )
 
 import NotificationCenter.Notifications.NotificationPopup
   ( showNotificationWindow
@@ -20,6 +20,7 @@ import TransparentWindow
 import Config (Config(..))
 import NotificationCenter.Notifications.Data
 
+import Control.Monad (when)
 import Control.Applicative ((<|>))
 import Control.Concurrent (forkIO)
 import Control.Concurrent.STM
@@ -102,13 +103,18 @@ emitNotificationClosed doSend onClose id ctype =
                                    _ -> 4 :: Word32)] }
   else return ()
 
-emitAction :: (Signal -> IO ()) -> Int -> String -> IO ()
-emitAction onAction id key = do
+emitAction :: (Signal -> IO ()) -> Int -> String -> Maybe String -> IO ()
+emitAction onAction id key mParam = do
   onAction $ (signal "/org/freedesktop/Notifications"
                "org.freedesktop.Notifications"
                "ActionInvoked")
     { signalBody = [ toVariant (fromIntegral id :: Word32)
-                   , toVariant key] }
+                   , toVariant key]
+                   ++ if mParam == Nothing then
+                        []
+                      else
+                        [toVariant $ fromMaybe "" mParam]
+        }
 
 
 parseActionIcons hints =
@@ -177,7 +183,7 @@ parseImg hints text =
   fromMaybe NoImage
   $ fromBody <|> fromImageData <|> fromImagePath <|> fromIcon
   where
-    fromBody = ImagePath <$> lookup "src" (snd $ removeImgTag (unpack text))
+    fromBody = ImagePath <$> unpack <$> lookup (pack "src") (getImgTagAttrs text)
     fromIcon = RawImg <$> (fromVariant =<< Map.lookup "icon_data" hints)
     fromImageData = RawImg <$> (fromVariant =<< Map.lookup "image-data" hints)
     fromImagePath = parseImageString <$> (fromVariant =<< Map.lookup "image-path" hints)
@@ -189,7 +195,7 @@ getTime = do
   return $ format "%H:%M"
 
 htmlEntitiesStrip :: Config -> Text -> Text
-htmlEntitiesStrip config text = 
+htmlEntitiesStrip config text =
   if configNotiParseHtmlEntities config
   then Text.pack $ parseHtmlEntities $ unpack text
   else text
@@ -197,8 +203,8 @@ htmlEntitiesStrip config text =
 xmlStrip :: Config -> Text -> Text
 xmlStrip config text = do
   if configNotiMarkup config then
-    Text.pack $ fst $ removeImgTag $ unpack text
-    else Text.pack $ removeAllTags $ unpack text
+    text
+    else removeAllTags text
 
 
 notify :: Config
@@ -239,7 +245,9 @@ notify config tState emit
         , notiSendClosedMsg = (configSendNotiClosedDbusMessage config)
         , notiTop = Nothing
         , notiRight = Nothing
-        }
+        , notiPercentage = fromIntegral
+          <$> (fromVariant =<< Map.lookup "has-percentage" hints :: Maybe Int32)
+}
 
   if Map.member (pack "deadd-notification-center")
     $ notiHints newNotiWithoutId
@@ -274,7 +282,7 @@ notify config tState emit
                { notiId = notiStNextId state
                , notiOnClosed = emitNotificationClosed (notiSendClosedMsg newNoti)
                  emit (notiStNextId state)
-               , notiOnAction = emitAction
+                              , notiOnAction = emitAction
                                 emit (notiStNextId state) })
               (fromIntegral (notiRepId newNoti))
           })
@@ -298,6 +306,7 @@ notify config tState emit
                else (newNoti:notis')
 
 
+replaceNoti:: Notification -> TVar NotifyState -> IO ()
 replaceNoti newNoti tState = do
   addSource $ do
     atomically $ modifyTVar tState $ \state ->
@@ -313,23 +322,27 @@ replaceNoti newNoti tState = do
            newNoti) notis
     notiStOnUpdate state
     return False
-      where repId = fromIntegral (notiRepId newNoti)
+  return ()
+ where repId = fromIntegral (notiRepId newNoti)
 
+insertNewNoti :: Notification -> TVar NotifyState -> IO ()
 insertNewNoti newNoti tState = do
   addSource $ do
     state <- readTVarIO tState
     -- new noti-window
-    dnoti <- showNotificationWindow
-      (notiConfig state)
-      newNoti
-      (notiDisplayingList state)
-      (removeNotiFromDistList tState $ notiId newNoti)
-    atomically $ modifyTVar' tState $ \state ->
-      state { notiDisplayingList = dnoti : notiDisplayingList state }
+    when ((fromIntegral $ notiTimeout newNoti) /= 1) $ do
+      dnoti <- showNotificationWindow
+        (notiConfig state)
+        newNoti
+        (notiDisplayingList state)
+        (removeNotiFromDistList tState $ notiId newNoti)
+      atomically $ modifyTVar' tState $ \state ->
+        state { notiDisplayingList = dnoti : notiDisplayingList state }
+      return ()
     -- trigger update in noti-center
     notiStOnUpdate state
     return False
-
+  return ()
 
 removeNotiFromDistList' :: TVar NotifyState -> Word32 -> IO ()
 removeNotiFromDistList' tState id =

@@ -4,13 +4,13 @@
 module NotificationCenter where
 
 import Config
-  (replaceColors,getConfig,Config(..))
+  (getConfig,Config(..))
 import NotificationCenter.NotificationInCenter
   (DisplayingNotificationInCenter(..), showNotification, updateNoti)
 import NotificationCenter.Notifications
   (NotifyState(..), startNotificationDaemon, hideAllNotis)
 import NotificationCenter.Notifications.Data (Notification(..))
-import NotificationCenter.Glade (glade, style)
+import NotificationCenter.Glade (glade)
 import NotificationCenter.Button
   (Button(..), createButton, setButtonState)
 import TransparentWindow
@@ -21,6 +21,7 @@ import Prelude
 import Text.I18N.GetText
 import System.Locale.SetLocale
 import System.IO.Unsafe
+import System.IO (readFile)
 
 import Data.Int (Int32(..))
 import Data.Tuple.Sequence (sequenceT)
@@ -126,6 +127,14 @@ deleteInCenter tState = do
   mapM (removeNoti tState) displayList
   return ()
 
+setWindowStyle tState = do
+  state <- readTVarIO tState
+  homeDir <- getXdgDirectory XdgConfig ""
+  style <- readFile (homeDir ++ "/deadd/deadd.css")
+  screen <- windowGetScreen $ stMainWindow state
+  setStyle screen $ BS.pack $ style
+  return False
+
 createNotiCenter :: TVar State -> Config -> IO ()
 createNotiCenter tState config = do
   (objs, _) <- createTransparentWindow (Text.pack glade)
@@ -143,11 +152,6 @@ createNotiCenter tState config = do
   timeL <- label objs "label_time"
   timeD <- label objs "label_date"
   deleteButton <- button objs "button_deleteAll"
-
-  screen <- windowGetScreen mainWindow
-  setStyle screen $ BS.pack $
-    replaceColors config style
---  (Just mainWindowGDK) <- widgetGetParentWindow mainWindow
 
   onButtonClicked deleteButton $ deleteInCenter tState
   buttonSetLabel deleteButton $ Text.pack $ translate "Delete all"
@@ -185,13 +189,16 @@ createNotiCenter tState config = do
                       , stNotisForMe = []
                       , stUserButtons = buttons' }
 
+  setWindowStyle tState
+
   startSetTimeThread tState
 
 
-
-  onWidgetLeaveNotifyEvent mainWindow $ \(_) -> do
-    hideNotiCenter tState
-    return True
+  when (configNotiCenterHideOnMouseLeave config) $ do
+    onWidgetLeaveNotifyEvent mainWindow $ \(_) -> do
+      hideNotiCenter tState
+      return True
+    return ()
 
   setNotificationCenterPosition mainWindow config
 
@@ -261,6 +268,10 @@ parseNotisForMe tState = do
                    putStrLn "unpausing popups"
                    atomically $ modifyTVar' tState
                      (\state -> state { stPopupsPaused = False })
+                 (Just "reloadStyle") -> do
+                   putStrLn "Reloading Style"
+                   addSource $ setWindowStyle tState
+                   return ()
       ) myNotiHints
   return False
 
