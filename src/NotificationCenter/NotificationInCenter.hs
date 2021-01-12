@@ -34,6 +34,10 @@ import qualified GI.Gtk as Gtk
   , builderAddFromString, widgetDestroy, labelSetText
   , labelSetEllipsize, labelSetLines
   , builderNew, Button(..), Label(..), Box(..))
+  
+import GI.Gtk ( labelGetText , labelSetText, labelGetLayout)
+import GI.Pango.Objects.Layout (layoutGetLinesReadonly, layoutGetLineCount)
+import GI.Pango.Structs.LayoutLine (getLayoutLineLength, getLayoutLineStartIndex)
 
 data DisplayingNotificationInCenter = DisplayingNotificationInCenter
   { _dpopupContent :: DisplayingNotificationContent
@@ -89,12 +93,27 @@ showNotification config mainBox dNoti tNState closeNotification = do
   Gtk.onButtonClicked buttonClose $ do
     closeNotification dispNoti
 
-  Gtk.labelSetEllipsize lblBody
-    (if configNotiCenterEllipsizeBody config
-     then EllipsizeModeEnd
-     else EllipsizeModeNone)
-
-  Gtk.labelSetLines lblBody $ fromIntegral $ configNotiCenterMaxLinesInBody config
+  -- TODO: Debug
+  -- Ellipsization of Body
+  numLines <- fromIntegral <$> (layoutGetLineCount =<< labelGetLayout lblBody)
+  let maxLines = (configNotiCenterMaxLinesInBody config) 
+      ellipsizeBody = configNotiCenterEllipsizeBody config
+  if numLines > maxLines && ellipsizeBody then do
+    lines <- layoutGetLinesReadonly =<< labelGetLayout lblBody
+    let lastLine = lines !! (maxLines - 1)
+    len <- fromIntegral <$> getLayoutLineLength lastLine
+    startOffset <- fromIntegral <$> getLayoutLineStartIndex lastLine
+    bodyText <- labelGetText lblBody
+    let lenOfTruncatedBody = len - 4 + startOffset + (maxLines - 1)
+    let truncatedBody = Text.take lenOfTruncatedBody $ bodyText
+        ellipsizedBody = Text.append truncatedBody "..."
+    labelSetText lblBody ellipsizedBody
+    return ()
+  else return ()
+    -- re-request height to reflect ellipsized body
+    -- TODO: rethink?
+    -- height' <- getHeight (view dContainer dispNoti) config
+    -- widgetSetSizeRequest (_dLabelBG dispNoti) (-1) height'
 
   Gtk.widgetShowAll (view dContainer dispNoti)
   return dispNoti
