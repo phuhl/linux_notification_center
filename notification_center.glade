@@ -68,6 +68,7 @@
                     <style>
                       <class name="deadd-noti-center"/>
                       <class name="date"/>
+                      <class name="noti-center"/>
                     </style>
                   </object>
                   <packing>
