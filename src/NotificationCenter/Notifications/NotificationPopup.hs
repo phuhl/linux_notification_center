@@ -32,7 +32,7 @@ import Control.Monad
 import DBus ( Variant (..) )
 
 import GI.Gdk (getEventButtonButton)
-import GI.Gtk (widgetGetPreferredHeightForWidth, widgetSetSizeRequest
+import GI.Gtk (widgetShow, widgetGetPreferredHeightForWidth, widgetSetSizeRequest
               , widgetShowAll, onWidgetButtonPressEvent, windowMove
               , setWidgetWidthRequest, widgetDestroy , labelGetText
               , labelSetText, labelGetLayout)
@@ -156,7 +156,7 @@ showNotificationWindow config noti dispNotis onClose = do
            notiOnClosed noti $ User
            onClose
        | valid && defaultAction -> do 
-           notiOnAction noti "default"
+           notiOnAction noti "default" Nothing
            notiOnClosed noti $ User
            onClose
        | not validDismiss -> do
@@ -173,7 +173,7 @@ showNotificationWindow config noti dispNotis onClose = do
            onClose
     return False
 
-  widgetShowAll mainWindow
+  widgetShow mainWindow
 
   return $ dispNoti { _dNotiTop = hBefore }
 

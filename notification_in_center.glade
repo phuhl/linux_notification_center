@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
+<!-- Generated with glade 3.38.2 -->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
+  <requires lib="gtk+" version="3.24"/>
+  <object class="GtkAdjustment" id="adjustment1">
+    <property name="upper">100</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
+  </object>
   <object class="GtkBox" id="box_container">
     <property name="visible">True</property>
-    <property name="can_focus">False</property>
+    <property name="can-focus">False</property>
     <child>
       <object class="GtkImage" id="img_img">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
+        <property name="can-focus">False</property>
         <property name="valign">center</property>
-        <property name="margin_left">10</property>
+        <property name="margin-start">10</property>
         <property name="icon_size">0</property>
         <style>
           <class name="deadd-noti-center"/>
@@ -27,23 +32,25 @@
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="margin_left">10</property>
-        <property name="margin_top">5</property>
-        <property name="margin_bottom">5</property>
+        <property name="can-focus">False</property>
+        <property name="margin-start">10</property>
+        <property name="margin-top">5</property>
+        <property name="margin-bottom">5</property>
         <property name="hexpand">True</property>
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <child>
               <object class="GtkLabel" id="label_titel">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="halign">start</property>
+                <property name="hexpand">False</property>
                 <property name="label" translatable="yes">Sample notification</property>
                 <property name="wrap">True</property>
+                <property name="wrap-mode">char</property>
                 <style>
                   <class name="title"/>
                   <class name="deadd-noti-center"/>
@@ -58,15 +65,15 @@
             </child>
             <child>
               <object class="GtkButton" id="button_close">
-                <property name="label" translatable="yes">x</property>
-                <property name="width_request">15</property>
-                <property name="height_request">15</property>
+                <property name="label" translatable="yes">✕</property>
+                <property name="width-request">15</property>
+                <property name="height-request">15</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
                 <property name="halign">end</property>
                 <property name="valign">start</property>
-                <property name="border_width">0</property>
+                <property name="border-width">0</property>
                 <property name="relief">none</property>
                 <style>
                   <class name="in-center"/>
@@ -77,7 +84,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="pack_type">end</property>
+                <property name="pack-type">end</property>
                 <property name="position">1</property>
               </packing>
             </child>
@@ -90,13 +97,15 @@
         </child>
         <child>
           <object class="GtkLabel" id="label_body">
-            <property name="height_request">1</property>
+            <property name="height-request">1</property>
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="halign">start</property>
             <property name="valign">start</property>
-            <property name="margin_right">10</property>
+            <property name="margin-end">10</property>
+            <property name="hexpand">False</property>
             <property name="wrap">True</property>
+            <property name="wrap-mode">char</property>
             <style>
               <class name="deadd-noti-center"/>
               <class name="in-center"/>
@@ -104,16 +113,54 @@
             </style>
           </object>
           <packing>
-            <property name="expand">True</property>
+            <property name="expand">False</property>
             <property name="fill">True</property>
             <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkProgressBar" id="progressbar">
+            <property name="can-focus">False</property>
+            <property name="margin-end">10</property>
+            <property name="margin-top">5</property>
+            <property name="margin-bottom">5</property>
+            <style>
+              <class name="deadd-noti-center"/>
+              <class name="in-center"/>
+              <class name="progressbar"/>
+            </style>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScale" id="scale">
+            <property name="can-focus">True</property>
+            <property name="margin-end">10</property>
+            <property name="adjustment">adjustment1</property>
+            <property name="restrict-to-fill-level">False</property>
+            <property name="round-digits">1</property>
+            <property name="draw-value">False</property>
+            <style>
+              <class name="deadd-noti-center"/>
+              <class name="in-center"/>
+              <class name="scale"/>
+            </style>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">3</property>
           </packing>
         </child>
         <child>
           <object class="GtkBox" id="box_actions">
             <property name="name">box_actions</property>
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="halign">center</property>
             <child>
               <placeholder/>
@@ -128,18 +175,19 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">2</property>
+            <property name="position">4</property>
           </packing>
         </child>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="margin_bottom">5</property>
+            <property name="can-focus">False</property>
+            <property name="margin-top">3</property>
+            <property name="margin-bottom">5</property>
             <child>
               <object class="GtkLabel" id="label_time">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="label" translatable="yes">23:49</property>
                 <style>
                   <class name="deadd-noti-center"/>
@@ -156,9 +204,9 @@
             <child>
               <object class="GtkImage" id="img_icon">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="margin_left">10</property>
-                <property name="margin_right">10</property>
+                <property name="can-focus">False</property>
+                <property name="margin-start">10</property>
+                <property name="margin-end">10</property>
                 <style>
                   <class name="deadd-noti-center"/>
                   <class name="in-center"/>
@@ -168,14 +216,14 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="pack_type">end</property>
+                <property name="pack-type">end</property>
                 <property name="position">2</property>
               </packing>
             </child>
             <child>
               <object class="GtkLabel" id="label_appname">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="label" translatable="yes">a</property>
                 <property name="justify">right</property>
                 <style>
@@ -187,7 +235,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="pack_type">end</property>
+                <property name="pack-type">end</property>
                 <property name="position">3</property>
               </packing>
             </child>
@@ -195,7 +243,7 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">3</property>
+            <property name="position">5</property>
           </packing>
         </child>
       </object>

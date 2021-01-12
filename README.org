@@ -18,8 +18,127 @@ The notification center can (optionally) show user-specified buttons
 in the bottom that can be in two states (highlighted/not highlighted)
 and that can run customizable shell commands.
 
-_NEW:_ Notifications can contain markup and links. The notification
-center can display custom buttons in notifications.
+
+#+BEGIN_EXAMPLE
+
+
+
+          ▙              █  █ ████████████  ███▙                  █   ▄██████▄
+          ███▄           █  █ ████        █  ███▙                █    ████    ██
+          ▜█████▄        █  █ ████         █  ███▙              █   █  ████    ▜█
+            ▜██████▄     █  █ ████          █  ███▙      ▙     █     █  ████
+          █▄   ▜██████▄  █  █ ████████████   █  ███▙    ██▙   █       █  ████
+          █ ▜█▄   ▜█████▄█  █ ████            █  ███▙   ███▙ █         █  ████
+          █    ▜█▄   ▜████  █ ████             █  ███▙█  ████           █  ████
+          █       ▜█▄   ▜█  █ ████              █  ███ █  ██       █▙    █  ████
+          █          ▜█▄    █ ████               █  █   █           █▙    █  ████
+          █             ▜▄  █ ████████████        █      █           ▜████▛  ██▛
+
+
+     ▄▇▇▀▀▀▀█▌        ▄▄▄▄▄▀▀██▇█▄▄▀▀▀▀▀    ▄▄▄▄▄▄      ▄▄█▇██▀▀▄▄▄▄▄        ▐█▀▀▀▀▇▇▄
+    ▐██▌   ▀▀    ▄▄▄████████▄▄█▀        ▄█████▀▀▀███▄      ▀█▄▄████████▄▄▄    ▀▀   ▐██▌
+    ████▄  ▄▄▄██████████▀▀   ▀▀▀█▄     ▇████▀    ▀▀██▌   ▄█▀▀▀   ▀▀██████████▄▄▄  ▄████
+     ▀███████████████▀▀         ▐█▌   ██████    ▄ ▐███  ▐█▌         ▀▀███████████████▀
+        ▀▀▀▀██████▀             ▀▀   ▐██▐▇▇     ▀▀▀▀      ▀▀             ▀██████▀▀▀▀
+        ▄▄██████▀                     ██ ██▌         ▄                     ▀██████▄▄
+      ▄███████▀                      █▀██ ▀█▄▄      ▄▄                       ▀███████▄
+     ▄███████                          ▀██▄▄█████████▀                         ███████▄
+     ██████                               ▀▀█████▀▀▀                            ███████
+     ▐████▌                                                                      ▐████▌
+       ███▄▄▄▄▄▌                                                             ▐▄▄▄▄▄███
+        ▀▀▀▀▀▀                                                                 ▀▀▀▀▀▀
+
+
+                                      ╒══════╕
+                                  NEW │ 2021 │ Update:
+                                      ╘══════╛
+
+                                   Customize all CSS
+                                   ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+                           New deadd.css configuration file
+                              Style all elements yourself
+
+                             Reload CSS styling on the fly
+
+                    Use CSS transitions when loading a new clorotheme
+                               and smoothly change the mood
+
+               (might [probably will] brake your current styling settings)
+             (more information on this in the file updateyourconfig2021.org)
+
+
+                              More notification scripting
+                              ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+                                Icons can be changed
+
+                                Images can be changed
+
+                            Action buttons can be removed
+
+
+                             Progress bar in notifications
+                             ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+
+                                    Some Bugfixes
+                                    ┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+                 Too wide notifications don't push out buttons anymore
+
+                       Notification area is always full height now
+
+                                      Many more
+
+
+                           Additional new Features from 2020
+                           ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+                              More configuration options
+
+                                   Git AUR package
+
+                                   Text ellipsation
+
+                                 Better html parsing
+
+                                     Pause poups
+
+                                      Much more
+
+
+            2020 has been a rough year for many. The DNC did make some progress
+            anyways, especially due to many new contributors:
+
+
+       (¯`·.¸¸.·´                                                     `·.¸¸.·´¯)
+       ( \                                                                     / )
+      ( \ )        mitchell-gil96 balsoft resolritter trk9001 rbowden91       ( / )
+     ( ) (                                                                     ) ( )
+      ( / )     ahmubashshir CobaltSpace woutervb avdv lierdakil MyriaCore    ( \ )
+       ( /                                                                     \ )
+        (_.·´¯`·.¸                                                    ¸.·´¯`·.¸_)
+
+
+                                 Thank you very much!
+
+
+            Special thanks to MyriaCore who created many high quality PRs and was
+            very active in the issue tracker.
+
+            Finally, thank you to everyone who created issues, commented, and
+            helped to further this project.
+
+                                                                                         ▝
+                                                                                         ▝
+▖                                                                                        ▐
+▖                                                                                        ▐
+▌                                                       Further news in releasenotes.org ▐
+▙▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▟
+
+#+END_EXAMPLE
+
 
 ** Screenshots
 
@@ -29,8 +148,9 @@ Some applications, notification:
 Notification Center opened:
 [[file:README.org.img/org_20200223_193345_VhlbOf.jpg]]
 
-Link, Markup and Action support:
-[[file:README.org.img/org_20200223_200131_4WWV2Y.jpg]]
+Link, Markup, Progressbar, and Action support:
+[[file:README.org.img/org_20201220_000601_9V037T.jpg]]
+
 
 ** Usage
 
@@ -82,6 +202,20 @@ Pause/Unpause popup notifications
                    string:type:unpausePopups
 #+END_SRC
 
+
+Reload CSS Styling file
+#+BEGIN_SRC sh
+  notify-send.py a --hint boolean:deadd-notification-center:true \
+                   string:type:reloadStyle
+#+END_SRC
+
+
+Send notifications that only show up in the notification center but do
+not produce a popup:
+#+BEGIN_SRC sh
+notify-send.py "Does not pop up" -t 1
+#+END_SRC
+
 *** Supported hints and features
 
 Action buttons with gtk icons
@@ -103,6 +237,19 @@ notify-send.py "Images are" "COOL" \
                --hint string:image-path:file://path/to/image/from/root.png
 #+END_SRC
 
+Notification with progress bar
+#+BEGIN_SRC sh
+notify-send.py "This notification has a progressbar" "33%" \
+                         --hint int:has-percentage:33)
+#+END_SRC
+
+Notification with slider
+#+BEGIN_SRC sh
+notify-send.py "This notification has a slider" "33%" \
+                         --hint int:has-percentage:33
+                         --action changeValue:abc)
+#+END_SRC
+
 *** Example: Brightness indicator
 
 This snippet can be used to produce a brightness-indicator. It requires the 
@@ -122,6 +269,7 @@ fi
 BRIGHTNESS=$(xbacklight -get)
 NOTI_ID=$(notify-send.py "Bildschirmhelligkeit" "$BRIGHTNESS/100" \
                          --hint string:image-path:video-display boolean:transient:true \
+                                int:has-percentage:$BRIGHTNESS \
                          --replaces-process "brightness-popup")
 #+END_SRC
 
@@ -165,6 +313,7 @@ fi
 
 NOTI_ID=$(notify-send.py "Lautstärke" "$VOLUME/100" \
                          --hint string:image-path:$ICON boolean:transient:true \
+                                int:has-percentage:$VOLUME \
                          --replaces-process "volume-popup")
 #+END_SRC
 
@@ -219,18 +368,29 @@ sudo make install
 
 ** Configuration
 
+NOTE: Some styling config has moved. More infos in this file:
+[[https://github.com/phuhl/linux_notification_center/blob/master/updateyourconfig2021.org][updateyourconfig2021.org]]
+
 No configuration is necessary, the notification center comes with
 sensible defaults™.
 
-Nearly all colors and many sizes are customizable, as well as the
-default timeout for notifications and the optional buttons in the
-notification center. Below are possible configurable options shown.
-The configuration file must be located at
-=~/.config/deadd/deadd.conf= (or, if configured differently on your
-system: =${XDG_CONFIG_HOME}/deadd/deadd.conf=).
+All colors and sizes are customizable, as well as the default timeout
+for notifications and the optional buttons in the notification
+center. Below are possible configurable options shown. The
+configuration file must be located at =~/.config/deadd/deadd.conf= (or,
+if configured differently on your system:
+=${XDG_CONFIG_HOME}/deadd/deadd.conf=).
+
+Additionally, a =deadd.css= will be loaded from the same folder. It
+contains the styling of the notification center. You can load changes
+from the =deadd.css= file by using the command described in the section
+"Usage".
 
 #+BEGIN_SRC ini
 [notification-center]
+
+# Hide the notification center when the mouse leaves the window
+hideOnMouseLeave = True
 
 # Margin at the top of the notification center in pixels. This can be
 # used to avoid overlap between the notification center and bars such
@@ -263,9 +423,6 @@ followMouse = false
 # of the notification center. Else, notifications stack, from top to
 # bottom.
 newFirst = true
-
-# Text size for the time in the notification center
-timeTextSize = 32px
 
 # If true, the transient field in notifications will be ignored and
 # the notification will be persisted in the notification center anyways
@@ -332,15 +489,6 @@ followMouse = false
 # pop-ups and in the notification center
 iconSize = 20
 
-# Text size for the title in the notification pop-ups
-titleTextSize = 16px
-
-# Text size for the app name in the notification pop-ups
-appNameTextSize = 12px
-
-# Text size for the time in the notification pop-ups
-timeTextSize = 12px
-
 # The maximal display size of images that are part of notifications
 # for notification pop-ups and in the notification center
 maxImageSize = 100
@@ -364,64 +512,6 @@ dismissButton = mouse1
 # The mouse button for opening a popup with the default action.
 # Must be either "mouse1", "mouse2", "mouse3", "mouse4", or "mouse5"
 defaultActionButton = mouse3
-
-[colors]
-# Note about colors: Colors can be represented in (at least, I mean,
-# who knows...) three different ways:
-#   1. #RGB with "R", "G" and "B" hexadecimal numbers (0-9, A-F or
-#      a-f).
-#   2. #RRGGBB with each occurrence of "R", "G" and "B" are hexadecimal
-#      numbers (0-9, A-F or a-f).
-#   3. rgba(R, G, B, A) where "R", "G" and "B" are between 0 and 255
-#      and A is a floating point number between 0 and 1 representing
-#      the alpha channel (transparency).
-
-
-# Background color for the notification center.
-background = rgba(29, 27, 20, 0.6)
-
-# Background color for the notification popups.
-notiBackground = rgba(9, 0, 0, 0.5)
-
-# Color for the text (summary, body and application name) in
-# notification popups.
-notiColor = #fef3f6
-
-# Background color for "critical" notification popups.
-critical = rgba(255, 0, 50, 0.5)
-
-# Color for the text (summary, body and application name) in
-# "critical" notification popups.
-criticalColor = #FFF
-
-# Background color for "critical" notifications in notification
-# center.
-criticalInCenter = rgba(155, 0, 20, 0.5)
-
-# Color for the text (summary, body and application name) in
-# "critical" notification in notification center.
-criticalInCenterColor = #FFF
-
-
-# Global text color
-labelColor = #eae2e0
-
-### These button configurations are applied globally (except they
-### get overwritten in the [buttons] section. The buttons section
-### only applies to the configurable buttons within the notification
-### center, while these configs also apply to the buttons within
-### notifications.)
-# Color for the text in the buttons.
-buttonColor = #eae2e0
-
-# Background color of button in hover state (mouse over)
-buttonHover = rgba(0, 20, 20, 0.2)
-
-# Text color of button in hover state (mouse over)
-buttonHoverColor = #fee
-
-# Background color of button
-buttonBackground = transparent
 
 [buttons]
 ### This section describes the configurable buttons within the
@@ -455,88 +545,33 @@ buttonMargin = 2
 # be launched when the user clicks on the associated button.  There
 # should be the same number of entries in `commands` and in `labels`
 # commands = "sudo vpnToggle":"bluetoothToggle":"wifiToggle":"screensaverToggle"
-
-# Color of the labels of the custom buttons in the notification
-# center.
-buttonColor = #fee
-
-# Color of the custom buttons' background in the notification center.
-buttonBackground = rgba(255, 255, 255, 0.15)
-
-# Color of the custom buttons' background in the notification center
-# when hovered.
-buttonHover = rgba(0, 20, 20, 0.2)
-
-# Color of the labels of the custom buttons in the notification center
-# when hovered.
-buttonHoverColor = #fee
-
-# Text size of the custom buttons in the notification center.
-buttonTextSize = 12px;
-
-# Color of the custom buttons' background in the notification center
-# when its state is set to true as described in the Section Usage
-buttonState1 = rgba(255,255,255,0.5)
-
-# Color of the custom buttons' text in the notification center
-# when its state is set to true as described in the Section Usage
-buttonState1Color = #fff
-
-# Color of the custom buttons' background, hovering, in the
-# notification center when its state is set to true as described in
-# the Section Usage
-buttonState1Hover = rgba(0, 20, 20, 0.4)
-
-# Color of the custom buttons' text, hovering, in the
-# notification center when its state is set to true as described in
-# the Section Usage
-buttonState1HoverColor = #fee
-
-# Color of the custom buttons' background, in the notification center
-# when the button is clicked and not yet set to a new value via the
-# method as described in Section Usage
-buttonState2 = rgba(255,255,255,0.3)
-
-# Color of the custom buttons' text, in the notification center
-# when the button is clicked and not yet set to a new value via the
-# method as described in Section Usage
-buttonState2Color = #fff
-
-# Color of the custom buttons' background,
-# hovering, in the notification center when the button is clicked and
-# not yet set to a new value via the method as described in Section
-# Usage
-buttonState2Hover = rgba(0, 20, 20, 0.3)
-
-# Color of the custom buttons' text, hovering, in the notification
-# center when the button is clicked and not yet set to a new value via
-# the method as described in Section Usage
-buttonState2HoverColor = #fee
 #+END_SRC
 
-*** More styling
+*** CSS styling
 
-In the file =.config/gtk-3.0/gtk.css= you can add styles that will
-affect the notification center.
+In the file =${XDG_CONFIG_HOME}/deadd/deadd.css= (usually
+=.config/deadd/deadd.css=) you can add CSS styles (GTK3-flavor).
 
 The following class-names for labels are defined:
 - Notifications:
-  - =label.deadd-noti-center.notification.appname=
-  - =label.deadd-noti-center.notification.body=
-  - =label.deadd-noti-center.notification.title=
-  - =image.deadd-noti-center.notification.image=
-  - =image.deadd-noti-center.notification.icon=
+  - =label.deadd-noti-center.notification.appname= :: Appname
+  - =label.deadd-noti-center.notification.body= :: Textbody
+  - =label.deadd-noti-center.notification.title= :: Notification title
+  - =image.deadd-noti-center.notification.image= :: Image of a notification
+  - =image.deadd-noti-center.notification.icon= :: Appicon
 - Notifications in the notification center:
-  - =label.deadd-noti-center.in-center.appname=
-  - =label.deadd-noti-center.in-center.body=
-  - =label.deadd-noti-center.in-center.title=
-  - =label.deadd-noti-center.in-center.time=
-  - =image.deadd-noti-center.in-center.image=
-  - =image.deadd-noti-center.in-center.icon=
-  - =button.deadd-noti-center.in-center.button-close=
+  - =label.deadd-noti-center.in-center.appname= :: Appname
+  - =label.deadd-noti-center.in-center.body= :: Textbody
+  - =label.deadd-noti-center.in-center.title= :: Notification title
+  - =label.deadd-noti-center.in-center.time= :: Notification time
+  - =image.deadd-noti-center.in-center.image= :: Image of a notification
+  - =image.deadd-noti-center.in-center.icon= :: Appicon
+  - =button.deadd-noti-center.in-center.button-close= :: Close button on notification
+
 - Notification-center:
-  - =label.deadd-noti-center.noti-center.time=
-  - =label.deadd-noti-center.noti-center.date=
+  - =label.deadd-noti-center.noti-center.time= :: The big time at the top
+  - =label.deadd-noti-center.noti-center.date= :: The date text
+  - =label.deadd-noti-center.noti-center.delete-all= :: "Delete all" Button
 
 _Examples:_
 
@@ -586,12 +621,17 @@ You can set the following parameters:
 - timeout (specified in milliseconds)
 - right (overrides ~distanceRight~ from the configuration)
 - top (overrides ~distanceTop~ from the configuration)
-- icon (does not do anything, currently)
+- icon (overrides the app-icon, value must be either empty, a path to
+  an image or a gtk-icon-name)
+- image (overrides the image of the notification, value must be either
+  empty, a path to an image or a gtk-icon-name)
 - transient (value has to be =true= or =false=)
 - noClosedMsg (value has to be =true= or =false=, if set to true it
   will prevent that a DBUS =NotificationClosed= message will be send
   for this notification. Only applies if the configuration parameter
   =configSendNotiClosedDbusMessage= is set to =true=)
+- removeActions (value can be anything, if used, no action buttons
+  will be displayed on the notifications)
 
 If you want to set more than one parameter you can concatenate them
 with =;= like this: =app=Crashmaster 2000;time=4:20=.
