@@ -61,7 +61,7 @@ and that can run customizable shell commands.
 
                              Reload CSS styling on the fly
 
-                    Use CSS transitions when loading a new clorotheme
+                    Use CSS transitions when loading a new colortheme
                                and smoothly change the mood
 
                (might [probably will] brake your current styling settings)
