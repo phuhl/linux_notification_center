@@ -246,7 +246,8 @@ notify config tState emit
         , notiTop = Nothing
         , notiRight = Nothing
         , notiPercentage = fromIntegral
-          <$> (fromVariant =<< Map.lookup "has-percentage" hints :: Maybe Int32)
+          <$> ( fromVariant =<< Map.lookup "has-percentage" hints
+                <|> Map.lookup "value" hints :: Maybe Int32 )
 }
 
   if Map.member (pack "deadd-notification-center")
