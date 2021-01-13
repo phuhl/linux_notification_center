@@ -1,3 +1,5 @@
+[[https://github.com/phuhl/linux_notification_center/workflows/CI/badge.svg]]
+
 * Linux Notification Center
 
 A haskell-written notification center for users that like a desktop with style...
