@@ -424,6 +424,9 @@ followMouse = false
 # bottom.
 newFirst = true
 
+# If useActionIcons is set to true, Action Buttons can show Icon
+useActionIcons = true
+
 # If true, the transient field in notifications will be ignored and
 # the notification will be persisted in the notification center anyways
 ignoreTransient = false
