@@ -408,11 +408,9 @@ notificationDaemon config onNote onCloseNote = do
       "Notify" (onNote (emit client))
     ]
 #endif
-
 startNotificationDaemon :: Config -> IO () ->  IO () ->  IO (TVar NotifyState)
 startNotificationDaemon config onUpdate onUpdateForMe = do
   istate <- newTVarIO $ NotifyState [] [] 1 onUpdate onUpdateForMe config []
   forkIO (notificationDaemon config (notify config istate)
           (closeNotification istate))
   return istate
-
