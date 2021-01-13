@@ -448,11 +448,6 @@ configSendNotiClosedDbusMessage = false
 # Default is true.
 guessIconFromAppname = true
 
-# Truncates notification bodies with '...' at the specified number of 
-# lines. If -1 is specified, the body text will not be truncated.
-# Applies only to notifications within the notification center. 
-shortenBody = -1
-
 # See section "Notification based scripting" for an explanation
 #match = "title=Abc;body=abc":"app=notify-send"
 #modify = "transient=false"
