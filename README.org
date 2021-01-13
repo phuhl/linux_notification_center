@@ -551,7 +551,10 @@ buttonMargin = 2
 *** CSS styling
 
 In the file =${XDG_CONFIG_HOME}/deadd/deadd.css= (usually
-=.config/deadd/deadd.css=) you can add CSS styles (GTK3-flavor).
+=.config/deadd/deadd.css=) you can add CSS styles (GTK3-flavor). Should the
+installation not have created a =dead.css=, you can use the content of
+[[https://github.com/phuhl/linux_notification_center/blob/master/style.css][style.css]]
+as a foundation.
 
 The following class-names for labels are defined:
 - Notifications:
