@@ -134,7 +134,7 @@ and that can run customizable shell commands.
                                                                                          ▝
 ▖                                                                                        ▐
 ▖                                                                                        ▐
-▌                                                       Further news in releasenotes.org ▐
+▌                                                        Further news in releasenotes.org ▐
 ▙▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▟
 
 #+END_EXAMPLE
