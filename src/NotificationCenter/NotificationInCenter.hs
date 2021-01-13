@@ -89,13 +89,6 @@ showNotification config mainBox dNoti tNState closeNotification = do
   Gtk.onButtonClicked buttonClose $ do
     closeNotification dispNoti
 
-  Gtk.labelSetEllipsize lblBody
-    (if configNotiCenterEllipsizeBody config
-     then EllipsizeModeEnd
-     else EllipsizeModeNone)
-
-  Gtk.labelSetLines lblBody $ fromIntegral $ configNotiCenterMaxLinesInBody config
-
   Gtk.widgetShowAll (view dContainer dispNoti)
   return dispNoti
 

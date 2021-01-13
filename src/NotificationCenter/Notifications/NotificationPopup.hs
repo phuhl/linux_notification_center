@@ -34,8 +34,11 @@ import DBus ( Variant (..) )
 import GI.Gdk (getEventButtonButton)
 import GI.Gtk (widgetShow, widgetGetPreferredHeightForWidth, widgetSetSizeRequest
               , widgetShowAll, onWidgetButtonPressEvent, windowMove
-              , setWidgetWidthRequest, widgetDestroy, labelSetLines, labelSetEllipsize)
+              , setWidgetWidthRequest, widgetDestroy , labelGetText
+              , labelSetText, labelGetLayout)
 import GI.Pango.Enums (EllipsizeMode(..))
+import GI.Pango.Objects.Layout (layoutGetLinesReadonly, layoutGetLineCount)
+import GI.Pango.Structs.LayoutLine (getLayoutLineLength, getLayoutLineStartIndex)
 import qualified GI.Gtk as Gtk (Window(..), Label(..))
 
 
@@ -85,18 +88,10 @@ showNotificationWindow config noti dispNotis onClose = do
     , _dHasCustomPosition = hasCustomPosition
     , _dpopupContent = DisplayingNotificationContent {} }
 
-
   let dispNoti = set dNotiGetHeight
         (getHeight (view dContainer dispNotiWithoutHeight) config)
         dispNotiWithoutHeight
       lblBody = (flip view) dispNoti $ dLabelBody
-
-  labelSetEllipsize lblBody
-    (if configPopupEllipsizeBody config
-     then EllipsizeModeEnd
-     else EllipsizeModeNone)
-
-  labelSetLines lblBody $ fromIntegral $ configPopupMaxLinesInBody config
 
   setWidgetWidthRequest mainWindow $ fromIntegral $ configWidthNoti config
 
@@ -105,6 +100,28 @@ showNotificationWindow config noti dispNotis onClose = do
     $ (flip view) dispNoti <$> [dLabelTitel, dLabelBody, dLabelAppname]
 
   height <- updateNoti' config onClose noti dispNoti
+
+  -- Ellipsization of Body
+  numLines <- fromIntegral <$> (layoutGetLineCount =<< labelGetLayout lblBody)
+  let maxLines = (configPopupMaxLinesInBody config) 
+      ellipsizeBody = configPopupEllipsizeBody config
+  height <-
+    if numLines > maxLines && ellipsizeBody then do
+      lines <- layoutGetLinesReadonly =<< labelGetLayout lblBody
+      let lastLine = lines !! (maxLines - 1)
+      len <- fromIntegral <$> getLayoutLineLength lastLine
+      startOffset <- fromIntegral <$> getLayoutLineStartIndex lastLine
+      bodyText <- labelGetText lblBody
+      let lenOfTruncatedBody = len - 4 + startOffset + (maxLines - 1)
+      let truncatedBody = Text.take lenOfTruncatedBody $ bodyText
+          ellipsizedBody = Text.append truncatedBody "..."
+      labelSetText lblBody ellipsizedBody
+      -- re-request height to reflect ellipsized body
+      height' <- getHeight (view dContainer dispNoti) config
+      widgetSetSizeRequest (_dLabelBG dispNoti) (-1) height'
+      return height'
+    else
+      return height
 
   (screenW, screenY, screenH) <- if configNotiFollowMouse config then
                                    getMouseActiveScreenPos mainWindow
