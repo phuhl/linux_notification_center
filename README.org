@@ -202,6 +202,10 @@ Pause/Unpause popup notifications
   # unpause popup notifications
   notify-send.py a --hint boolean:deadd-notification-center:true \
                    string:type:unpausePopups
+
+  # get status of paused popup notifications
+  notify-send.py a --hint boolean:deadd-notification-center:true \
+                   string:type:pausedPopups
 #+END_SRC
 
 
