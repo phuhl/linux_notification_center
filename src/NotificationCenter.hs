@@ -268,6 +268,9 @@ parseNotisForMe tState = do
                    putStrLn "unpausing popups"
                    atomically $ modifyTVar' tState
                      (\state -> state { stPopupsPaused = False })
+                 (Just "pausedPopups") -> do
+                   pausedPopups <- stPopupsPaused <$> readTVarIO tState
+                   putStrLn ("pausedPopups " ++ show pausedPopups)
                  (Just "reloadStyle") -> do
                    putStrLn "Reloading Style"
                    addSource $ setWindowStyle tState
