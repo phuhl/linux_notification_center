@@ -54,7 +54,7 @@ library
                      , bytestring
                      , ConfigFile
                      , mtl
-                     , dbus >= 0.10.15 && < 2
+                     , dbus >= 1.0.1 && < 2
                      , containers
                      , unix
                      , stm >= 2.5.0.0
