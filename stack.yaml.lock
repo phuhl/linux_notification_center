@@ -12,13 +12,6 @@ packages:
   original:
     hackage: ConfigFile-1.1.4
 - completed:
-    hackage: system-locale-0.3.0.0@sha256:13b3982403d8ac8cc6138e68802be8d8e7cf7ebc4cbc7e47e99e3c0dd1be066a,1529
-    pantry-tree:
-      size: 446
-      sha256: 3b22af3e6315835bf614a0d30381ec7e47aca147b59ba601aeaa26f1fdc19373
-  original:
-    hackage: system-locale-0.3.0.0
-- completed:
     hackage: gi-harfbuzz-0.0.3@sha256:0550f498854b7edac66b1a09f283e5b5c86033aff58b4ac30b024ae59e1bd866,5869
     pantry-tree:
       size: 364
@@ -26,12 +19,12 @@ packages:
   original:
     hackage: gi-harfbuzz-0.0.3
 - completed:
-    hackage: dbus-0.10.15@sha256:0cbccdf3f249f7d1485643df6e1a70d360b02b467fdc37c61c73de7fb327336d,4079
+    hackage: env-locale-1.0.0.1@sha256:aedab9b7bbed9f523f9821771b4c67d64f34a00be2be60de1d25b1a97278d475,894
     pantry-tree:
-      size: 2275
-      sha256: 8ac4beea6d6a51079e7f47506822803da8ac26fff7a0aff905debcf350a643e8
+      size: 271
+      sha256: 091cde93ceb962d18f21ec926436dc03bab61137db9eae9841f6c75725e09e5f
   original:
-    hackage: dbus-0.10.15
+    hackage: env-locale-1.0.0.1
 - completed:
     hackage: gtk3-0.15.4@sha256:e8de08763cb757c4be202a4eb7551a108b49cd59aa90bc7e2d680893d5fccec1,19491
     pantry-tree:
