@@ -4,7 +4,7 @@
 module NotificationCenter where
 
 import Config
-  (getConfig,Config(..))
+  (getConfig, getNewConfig, Config(..))
 import NotificationCenter.NotificationInCenter
   (DisplayingNotificationInCenter(..), showNotification, updateNoti)
 import NotificationCenter.Notifications
@@ -385,8 +385,8 @@ main' = do
   GI.init Nothing
 
   homeDir <- getXdgDirectory XdgConfig ""
-  config <- getConfig <$> (readConfigFile
-                            (homeDir ++ "/deadd/deadd.conf"))
+  config <- getConfig <$> readConfigFile (homeDir ++ "/deadd/deadd.conf")
+  config1 <- getNewConfig <$> readFile (homeDir ++ "/deadd/deadd.yml")
 
   initI18n
 

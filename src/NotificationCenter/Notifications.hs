@@ -262,10 +262,10 @@ notify config tState emit
     -- Noti has to be displayed
     do
       -- Apply modifications and run scripts for noti
-      let matchingRules = filter (\(match, rep, com) -> match newNotiWithoutId)
+      let matchingRules = filter (\(match, rep) -> match newNotiWithoutId)
             (configMatchingRules config)
-      let newNotiWoIdModified = foldl (\noti (_, mod, _) -> mod noti)
-            newNotiWithoutId matchingRules
+      newNotiWoIdModified <- foldl (\noti (_, mod) -> mod =<< noti)
+            (return newNotiWithoutId) matchingRules
 
       let newNoti = newNotiWoIdModified
 
