@@ -20,6 +20,9 @@ import qualified Data.Map as Map ( Map )
 import Data.List ( sortOn )
 import DBus ( Variant (..), Signal )
 
+import qualified Data.Yaml as Y
+import Data.Yaml as Y ((.=))
+
 import GI.GdkPixbuf (Pixbuf(..), pixbufNewFromData, Colorspace(..))
 
 data Urgency = Normal | Low | High deriving Eq
@@ -54,6 +57,27 @@ data Notification = Notification
   , notiPercentage :: Maybe Double
     -- ^ The percentage that should be shown in a percentage bar
   }
+
+instance Y.ToJSON Notification where
+  toJSON n = Y.object [
+    "appname" .= notiAppName n
+    , "repId" .= notiRepId n
+    , "id" .= notiId n
+    , "icon" .= ((show $ notiIcon n) :: String)
+    , "img" .= ((show $ notiImg n) :: String)
+    , "title" .= notiSummary n
+    , "body" .= notiBody n
+    , "actions" .= notiActions n
+    , "actionIcons" .= notiActionIcons n
+--    , "notiHints" .= notiHints n
+--    , "notiUrgency" .= ((show $ notiUrgency n) :: String)
+    , "timeout" .= notiTimeout n
+    , "time" .= notiTime n
+    , "transient" .= notiTransient n
+    , "sendClosedMsg" .= notiSendClosedMsg n
+    , "top" .= notiTop n
+    , "right" .= notiRight n
+    , "percentage" .= notiPercentage n ]
 
 instance Show Notification where
   show n = foldl (++) ""

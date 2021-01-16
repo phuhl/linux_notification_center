@@ -17,7 +17,7 @@ import NotificationCenter.Notifications.NotificationPopup
 import NotificationCenter.Notifications.Data
   (Urgency(..), Notification(..), Image(..), parseImageString)
 import TransparentWindow
-import Config (Config(..))
+import Config (Config(..), ModificationRule(..))
 import NotificationCenter.Notifications.Data
 
 import Control.Monad (when)
@@ -34,6 +34,9 @@ import DBus.Client
        , nameAllowReplacement, nameReplaceExisting, emit)
 import Data.Char (toLower)
 import Data.Text (unpack, Text, pack )
+import Data.Text.Encoding (decodeUtf8, encodeUtf8)
+import Data.ByteString.Lazy (toStrict)
+
 import qualified Data.Text as Text
 import Data.Word ( Word, Word8, Word32 )
 import Data.Int ( Int32 )
@@ -43,6 +46,10 @@ import Data.Time
 import Data.Time.LocalTime
 import Data.Maybe (fromMaybe)
 
+import qualified Data.Yaml as Yaml
+import qualified Data.Aeson as Aeson
+
+import System.Process (readCreateProcess, shell)
 import System.Locale.Read
 import System.IO (readFile)
 import System.IO.Error (tryIOError)
@@ -262,10 +269,7 @@ notify config tState emit
     -- Noti has to be displayed
     do
       -- Apply modifications and run scripts for noti
-      let matchingRules = filter (\(match, rep) -> match newNotiWithoutId)
-            (configMatchingRules config)
-      newNotiWoIdModified <- foldl (\noti (_, mod) -> mod =<< noti)
-            (return newNotiWithoutId) matchingRules
+      newNotiWoIdModified <- modifyNoti config newNotiWithoutId
 
       let newNoti = newNotiWoIdModified
 
@@ -305,6 +309,50 @@ notify config tState emit
             in if (find ((==) newNoti) notis') /= Nothing then notis'
                else (newNoti:notis')
 
+
+modifyNoti :: Config -> Notification -> IO Notification
+modifyNoti config noti =
+  let modificationRules = configMatchingRules config
+  in foldr (\rule ioNoti -> modifies rule =<< ioNoti) (return noti)
+     $ filter (\rule -> rule `matches` noti) modificationRules
+  where matches rule noti =
+          Map.foldrWithKey (\k v matches -> matches && ((v == lookupFun k noti)))
+          True (mMatch rule)
+        lookupFun name noti = Text.unpack $ fromMaybe (Text.pack "")
+          ((lookup name
+             [ ("title", notiSummary)
+             , ("body", notiBody)
+             , ("appname", notiAppName)
+             , ("time", notiTime) ]) <*> (Just noti))
+        replace ('\\':cs) = "\\\\" ++ replace cs
+        replace (c:cs) = c : replace cs
+        replace ([]) = []
+        modifies (Script m s) noti = do
+          putStrLn $ show noti
+          putStrLn $ Text.unpack $ notiBody noti
+          putStrLn $ unpack $ decodeUtf8 $ toStrict $ Aeson.encode noti
+          returnText <- readCreateProcess (shell s)
+            $ replace (unpack $ decodeUtf8 $ toStrict $ Aeson.encode noti) ++ "\n"
+          newModifier <- Yaml.decodeThrow $ encodeUtf8 $ pack returnText
+          modifies newModifier noti
+        modifies modify noti = do
+          putStrLn $ show modify
+          putStrLn $ show noti
+          let newnoti = noti {
+          notiSummary = fromMaybe (notiSummary noti) $ pack <$> modifyTitle modify
+          , notiBody = fromMaybe (notiBody noti) $ pack <$> modifyBody modify
+          , notiAppName = fromMaybe (notiAppName noti) $ pack <$> modifyAppname modify
+          , notiIcon = fromMaybe (notiIcon noti) $ parseImageString <$> pack <$> modifyAppicon modify
+          , notiTimeout = fromMaybe (notiTimeout noti) $ modifyTimeout modify
+          , notiRight = fromMaybe (notiRight noti) $ Just <$> modifyRight modify
+          , notiTop = fromMaybe (notiTop noti) $ Just <$> modifyTop modify
+          , notiImg = fromMaybe (notiImg noti) $ parseImageString <$> pack <$> modifyImage modify
+          , notiTransient = fromMaybe (notiTransient noti) $ modifyTransient modify
+          , notiSendClosedMsg = fromMaybe (notiSendClosedMsg noti) $ modifyNoClosedMsg modify
+          , notiActions = fromMaybe (notiActions noti) $ (\_ -> []) <$> modifyRemoveActions modify
+          }
+          putStrLn $ show newnoti
+          return newnoti
 
 replaceNoti:: Notification -> TVar NotifyState -> IO ()
 replaceNoti newNoti tState = do

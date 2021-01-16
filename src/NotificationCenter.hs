@@ -4,7 +4,7 @@
 module NotificationCenter where
 
 import Config
-  (getConfig, getNewConfig, Config(..))
+  (getConfig, Config(..), ButtonConfig(..))
 import NotificationCenter.NotificationInCenter
   (DisplayingNotificationInCenter(..), showNotification, updateNoti)
 import NotificationCenter.Notifications
@@ -156,10 +156,7 @@ createNotiCenter tState config = do
   onButtonClicked deleteButton $ deleteInCenter tState
   buttonSetLabel deleteButton $ Text.pack $ translate "Delete all"
 
-  let buttons = zip
-        (split $ removeOuterLetters $ configLabels config)
-        (split $ removeOuterLetters $ configCommands config)
-      (buttonLabels, buttonCommands) = unzip buttons
+  let buttons = configButtons config
       margin = fromIntegral $ configButtonMargin config
       width = fromIntegral (((configWidth config) - 20)
                             `div` (configButtonsPerRow config))
@@ -169,7 +166,9 @@ createNotiCenter tState config = do
         $ ((fromIntegral $ length buttons) / (fromIntegral $ configButtonsPerRow config))
   lines' <- sequence $ take linesNeeded $ repeat $ boxNew OrientationHorizontal 0
   buttons' <- sequence $ map
-    (\(label, command) -> createButton config width height command label)
+    (\(button) -> createButton config width height
+                  (configButtonCommand button)
+                  (configButtonLabel button))
     buttons
 
 
@@ -385,8 +384,7 @@ main' = do
   GI.init Nothing
 
   homeDir <- getXdgDirectory XdgConfig ""
-  config <- getConfig <$> readConfigFile (homeDir ++ "/deadd/deadd.conf")
-  config1 <- getNewConfig <$> readFile (homeDir ++ "/deadd/deadd.yml")
+  config <- getConfig =<< (Text.pack <$> readFile (homeDir ++ "/deadd/deadd.yml"))
 
   initI18n
 
