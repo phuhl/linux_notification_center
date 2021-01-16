@@ -13,6 +13,7 @@ module TransparentWindow
   , button
   , image
   , progressbar
+  , adjustment
   , scale
   , getObjs
   , getScreenPos
@@ -64,7 +65,7 @@ import GI.Gtk
 import qualified GI.Gtk as Gtk
   (ProgressBar(..), Scale(..), DrawingArea(..), unsafeCastTo, Window(..), IsWidget(..)
   , builderGetObject, builderAddFromString
-  , builderNew, Builder(..), Label(..), Box(..), Button(..), Image(..))
+  , builderNew, Builder(..), Label(..), Box(..), Button(..), Image(..), Adjustment(..))
 import GI.Gtk.Constants
 import GI.Gdk (getRectangleHeight, getRectangleWidth, getRectangleY
               , getRectangleX, Monitor, monitorGetGeometry, displayGetMonitor
@@ -98,6 +99,7 @@ gObjLookup f dict name = f $ fromJust $ lookup name dict
 window = gObjLookup (Gtk.unsafeCastTo Gtk.Window)
 drawingArea = gObjLookup (Gtk.unsafeCastTo Gtk.DrawingArea)
 label = gObjLookup (Gtk.unsafeCastTo Gtk.Label)
+adjustment = gObjLookup (Gtk.unsafeCastTo Gtk.Adjustment)
 box = gObjLookup (Gtk.unsafeCastTo Gtk.Box)
 button = gObjLookup (Gtk.unsafeCastTo Gtk.Button)
 image  = gObjLookup (Gtk.unsafeCastTo Gtk.Image)
