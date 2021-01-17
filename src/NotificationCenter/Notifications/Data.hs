@@ -37,6 +37,7 @@ data Notification = Notification
   , notiId :: Int -- ^ Id
   , notiIcon :: Image -- ^ App icon
   , notiImg :: Image -- ^ Image
+  , notiImgSize :: Int -- ^ Image size
   , notiSummary :: Text.Text -- ^ Summary
   , notiBody :: Text.Text -- ^ Body
   , notiActions :: [Text.Text] -- ^ Actions
@@ -56,6 +57,8 @@ data Notification = Notification
     -- ^ Should be called when an action is used
   , notiPercentage :: Maybe Double
     -- ^ The percentage that should be shown in a percentage bar
+  , notiClassName :: Text.Text
+    -- ^ Class name to be attached to the window of the notification
   }
 
 instance Y.ToJSON Notification where
@@ -64,7 +67,8 @@ instance Y.ToJSON Notification where
     , "repId" .= notiRepId n
     , "id" .= notiId n
     , "icon" .= ((show $ notiIcon n) :: String)
-    , "img" .= ((show $ notiImg n) :: String)
+    , "image" .= ((show $ notiImg n) :: String)
+    , "imageSize" .= notiImgSize n
     , "title" .= notiSummary n
     , "body" .= notiBody n
     , "actions" .= notiActions n
@@ -87,6 +91,7 @@ instance Show Notification where
     , "  notiId = " ++ (show $ notiId n) ++ ", \n"
     , "  notiIcon = " ++ (show $ notiIcon n) ++ ", \n"
     , "  notiImg = " ++ (show $ notiImg n) ++ ", \n"
+    , "  notiImgSize = " ++ (show $ notiImgSize n) ++ ", \n"
     , "  notiSummary = " ++ (Text.unpack $ notiSummary n) ++ ", \n"
     , "  notiBody = " ++ (Text.unpack $ notiBody n) ++ ", \n"
     , "  notiActions = " ++ (show $ Text.unpack <$> notiActions n) ++ ", \n"

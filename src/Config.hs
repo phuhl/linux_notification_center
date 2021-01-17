@@ -37,6 +37,7 @@ data ModificationRule = Modify
   , modifyRight :: Maybe Int
   , modifyTop :: Maybe Int
   , modifyImage :: Maybe String
+  , modifyImageSize :: Maybe Int
   , modifyTransient :: Maybe Bool
   , modifyNoClosedMsg :: Maybe Bool
   , modifyRemoveActions :: Maybe Bool
@@ -63,6 +64,7 @@ instance Show ModificationRule where
     , "  modifyRight = " ++ (show $ modifyRight m) ++ ", \n"
     , "  modifyTop = " ++ (show $ modifyTop m) ++ ", \n"
     , "  modifyImage = " ++ (show $ modifyImage m) ++ ", \n"
+    , "  modifyImageSize = " ++ (show $ modifyImageSize m) ++ ", \n"
     , "  modifyTransient = " ++ (show $ modifyTransient m) ++ ", \n"
     , "  modifyNoClosedMsg = " ++ (show $ modifyNoClosedMsg m) ++ ", \n"
     , "  modifyRemoveActions = " ++ (show $ modifyRemoveActions m) ++ ", \n"]
@@ -89,6 +91,8 @@ instance FromJSON ModificationRule where
         <*> o .: "modify" .:. "margin-top"
       -- modifyImage
         <*> o .: "modify" .:. "image"
+      -- modifyImageSize
+        <*> o .: "modify" .:. "imageSize"
       -- modifyTransient
         <*> o .: "modify" .:. "transient"
       -- modifyNoClosedMsg
