@@ -48,13 +48,13 @@ library
                      , gi-gtk >= 3.0.19
                      , gi-gio
                      , time
-                     , system-locale
+                     , env-locale
                      , gi-gobject
                      , text
                      , bytestring
                      , ConfigFile
                      , mtl
-                     , dbus >= 0.10.15 && < 1
+                     , dbus >= 1.0.1 && < 2
                      , containers
                      , unix
                      , stm >= 2.5.0.0

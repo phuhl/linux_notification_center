@@ -31,6 +31,7 @@ import DBus (Variant(..), Structure(..), fromVariant, signal, toVariant, variant
 import DBus.Internal.Message (Signal(..))
 import DBus.Client
        ( connectSession, AutoMethod(..), autoMethod, requestName, export
+       , defaultInterface, interfaceName, interfaceMethods
        , nameAllowReplacement, nameReplaceExisting, emit)
 import Data.Char (toLower)
 import Data.Text (unpack, Text, pack )
@@ -43,7 +44,7 @@ import Data.Time
 import Data.Time.LocalTime
 import Data.Maybe (fromMaybe)
 
-import System.Locale.Read
+import System.Locale.Current
 import System.IO (readFile)
 import System.IO.Error (tryIOError)
 import Data.GI.Base.GError (catchGErrorJust)
@@ -190,7 +191,7 @@ parseImg hints text =
 
 getTime = do
   now <- zonedTimeToLocalTime <$> getZonedTime
-  zone <- System.Locale.Read.getCurrentLocale
+  zone <- System.Locale.Current.currentLocale
   let format = pack . flip (formatTime zone) now
   return $ format "%H:%M"
 
@@ -383,16 +384,15 @@ notificationDaemon config onNote onCloseNote = do
   client <- connectSession
   _ <- requestName client "org.freedesktop.Notifications"
        [nameAllowReplacement, nameReplaceExisting]
-  export client "/org/freedesktop/Notifications"
-    [ autoMethod "org.freedesktop.Notifications"
-      "GetServerInformation" getServerInformation
-    , autoMethod "org.freedesktop.Notifications"
-      "GetCapabilities" (getCapabilities config)
-    , autoMethod "org.freedesktop.Notifications"
-      "CloseNotification" onCloseNote
-    , autoMethod "org.freedesktop.Notifications"
-      "Notify" (onNote (emit client))
-    ]
+  export client "/org/freedesktop/Notifications" defaultInterface
+    { interfaceName = "org.freedesktop.Notifications"
+    , interfaceMethods =
+      [ autoMethod "GetServerInformation" getServerInformation
+      , autoMethod "GetCapabilities" (getCapabilities config)
+      , autoMethod "CloseNotification" onCloseNote
+      , autoMethod "Notify" (onNote (emit client))
+      ]
+    }
 
 startNotificationDaemon :: Config -> IO () ->  IO () ->  IO (TVar NotifyState)
 startNotificationDaemon config onUpdate onUpdateForMe = do
@@ -400,4 +400,3 @@ startNotificationDaemon config onUpdate onUpdateForMe = do
   forkIO (notificationDaemon config (notify config istate)
           (closeNotification istate))
   return istate
-
