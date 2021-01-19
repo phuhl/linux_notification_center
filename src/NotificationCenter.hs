@@ -22,6 +22,7 @@ import Text.I18N.GetText
 import System.Locale.SetLocale
 import System.IO.Unsafe
 import System.IO (readFile)
+import System.IO.Error (tryIOError)
 
 import Data.Int (Int32(..))
 import Data.Tuple.Sequence (sequenceT)
@@ -402,7 +403,9 @@ main' = do
   GI.init Nothing
 
   homeDir <- getXdgDirectory XdgConfig ""
-  config <- getConfig =<< (Text.pack <$> readFile (homeDir ++ "/deadd/deadd.yml"))
+  configData <- fromEither (Text.pack "{}") <$> (tryIOError $ do
+    Text.pack <$> readFile (homeDir ++ "/deadd/deadd.yml"))
+  config <- getConfig configData
 
   initI18n
 
