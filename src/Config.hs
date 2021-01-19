@@ -41,33 +41,13 @@ data ModificationRule = Modify
   , modifyTransient :: Maybe Bool
   , modifyNoClosedMsg :: Maybe Bool
   , modifyRemoveActions :: Maybe Bool
+  , modifyClassName :: Maybe String
   } |
   Script
   {
     mMatch :: Map.Map String String
   , mScript :: String
   }
-
-instance Show ModificationRule where
-  show (Script m s) = foldl (++) ""
-    [ "Script "
-    , "  mMatch = " ++ (show m) ++ ", \n"
-    , "  mScript = " ++ (show s) ++ ", \n" ]
-  show m = foldl (++) ""
-    [ "Modify "
-    , "  mMatch = " ++ (show $ mMatch m) ++ ", \n"
-    , "  modifyTitle = " ++ (show $ modifyTitle m) ++ ", \n"
-    , "  modifyBody = " ++ (show $ modifyBody m) ++ ", \n"
-    , "  modifyAppname = " ++ (show $ modifyAppname m) ++ ", \n"
-    , "  modifyAppicon = " ++ (show $ modifyAppicon m) ++ ", \n"
-    , "  modifyTimeout = " ++ (show $ modifyTimeout m) ++ ", \n"
-    , "  modifyRight = " ++ (show $ modifyRight m) ++ ", \n"
-    , "  modifyTop = " ++ (show $ modifyTop m) ++ ", \n"
-    , "  modifyImage = " ++ (show $ modifyImage m) ++ ", \n"
-    , "  modifyImageSize = " ++ (show $ modifyImageSize m) ++ ", \n"
-    , "  modifyTransient = " ++ (show $ modifyTransient m) ++ ", \n"
-    , "  modifyNoClosedMsg = " ++ (show $ modifyNoClosedMsg m) ++ ", \n"
-    , "  modifyRemoveActions = " ++ (show $ modifyRemoveActions m) ++ ", \n"]
 
 instance FromJSON ModificationRule where
   parseJSON (Y.Object o) = do
@@ -80,9 +60,9 @@ instance FromJSON ModificationRule where
       -- modifyBody
         <*> o .: "modify" .:. "body"
       -- modifyAppname
-        <*> o .: "modify" .:. "appname"
+        <*> o .: "modify" .:. "app-name"
       -- modifyAppicon
-        <*> o .: "modify" .:. "appicon"
+        <*> o .: "modify" .:. "app-icon"
       -- modifyTimeout
         <*> o .: "modify" .:. "timeout"
       -- modifyRight
@@ -92,13 +72,15 @@ instance FromJSON ModificationRule where
       -- modifyImage
         <*> o .: "modify" .:. "image"
       -- modifyImageSize
-        <*> o .: "modify" .:. "imageSize"
+        <*> o .: "modify" .:. "image-size"
       -- modifyTransient
         <*> o .: "modify" .:. "transient"
       -- modifyNoClosedMsg
-        <*> o .: "modify" .:. "noClosedMsg"
+        <*> o .: "modify" .:. "send-noti-closed"
       -- modifyRemoveActions
-        <*> o .: "modify" .:. "removeActions"
+        <*> o .: "modify" .:. "remove-actions"
+      -- modifyClassName
+        <*> o .: "modify" .:. "class-name"
       Just (script)-> Script
         <$> o .: "match"
       -- mScript

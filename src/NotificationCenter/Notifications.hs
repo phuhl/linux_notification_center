@@ -257,7 +257,7 @@ notify config tState emit
         , notiPercentage = fromIntegral
           <$> ( fromVariant =<< Map.lookup "has-percentage" hints
                 <|> Map.lookup "value" hints :: Maybe Int32 )
-        , notiClassName = appName }
+        , notiClassName = ""}
 
   if Map.member (pack "deadd-notification-center")
     $ notiHints newNotiWithoutId
@@ -325,7 +325,7 @@ modifyNoti config noti =
           ((lookup name
              [ ("title", notiSummary)
              , ("body", notiBody)
-             , ("appname", notiAppName)
+             , ("app-name", notiAppName)
              , ("time", notiTime) ]) <*> (Just noti))
         replace ('\\':cs) = "\\\\" ++ replace cs
         replace (c:cs) = c : replace cs
@@ -339,24 +339,33 @@ modifyNoti config noti =
           newModifier <- Yaml.decodeThrow $ encodeUtf8 $ pack returnText
           modifies newModifier noti
         modifies modify noti = do
-          putStrLn $ show modify
-          putStrLn $ show noti
-          let newnoti = noti {
-          notiSummary = fromMaybe (notiSummary noti) $ pack <$> modifyTitle modify
-          , notiBody = fromMaybe (notiBody noti) $ pack <$> modifyBody modify
-          , notiAppName = fromMaybe (notiAppName noti) $ pack <$> modifyAppname modify
-          , notiClassName = fromMaybe (notiAppName noti) $ pack <$> modifyAppname modify
-          , notiIcon = fromMaybe (notiIcon noti) $ parseImageString <$> pack <$> modifyAppicon modify
-          , notiTimeout = fromMaybe (notiTimeout noti) $ modifyTimeout modify
-          , notiRight = fromMaybe (notiRight noti) $ Just <$> modifyRight modify
-          , notiTop = fromMaybe (notiTop noti) $ Just <$> modifyTop modify
-          , notiImg = fromMaybe (notiImg noti) $ parseImageString <$> pack <$> modifyImage modify
-          , notiImgSize = fromMaybe (notiImgSize noti) $ modifyImageSize modify
-          , notiTransient = fromMaybe (notiTransient noti) $ modifyTransient modify
-          , notiSendClosedMsg = fromMaybe (notiSendClosedMsg noti) $ modifyNoClosedMsg modify
-          , notiActions = fromMaybe (notiActions noti) $ (\_ -> []) <$> modifyRemoveActions modify
-          }
-          putStrLn $ show newnoti
+          let newnoti = noti
+                { notiSummary = fromMaybe (notiSummary noti)
+                  $ pack <$> modifyTitle modify
+                , notiBody = fromMaybe (notiBody noti)
+                  $ pack <$> modifyBody modify
+                , notiAppName = fromMaybe (notiAppName noti)
+                  $ pack <$> modifyAppname modify
+                , notiIcon = fromMaybe (notiIcon noti)
+                  $ parseImageString <$> pack <$> modifyAppicon modify
+                , notiTimeout = fromMaybe (notiTimeout noti)
+                  $ modifyTimeout modify
+                , notiRight = fromMaybe (notiRight noti)
+                  $ Just <$> modifyRight modify
+                , notiTop = fromMaybe (notiTop noti)
+                  $ Just <$> modifyTop modify
+                , notiImg = fromMaybe (notiImg noti)
+                  $ parseImageString <$> pack <$> modifyImage modify
+                , notiImgSize = fromMaybe (notiImgSize noti)
+                  $ modifyImageSize modify
+                , notiTransient = fromMaybe (notiTransient noti)
+                  $ modifyTransient modify
+                , notiSendClosedMsg = fromMaybe (notiSendClosedMsg noti)
+                  $ modifyNoClosedMsg modify
+                , notiActions = fromMaybe (notiActions noti)
+                  $ (\_ -> []) <$> modifyRemoveActions modify
+                , notiClassName = fromMaybe (notiClassName noti)
+                  $ pack <$> modifyClassName modify }
           return newnoti
 
 replaceNoti:: Notification -> TVar NotifyState -> IO ()
