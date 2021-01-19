@@ -184,7 +184,7 @@ instance FromJSON Config where
   -- configStartupCommand
     <*> firstLevel o "startup-command" ""
   -- configNotiCenterMonitor
-    <*> secondLevel o "notification-center" "monitor" 0
+    <*> inheritingSecondLevel o "notification-center" "monitor" 0
   -- configNotiCenterFollowMouse
     <*> inheritingSecondLevel o "notification-center" "follow-mouse" False
   -- configNotiCenterNewFirst
