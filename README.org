@@ -1,3 +1,5 @@
+[[https://github.com/phuhl/linux_notification_center/workflows/CI/badge.svg]]
+
 * Linux Notification Center
 
 A haskell-written notification center for users that like a desktop with style...
@@ -61,7 +63,7 @@ and that can run customizable shell commands.
 
                              Reload CSS styling on the fly
 
-                    Use CSS transitions when loading a new clorotheme
+                    Use CSS transitions when loading a new colortheme
                                and smoothly change the mood
 
                (might [probably will] brake your current styling settings)
@@ -241,6 +243,9 @@ Notification with progress bar
 #+BEGIN_SRC sh
 notify-send.py "This notification has a progressbar" "33%" \
                          --hint int:has-percentage:33)
+#or
+notify-send.py "This notification has a progressbar" "33%" \
+                         --hint int:value:33)
 #+END_SRC
 
 Notification with slider
@@ -424,6 +429,9 @@ followMouse = false
 # bottom.
 newFirst = true
 
+# If useActionIcons is set to true, Action Buttons can show Icon
+useActionIcons = true
+
 # If true, the transient field in notifications will be ignored and
 # the notification will be persisted in the notification center anyways
 ignoreTransient = false
@@ -447,11 +455,6 @@ configSendNotiClosedDbusMessage = false
 # center will try to guess the icon from the application name (if present).
 # Default is true.
 guessIconFromAppname = true
-
-# Truncates notification bodies with '...' at the specified number of 
-# lines. If -1 is specified, the body text will not be truncated.
-# Applies only to notifications within the notification center. 
-shortenBody = -1
 
 # See section "Notification based scripting" for an explanation
 #match = "title=Abc;body=abc":"app=notify-send"
@@ -550,7 +553,10 @@ buttonMargin = 2
 *** CSS styling
 
 In the file =${XDG_CONFIG_HOME}/deadd/deadd.css= (usually
-=.config/deadd/deadd.css=) you can add CSS styles (GTK3-flavor).
+=.config/deadd/deadd.css=) you can add CSS styles (GTK3-flavor). Should the
+installation not have created a =dead.css=, you can use the content of
+[[https://github.com/phuhl/linux_notification_center/blob/master/style.css][style.css]]
+as a foundation.
 
 The following class-names for labels are defined:
 - Notifications:

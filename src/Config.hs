@@ -118,12 +118,11 @@ data Config = Config
   , configNotiCenterNewFirst :: Bool
   , configIgnoreTransient :: Bool
   , configMatchingRules :: [ModificationRule]
+  , configActionIcons :: Bool
   , configNotiMarkup :: Bool
   , configNotiParseHtmlEntities :: Bool
   , configSendNotiClosedDbusMessage :: Bool
   , configGuessIconFromAppname :: Bool
-  , configNotiCenterMaxLinesInBody :: Int
-  , configNotiCenterEllipsizeBody :: Bool
   , configNotiCenterHideOnMouseLeave :: Bool
 
   -- notification-center-notification-popup
@@ -210,8 +209,10 @@ instance FromJSON Config where
     <*> secondLevel o "notification-center" "new-first" True
   -- configIgnoreTransient
     <*> secondLevel o "notification-center" "ignore-transient" False
- -- configMatchingRules
+  -- configMatchingRules
     <*> secondLevel o "notification" "modifications" []
+  -- configActionIcons
+    <*> secondLevel o "notification" "use-action-icons" True
   -- configNotiMarkup
     <*> secondLevel o "notification" "use-markup" True
   -- configNotiParseHtmlEntities

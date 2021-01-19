@@ -38,5 +38,6 @@ All these colors can now be set directly in the =deadd.css= file which
 resides in the =${XDG_CONFIG_HOME}/deadd/= folder (usually
 =.config/deadd/=).
 
+If the installer did not create a =deadd.css= file, create it yourself. You can use [[https://github.com/phuhl/linux_notification_center/blob/master/style.css][style.css]] as a foundation.
 
 Changes to =gtk.css= are now longer required.

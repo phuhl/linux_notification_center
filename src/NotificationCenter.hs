@@ -43,7 +43,7 @@ import Control.Concurrent.STM
   ( readTVarIO, modifyTVar', TVar(..), atomically, newTVarIO )
 
 import System.Process (runCommand)
-import System.Locale.Read
+import System.Locale.Current
 import System.Posix.Signals (sigUSR1)
 import System.Posix.Daemonize (serviced, daemonize)
 import System.Directory (getXdgDirectory, XdgDirectory(..))
@@ -56,6 +56,7 @@ import GI.Gtk
        , setWindowWindowPosition, WindowPosition(..), windowMove
        , frameSetShadowType, aspectFrameNew
        , widgetGetAllocatedHeight, widgetGetAllocatedWidth, onWidgetDraw
+       , adjustmentSetValue, adjustmentGetLower, adjustmentGetUpper, adjustmentGetPageSize
        , onWidgetLeaveNotifyEvent, onWidgetMotionNotifyEvent
        , widgetAddEvents, alignmentSetPadding, alignmentNew, rangeSetValue
        , scaleSetDigits, scaleSetValuePos, rangeGetValue
@@ -70,7 +71,7 @@ import GI.Gtk
        , afterWindowSetFocus, labelSetText
        , onWidgetFocusOutEvent, onWidgetKeyReleaseEvent, widgetGetParentWindow
        , onButtonClicked, windowGetScreen, boxNew, widgetSetValign)
-import qualified GI.Gtk as Gtk (containerAdd, Window(..), Box(..), Label(..), Button(..))
+import qualified GI.Gtk as Gtk (containerAdd, Window(..), Box(..), Label(..), Button(..), Adjustment(..))
 
 import qualified GI.Gtk as GI (init, main)
 import GI.GLib (sourceRemove, timeoutAdd, unixSignalAdd)
@@ -87,6 +88,7 @@ import qualified GI.Gdk.Objects.Window
 data State = State
   { stMainWindow :: Gtk.Window
   , stNotiBox :: Gtk.Box
+  , stNotiBoxAdj :: Gtk.Adjustment
   , stTimeLabel :: Gtk.Label
   , stDateLabel :: Gtk.Label
   , stDeleteAll :: Gtk.Button
@@ -103,7 +105,7 @@ setTime :: TVar State -> IO Bool
 setTime tState = do
   state <- readTVarIO tState
   now <- zonedTimeToLocalTime <$> getZonedTime
-  zone <- System.Locale.Read.getCurrentLocale
+  zone <- System.Locale.Current.currentLocale
   let format = Text.pack . flip (formatTime zone) now
   labelSetText (stTimeLabel state) $ format "%H:%M"
   labelSetText (stDateLabel state) $ format "%A, %x"
@@ -142,6 +144,7 @@ createNotiCenter tState config = do
     , "label_time"
     , "label_date"
     , "box_notis"
+    , "box_notis_adj"
     , "box_buttons"
     , "button_deleteAll" ]
     (Just "Notification area")
@@ -151,6 +154,7 @@ createNotiCenter tState config = do
   buttonBox <- box objs "box_buttons"
   timeL <- label objs "label_time"
   timeD <- label objs "label_date"
+  notiBoxAdj <- adjustment objs "box_notis_adj"
   deleteButton <- button objs "button_deleteAll"
 
   onButtonClicked deleteButton $ deleteInCenter tState
@@ -182,6 +186,7 @@ createNotiCenter tState config = do
   atomically $ modifyTVar' tState $
     \state -> state { stMainWindow = mainWindow
                       , stNotiBox = notiBox
+                      , stNotiBoxAdj = notiBoxAdj
                       , stTimeLabel = timeL
                       , stDateLabel = timeD
                       , stDeleteAll = deleteButton
@@ -297,6 +302,19 @@ showNotiCenter tState notiState config = do
       return True
   atomically $ modifyTVar' tState
     (\state -> state {stCenterShown = newShown })
+
+  notiBoxAdj <- stNotiBoxAdj <$> readTVarIO tState
+  notiBoxAdjVal <- if configNotiCenterNewFirst config then
+    do
+      adj <- adjustmentGetLower notiBoxAdj
+      return adj
+    else
+    do
+      adj <- adjustmentGetUpper notiBoxAdj
+      page <- adjustmentGetPageSize notiBoxAdj
+      return (adj - page)
+  adjustmentSetValue notiBoxAdj notiBoxAdjVal
+
   return True
 
 updateNotisForMe :: TVar State -> IO()

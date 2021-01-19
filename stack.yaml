@@ -40,9 +40,8 @@ packages:
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
 extra-deps: [ ConfigFile-1.1.4
-            , system-locale-0.3.0.0
             , gi-harfbuzz-0.0.3
-            , dbus-0.10.15
+            , env-locale-1.0.0.1
             , gtk3-0.15.4
             , stm-2.5.0.0
             , hgettext-0.1.31.0
