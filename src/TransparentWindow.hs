@@ -28,6 +28,8 @@ module TransparentWindow
   -- * Colors
   ) where
 
+import Helpers ((=<<?))
+
 import Data.Int ( Int32 )
 import Data.Word ( Word32 )
 import Data.Maybe
@@ -39,39 +41,11 @@ import Control.Monad.Trans.Reader (ReaderT(..))
 import Control.Monad.IO.Class (MonadIO(..))
 import Control.Concurrent (forkIO, threadDelay, ThreadId(..), killThread)
 
-import GI.Gtk
-       (styleContextRemoveClass, widgetShowAll, widgetHide
-       , onWidgetDestroy, windowSetDefaultSize
-       , setWindowTitle, boxPackStart, boxNew, setWindowWindowPosition
-       , WindowPosition(..), windowMove
-       , frameSetShadowType, aspectFrameNew
-       , widgetGetAllocatedHeight, widgetGetAllocatedWidth, onWidgetDraw
-       , onWidgetLeaveNotifyEvent, onWidgetMotionNotifyEvent
-       , widgetAddEvents, alignmentSetPadding, alignmentNew, rangeSetValue
-       , scaleSetDigits, scaleSetValuePos, rangeGetValue
-       , afterScaleButtonValueChanged, scaleNewWithRange, containerAdd
-       , buttonBoxNew, mainQuit, onButtonActivate
-       , toggleButtonGetActive, onToggleButtonToggled, buttonSetUseStock
-       , toggleButtonNewWithLabel, onButtonClicked
-       , buttonNewWithLabel, widgetQueueDraw, drawingAreaNew
-       , windowNew, widgetDestroy, dialogRun, setAboutDialogComments
-       , setAboutDialogAuthors, setAboutDialogVersion
-       , setAboutDialogProgramName, aboutDialogNew, labelNew, get
-       , afterWindowSetFocus, labelSetText
-       , onWidgetFocusOutEvent, onWidgetKeyReleaseEvent, widgetGetParentWindow
-       , onWidgetRealize, styleContextAddProviderForScreen
-       , cssProviderLoadFromData, cssProviderNew, styleContextAddClass
-       , widgetGetStyleContext, CssProvider(..))
 import qualified GI.Gtk as Gtk
-  (ProgressBar(..), Scale(..), DrawingArea(..), unsafeCastTo, Window(..), IsWidget(..)
-  , builderGetObject, builderAddFromString
-  , builderNew, Builder(..), Label(..), Box(..), Button(..), Image(..), Adjustment(..))
+
 import GI.Gtk.Constants
-import GI.Gdk (getRectangleHeight, getRectangleWidth, getRectangleY
-              , getRectangleX, Monitor, monitorGetGeometry, displayGetMonitor
-              , screenGetDisplay, screenGetHeight, screenGetWidth, Screen (..)
-              , displayGetPointer, displayGetDefault, displayGetDefaultSeat
-              , deviceGetPosition, seatGetPointer, displayGetMonitorAtPoint)
+import qualified GI.Gio as Gio
+import qualified GI.Gdk as Gdk
 
 import GI.GObject.Objects (IsObject(..), Object(..))
 
@@ -116,9 +90,10 @@ getObjs builder dict = do
 
 getScreenProportions :: Gtk.Window -> IO (GHC.Int.Int32, GHC.Int.Int32)
 getScreenProportions window = do
-  screen <- window `get` #screen
-  h <- screenGetHeight screen
-  w <- screenGetWidth screen
+  monitor <- getMonitor window 0
+  geometry <- Gdk.monitorGetGeometry monitor
+  h <- Gdk.getRectangleHeight geometry
+  w <- Gdk.getRectangleWidth geometry
   return (h, w)
 
 createTransparentWindow :: Text.Text -> [Text.Text] -> Maybe Text.Text
@@ -139,12 +114,12 @@ createTransparentWindow
 
   mainWindow <- window objs "main_window"
 
-  screen <- mainWindow `get` #screen
-  visual <- #getRgbaVisual screen
-  #setVisual mainWindow visual
+--  screen <- mainWindow `get` #screen
+--  visual <- #getRgbaVisual screen
+--  #setVisual mainWindow visual
 
   when (title /= Nothing) $ let (Just title') = title in
-    setWindowTitle mainWindow title'
+    Gtk.setWindowTitle mainWindow title'
 
   return (objs, builder)
 
@@ -157,65 +132,69 @@ addSource f = do
   idleAdd PRIORITY_DEFAULT f
 
 
-setStyle :: Screen -> BS.ByteString -> IO ()
+setStyle :: Gdk.Display -> BS.ByteString -> IO ()
 setStyle screen style = do
-  provider <- cssProviderNew
-  cssProviderLoadFromData provider style
-  styleContextAddProviderForScreen screen provider
+  provider <- Gtk.cssProviderNew
+  Gtk.cssProviderLoadFromData provider style
+  Gtk.styleContextAddProviderForDisplay screen provider
     $ fromIntegral STYLE_PROVIDER_PRIORITY_USER
   return ()
 
 addClass :: Gtk.IsWidget a => a -> Text.Text -> IO ()
 addClass w clazz = do
-  context <- widgetGetStyleContext w
-  styleContextAddClass context clazz
+  context <- Gtk.widgetGetStyleContext w
+  Gtk.styleContextAddClass context clazz
 
 removeClass :: Gtk.IsWidget a => a -> Text.Text -> IO ()
 removeClass w clazz = do
-  context <- widgetGetStyleContext w
-  styleContextRemoveClass context clazz
+  context <- Gtk.widgetGetStyleContext w
+  Gtk.styleContextRemoveClass context clazz
 
 getScreenPos :: Gtk.Window -> GHC.Int.Int32
   -> IO (GHC.Int.Int32, GHC.Int.Int32, GHC.Int.Int32)
-getScreenPos window number = do
-  screen <- window `get` #screen
-  display <- screenGetDisplay screen
-  monitor <- fromMaybe (error "Unknown screen")
-    <$> displayGetMonitor display number
-  getMonitorProps monitor
+getScreenPos window number =
+  getMonitorProps =<< getMonitor window number
+
+getDisplay :: Gtk.Window -> IO Gdk.Display
+getDisplay window = do
+  display <- window `Gdk.get` #display :: IO (Maybe Gdk.Display)
+  return $ fromMaybe (error "No display found") display
+
+getMonitor :: Gtk.Window -> GHC.Int.Int32 -> IO Gdk.Monitor
+getMonitor window number = do
+  display <- window `Gdk.get` #display :: IO (Maybe Gdk.Display)
+  monitors <- sequence $ Gdk.displayGetMonitors <$> display :: IO (Maybe Gio.ListModel)
+  monitorObj <- (flip Gio.listModelGetItem) 0 =<<? monitors :: IO (Maybe GI.GObject.Objects.Object)
+  monitor <- sequence $ (Gtk.unsafeCastTo Gdk.Monitor) <$> monitorObj
+  return $ fromMaybe (error "Unknown screen") monitor
 
 getMouseActiveScreenPos :: Gtk.Window -> GHC.Int.Int32
   -> IO (GHC.Int.Int32, GHC.Int.Int32, GHC.Int.Int32)
 getMouseActiveScreenPos window number = do
-  screen <- window `get` #screen
-  display <- screenGetDisplay screen
+  display <- getDisplay window
   mPointerPos <- getPointerPos
   monitor <- case mPointerPos of
-               Just (x, y) -> displayGetMonitorAtPoint display x y
-               Nothing -> fromMaybe (error "Unknown screen")
-                          <$> displayGetMonitor display number
+               Just (surface) -> Gdk.displayGetMonitorAtSurface display surface
+               Nothing -> getMonitor window number
   getMonitorProps monitor
 
-getMonitorProps :: Monitor -> IO (GHC.Int.Int32, GHC.Int.Int32, GHC.Int.Int32)
+getMonitorProps :: Gdk.Monitor -> IO (GHC.Int.Int32, GHC.Int.Int32, GHC.Int.Int32)
 getMonitorProps monitor = do
-  monitorGeometry <- monitorGetGeometry monitor
-  monitorX <- getRectangleX monitorGeometry
-  monitorY <- getRectangleY monitorGeometry
-  monitorWidth <- getRectangleWidth monitorGeometry
-  monitorHeight <- getRectangleHeight monitorGeometry
-  return (monitorX + monitorWidth, monitorY, monitorHeight)
+  geometry <- Gdk.monitorGetGeometry monitor
+  h <- Gdk.getRectangleHeight geometry
+  w <- Gdk.getRectangleWidth geometry
+  x <- Gdk.getRectangleX geometry
+  y <- Gdk.getRectangleY geometry
+  return (x + w, y, h)
 
 
-getPointerPos :: IO (Maybe (Int32, Int32))
+getPointerPos :: IO (Maybe (Gdk.Surface))
 getPointerPos = do
-  mDisplay <- displayGetDefault
-  mSeat <- sequence $ displayGetDefaultSeat <$> mDisplay
-  case mSeat of
-    Just (seat) -> do
-      mPointer <- seatGetPointer seat
-      case mPointer of
-        Just (pointer) -> do
-          (screen, x, y) <- deviceGetPosition pointer
-          return $ Just (x, y)
-        Nothing -> return Nothing
+  mDisplay <- Gdk.displayGetDefault
+  mSeat <- Gdk.displayGetDefaultSeat =<<? mDisplay
+  mPointer <- Gdk.seatGetPointer =<<? mSeat
+  case mPointer of
+    Just (pointer) -> do
+      (msurface, x, y) <- Gdk.deviceGetSurfaceAtPosition pointer
+      return msurface
     Nothing -> return Nothing

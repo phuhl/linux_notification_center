@@ -189,3 +189,8 @@ parseHtmlEntities =
                      _ -> matched
         in a ++ repl ++ (if length c > 0 then parseNamedEntities c else "")
   in parseAsciiEntities . parseNamedEntities
+
+(=<<?) :: (Monad n) =>  (a -> n (Maybe b)) -> Maybe a -> n (Maybe b)
+(=<<?) f Nothing = return Nothing
+(=<<?) f (Just a) = f a
+

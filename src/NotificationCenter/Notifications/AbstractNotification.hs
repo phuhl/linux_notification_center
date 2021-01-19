@@ -26,22 +26,11 @@ import Control.Lens.TH (makeClassy)
 import Control.Lens (view, set)
 import Control.Monad (when)
 
-import GI.Gtk (rangeGetValue, onRangeValueChanged, rangeSetValue, widgetShowAll, widgetHide, windowMove, widgetDestroy
-              , widgetSetValign, widgetSetMarginStart, widgetSetMarginEnd 
-              , widgetSetMarginTop, widgetSetMarginBottom, labelSetText 
-              , labelSetMarkup, widgetSetSizeRequest, labelSetXalign 
-              , widgetGetPreferredHeightForWidth, onWidgetButtonPressEvent
-              , imageSetFromPixbuf, imageSetFromIconName, setWidgetWidthRequest
-              , setImagePixelSize, widgetSetMarginStart, widgetSetMarginEnd
-              , progressBarSetFraction, widgetSetVisible
-              , catchGErrorJustDomain, GErrorMessage(..))
+import qualified GI.Gtk as Gtk
 import GI.GLib (FileError(..))
 import GI.GdkPixbuf (pixbufScaleSimple, pixbufGetHeight, pixbufGetWidth
                     , Pixbuf(..), pixbufNewFromFileAtScale
                     , InterpType(..), PixbufError(..))
-import qualified GI.Gtk as Gtk
-  (Scale, ProgressBar, IsWidget, Box(..), Label(..), Button(..), Window(..), Image(..)
-  , Builder(..), containerAdd, containerRemove, containerGetChildren)
 import GI.Gtk.Enums (Align(..))
 
 data DisplayingNotificationContent = DisplayingNotificationContent
@@ -84,18 +73,18 @@ createNotification config builder noti dispNoti = do
   scale <- scale objs "scale"
 
   -- set margins from config
-  widgetSetMarginTop imgImage
+  Gtk.widgetSetMarginTop imgImage
     (fromIntegral $ configImgMarginTop config)
-  widgetSetMarginBottom imgImage
+  Gtk.widgetSetMarginBottom imgImage
     (fromIntegral $ configImgMarginBottom config)
-  widgetSetMarginStart imgImage
+  Gtk.widgetSetMarginStart imgImage
     (fromIntegral $ configImgMarginLeft config)
-  widgetSetMarginEnd imgImage
+  Gtk.widgetSetMarginEnd imgImage
     (fromIntegral $ configImgMarginRight config)
 
-  onWidgetButtonPressEvent container $ \(_) -> do
-    notiOnAction noti "default" Nothing
-    return False
+  --  Gtk.onWidgetButtonPressEvent container $ \(_) -> do
+  --    notiOnAction noti "default" Nothing
+  --    return False
 
 
   return
@@ -122,17 +111,25 @@ setUrgencyLevel urgency elems = do
   return ()
 
 
+removeChildren :: Gtk.Box -> IO ()
+removeChildren w = do
+  mc <- Gtk.widgetGetFirstChild w
+  case mc of
+    Nothing -> return ()
+    (Just c) -> do Gtk.boxRemove w c
+                   removeChildren w
+
 updateNotiContent :: HasDisplayingNotificationContent dn
   => Config -> Notification -> dn -> IO ()
 updateNotiContent config noti dNoti = do
-  labelSetText (view dLabelTitel dNoti) $ notiSummary noti
+  Gtk.labelSetText (view dLabelTitel dNoti) $ notiSummary noti
   if (configNotiMarkup config) then do
-      labelSetMarkup (view dLabelBody dNoti) $ markupify $ notiBody noti
+      Gtk.labelSetMarkup (view dLabelBody dNoti) $ markupify $ notiBody noti
       else do
-      labelSetText (view dLabelBody dNoti) $ notiBody noti
-  labelSetText (view dLabelAppname dNoti) $ notiAppName noti
-  labelSetXalign (view dLabelTitel dNoti) 0
-  labelSetXalign (view dLabelBody dNoti) 0
+      Gtk.labelSetText (view dLabelBody dNoti) $ notiBody noti
+  Gtk.labelSetText (view dLabelAppname dNoti) $ notiAppName noti
+  Gtk.labelSetXalign (view dLabelTitel dNoti) 0
+  Gtk.labelSetXalign (view dLabelBody dNoti) 0
   let iconSize = 15
       imageSize = 100
   setImage (notiIcon noti) (fromIntegral $ configIconSize config)
@@ -148,33 +145,32 @@ updateNotiContent config noti dNoti = do
                            && (notiPercentage noti == Nothing
                                || a /= "changeValue"))
          $ takeTwo (unpack <$> notiActions noti))
-  currentButtons <- Gtk.containerGetChildren (view dActions dNoti)
-  sequence $ Gtk.containerRemove (view dActions dNoti) <$> currentButtons
-  sequence $ Gtk.containerAdd (view dActions dNoti) <$> actionButton <$> actionButtons
+  removeChildren (view dActions dNoti)
+  sequence $ Gtk.boxAppend (view dActions dNoti) <$> actionButton <$> actionButtons
 
-  widgetShowAll (view dActions dNoti)
+  Gtk.widgetShow (view dActions dNoti)
 
 
   if (notiPercentage noti /= Nothing) then do
     if (onChangeAction == Nothing) then do
-      progressBarSetFraction (view dProgressbar dNoti)
+      Gtk.progressBarSetFraction (view dProgressbar dNoti)
         ((fromMaybe 0 $ notiPercentage noti) / 100.0)
-      widgetSetVisible (view dProgressbar dNoti) True
-      widgetSetVisible (view dScale dNoti) False
+      Gtk.widgetSetVisible (view dProgressbar dNoti) True
+      Gtk.widgetSetVisible (view dScale dNoti) False
       return ()
       else do
-      rangeSetValue (view dScale dNoti)
+      Gtk.rangeSetValue (view dScale dNoti)
         (fromMaybe 0 $ notiPercentage noti)
-      onRangeValueChanged (view dScale dNoti) $ do
-        value <- rangeGetValue (view dScale dNoti)
+      Gtk.onRangeValueChanged (view dScale dNoti) $ do
+        value <- Gtk.rangeGetValue (view dScale dNoti)
         (notiOnAction noti) "changeValue" $ Just $ show value
         return ()
-      widgetSetVisible (view dScale dNoti) True
-      widgetSetVisible (view dProgressbar dNoti) False
+      Gtk.widgetSetVisible (view dScale dNoti) True
+      Gtk.widgetSetVisible (view dProgressbar dNoti) False
       return ()
     else do
-    widgetSetVisible (view dProgressbar dNoti) False
-    widgetSetVisible (view dScale dNoti) False
+    Gtk.widgetSetVisible (view dProgressbar dNoti) False
+    Gtk.widgetSetVisible (view dScale dNoti) False
   return ()
   where  onChangeAction = atMay
            (Prelude.filter (\(a, b) -> a == "changeValue")
@@ -188,27 +184,27 @@ setImage :: Image -> Int32 -> Gtk.Image -> IO ()
 setImage image imageSize widget = do
   case image of
     NoImage -> do
-      widgetSetMarginStart widget 0
-      widgetSetMarginEnd widget 0
+      Gtk.widgetSetMarginStart widget 0
+      Gtk.widgetSetMarginEnd widget 0
     (ImagePath path) -> do
-      pb <- catchGErrorJustDomain
-            (catchGErrorJustDomain
+      pb <- Gtk.catchGErrorJustDomain
+            (Gtk.catchGErrorJustDomain
              (Just <$> pixbufNewFromFileAtScale path imageSize imageSize True)
              ((\err message -> return Nothing)
-              :: PixbufError -> GErrorMessage -> IO (Maybe Pixbuf)))
+              :: PixbufError -> Gtk.GErrorMessage -> IO (Maybe Pixbuf)))
             ((\err message -> return Nothing)
-              :: FileError -> GErrorMessage -> IO (Maybe Pixbuf))
+              :: FileError -> Gtk.GErrorMessage -> IO (Maybe Pixbuf))
       case pb of
-        (Just pb') -> imageSetFromPixbuf widget (Just pb')
+        (Just pb') -> Gtk.imageSetFromPixbuf widget (Just pb')
         Nothing -> return ()
     (NamedIcon name) -> do
-      imageSetFromIconName widget
-        (Just $ pack name) imageSize
-      setImagePixelSize widget imageSize
+      Gtk.imageSetFromIconName widget
+        (Just $ pack name)
+      Gtk.setImagePixelSize widget imageSize
     (RawImg a) -> do
       pb <- rawImgToPixBuf $ RawImg a
       pb' <- scalePixbuf imageSize imageSize pb
-      imageSetFromPixbuf widget pb'
+      Gtk.imageSetFromPixbuf widget pb'
 
 
 scalePixbuf :: Int32 -> Int32 -> Pixbuf -> IO (Maybe Pixbuf)

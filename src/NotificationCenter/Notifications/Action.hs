@@ -8,33 +8,10 @@ module NotificationCenter.Notifications.Action
 import Config (Config(..))
 import TransparentWindow
 
-import GI.Gtk
-       (widgetSetHalign, widgetSetHexpand, buttonNew, setWidgetMargin
-       , buttonSetRelief, widgetSetSizeRequest, widgetShowAll, widgetShow
-       , widgetHide, onWidgetDestroy
-       , windowSetDefaultSize, setWindowTitle, boxPackStart, boxNew
-       , setWindowWindowPosition, WindowPosition(..), windowMove
-       , frameSetShadowType, aspectFrameNew
-       , widgetGetAllocatedHeight, widgetGetAllocatedWidth, onWidgetDraw
-       , onWidgetLeaveNotifyEvent, onWidgetMotionNotifyEvent
-       , widgetAddEvents, alignmentSetPadding, alignmentNew, rangeSetValue
-       , scaleSetDigits, scaleSetValuePos, rangeGetValue
-       , afterScaleButtonValueChanged, scaleNewWithRange, containerAdd
-       , buttonBoxNew, mainQuit, onButtonActivate
-       , toggleButtonGetActive, onToggleButtonToggled, buttonSetUseStock
-       , toggleButtonNewWithLabel, onButtonClicked
-       , buttonNewWithLabel, widgetQueueDraw, drawingAreaNew
-       , windowNew, widgetDestroy, dialogRun, setAboutDialogComments
-       , setAboutDialogAuthors, setAboutDialogVersion
-       , setAboutDialogProgramName, aboutDialogNew, labelNew, get
-       , afterWindowSetFocus, labelSetText
-       , onWidgetFocusOutEvent, onWidgetKeyReleaseEvent, widgetGetParentWindow
-       , onButtonClicked, windowGetScreen, boxNew, widgetSetValign
-       , imageNewFromIconName)
+import qualified GI.Gtk as Gtk
 import GI.Gtk.Enums
-       (Orientation(..), PositionType(..), ReliefStyle(..), Align(..), IconSize(..))
+       (Orientation(..), PositionType(..), Align(..), IconSize(..))
 
-import qualified GI.Gtk as Gtk (containerAdd, Box(..), Label(..), Button(..))
 import qualified Data.Text as Text
 import System.Process (runCommand)
 
@@ -47,27 +24,30 @@ data Action = Action
 
 createAction :: Config -> Bool -> (String -> Maybe String -> IO ()) -> Int -> Int -> String -> String -> IO Action
 createAction config useIcons onAction width height command description = do
-  button <- buttonNew
-  widgetSetSizeRequest button (fromIntegral width) (fromIntegral height)
+  button <- Gtk.buttonNew
+  Gtk.widgetSetSizeRequest button (fromIntegral width) (fromIntegral height)
   addClass button "userbutton"
   addClass button "deadd-noti-center"
-  buttonSetRelief button ReliefStyleNone
-  setWidgetMargin button $ fromIntegral $ configButtonMargin config
+  Gtk.buttonSetHasFrame button False
+  Gtk.setWidgetMarginTop button $ fromIntegral $ configButtonMargin config
+  Gtk.setWidgetMarginBottom button $ fromIntegral $ configButtonMargin config
+  Gtk.setWidgetMarginStart button $ fromIntegral $ configButtonMargin config
+  Gtk.setWidgetMarginEnd button $ fromIntegral $ configButtonMargin config
 --  widgetSetHalign label AlignStart
 --  widgetSetValign label AlignEnd
 
   let theButton = Action
         { actionButton = button
         , actionCommand = command }
-  onButtonClicked button $ do
+  Gtk.onButtonClicked button $ do
     onAction command Nothing
     return ()
   if useIcons && configActionIcons config then do
-    img <-imageNewFromIconName (Just $ Text.pack description) (fromIntegral $ fromEnum IconSizeButton)
-    Gtk.containerAdd button img
+    img <- Gtk.imageNewFromIconName (Just $ Text.pack description)
+    Gtk.buttonSetChild button $ Just img
   else do
-    label <- labelNew $ Just $ Text.pack description
+    label <- Gtk.labelNew $ Just $ Text.pack description
     addClass label "userbuttonlabel"
     addClass label "deadd-noti-center"
-    Gtk.containerAdd button label
+    Gtk.buttonSetChild button $ Just label
   return theButton

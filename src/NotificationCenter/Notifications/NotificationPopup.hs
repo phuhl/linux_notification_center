@@ -31,11 +31,8 @@ import Data.Maybe ( fromMaybe, isJust )
 import Control.Monad
 import DBus ( Variant (..) )
 
-import GI.Gdk (getEventButtonButton)
-import GI.Gtk (widgetShow, widgetGetPreferredHeightForWidth, widgetSetSizeRequest
-              , widgetShowAll, onWidgetButtonPressEvent, windowMove
-              , setWidgetWidthRequest, widgetDestroy , labelGetText
-              , labelSetText, labelGetLayout)
+import qualified GI.Gdk as Gdk
+import qualified GI.Gtk as Gtk
 import GI.Pango.Enums (EllipsizeMode(..))
 import GI.Pango.Objects.Layout (layoutGetLinesReadonly, layoutGetLineCount)
 import GI.Pango.Structs.LayoutLine (getLayoutLineLength, getLayoutLineStartIndex)
@@ -84,7 +81,7 @@ showNotificationWindow config noti dispNotis onClose = do
     { _dMainWindow = mainWindow
     , _dLabelBG = labelBG
     , _dNotiId = notiId noti
-    , _dNotiDestroy = widgetDestroy mainWindow
+    , _dNotiDestroy = Gtk.windowDestroy mainWindow
     , _dHasCustomPosition = hasCustomPosition
     , _dpopupContent = DisplayingNotificationContent {} }
 
@@ -93,7 +90,7 @@ showNotificationWindow config noti dispNotis onClose = do
         dispNotiWithoutHeight
       lblBody = (flip view) dispNoti $ dLabelBody
 
-  setWidgetWidthRequest mainWindow $ fromIntegral $ configWidthNoti config
+  Gtk.setWidgetWidthRequest mainWindow $ fromIntegral $ configWidthNoti config
 
   setUrgencyLevel (notiUrgency noti) [mainWindow]
   setUrgencyLevel (notiUrgency noti)
@@ -102,23 +99,23 @@ showNotificationWindow config noti dispNotis onClose = do
   height <- updateNoti' config onClose noti dispNoti
 
   -- Ellipsization of Body
-  numLines <- fromIntegral <$> (layoutGetLineCount =<< labelGetLayout lblBody)
-  let maxLines = (configPopupMaxLinesInBody config) 
+  numLines <- fromIntegral <$> (layoutGetLineCount =<< Gtk.labelGetLayout lblBody)
+  let maxLines = (configPopupMaxLinesInBody config)
       ellipsizeBody = configPopupEllipsizeBody config
   height <-
     if numLines > maxLines && ellipsizeBody then do
-      lines <- layoutGetLinesReadonly =<< labelGetLayout lblBody
+      lines <- layoutGetLinesReadonly =<< Gtk.labelGetLayout lblBody
       let lastLine = lines !! (maxLines - 1)
       len <- fromIntegral <$> getLayoutLineLength lastLine
       startOffset <- fromIntegral <$> getLayoutLineStartIndex lastLine
-      bodyText <- labelGetText lblBody
+      bodyText <- Gtk.labelGetText lblBody
       let lenOfTruncatedBody = len - 4 + startOffset + (maxLines - 1)
       let truncatedBody = Text.take lenOfTruncatedBody $ bodyText
           ellipsizedBody = Text.append truncatedBody "..."
-      labelSetText lblBody ellipsizedBody
+      Gtk.labelSetText lblBody ellipsizedBody
       -- re-request height to reflect ellipsized body
       height' <- getHeight (view dContainer dispNoti) config
-      widgetSetSizeRequest (_dLabelBG dispNoti) (-1) height'
+      Gtk.widgetSetSizeRequest (_dLabelBG dispNoti) (-1) height'
       return height'
     else
       return height
@@ -138,12 +135,12 @@ showNotificationWindow config noti dispNotis onClose = do
                   findBefore hBefores (distanceTop + screenY)
                   height (fromIntegral distanceBetween)
 
-  windowMove mainWindow
+  Gtk.windowMove mainWindow
     (screenW - fromIntegral
      (configWidthNoti config + distanceRight))
     hBefore
 
-  onWidgetButtonPressEvent mainWindow $ \eventButton -> do
+  Gtk.onWidgetButtonPressEvent mainWindow $ \eventButton -> do
     mouseButton <- (\n -> "mouse" ++ n) . show <$> getEventButtonButton eventButton
     let validMouseButtons = ["mouse1", "mouse2", "mouse3", "mouse4", "mouse5"]
         validInput = mouseButton `elem` validMouseButtons

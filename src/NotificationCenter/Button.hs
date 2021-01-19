@@ -9,32 +9,11 @@ module NotificationCenter.Button
 import Config (Config(..))
 import TransparentWindow
 
-import GI.Gtk
-       (widgetSetHalign, widgetSetHexpand, buttonNew, setWidgetMargin
-       , buttonSetRelief, widgetSetSizeRequest, widgetShowAll, widgetShow
-       , widgetHide, onWidgetDestroy
-       , windowSetDefaultSize, setWindowTitle, boxPackStart, boxNew
-       , setWindowWindowPosition, WindowPosition(..), windowMove
-       , frameSetShadowType, aspectFrameNew
-       , widgetGetAllocatedHeight, widgetGetAllocatedWidth, onWidgetDraw
-       , onWidgetLeaveNotifyEvent, onWidgetMotionNotifyEvent
-       , widgetAddEvents, alignmentSetPadding, alignmentNew, rangeSetValue
-       , scaleSetDigits, scaleSetValuePos, rangeGetValue
-       , afterScaleButtonValueChanged, scaleNewWithRange, containerAdd
-       , buttonBoxNew, mainQuit, onButtonActivate
-       , toggleButtonGetActive, onToggleButtonToggled, buttonSetUseStock
-       , toggleButtonNewWithLabel, onButtonClicked
-       , buttonNewWithLabel, widgetQueueDraw, drawingAreaNew
-       , windowNew, widgetDestroy, dialogRun, setAboutDialogComments
-       , setAboutDialogAuthors, setAboutDialogVersion
-       , setAboutDialogProgramName, aboutDialogNew, labelNew, get
-       , afterWindowSetFocus, labelSetText
-       , onWidgetFocusOutEvent, onWidgetKeyReleaseEvent, widgetGetParentWindow
-       , onButtonClicked, windowGetScreen, boxNew, widgetSetValign)
-import GI.Gtk.Enums
-       (Orientation(..), PositionType(..), ReliefStyle(..), Align(..))
+import qualified GI.Gtk as Gtk
 
-import qualified GI.Gtk as Gtk (containerAdd, Box(..), Label(..), Button(..))
+import GI.Gtk.Enums
+       (Orientation(..), PositionType(..), Align(..))
+
 import qualified Data.Text as Text
 import System.Process (runCommand)
 
@@ -49,29 +28,32 @@ data Button = Button
 
 createButton :: Config -> Int -> Int -> String -> String -> IO Button
 createButton config width height command description = do
-  button <- buttonNew
-  label <- labelNew $ Just $ Text.pack description
-  widgetSetSizeRequest button (fromIntegral width) (fromIntegral height)
+  button <- Gtk.buttonNew
+  label <- Gtk.labelNew $ Just $ Text.pack description
+  Gtk.widgetSetSizeRequest button (fromIntegral width) (fromIntegral height)
   addClass button "userbutton"
   addClass button "deadd-noti-center"
-  buttonSetRelief button ReliefStyleNone
-  setWidgetMargin button $ fromIntegral $ configButtonMargin config
-  widgetSetHalign label AlignStart
-  widgetSetValign label AlignEnd
-  addClass label "userbuttonlabel"
-  addClass label "deadd-noti-center"
+  Gtk.buttonSetHasFrame button False
+  Gtk.setWidgetMarginTop button $ fromIntegral $ configButtonMargin config
+  Gtk.setWidgetMarginBottom button $ fromIntegral $ configButtonMargin config
+  Gtk.setWidgetMarginStart button $ fromIntegral $ configButtonMargin config
+  Gtk.setWidgetMarginEnd button $ fromIntegral $ configButtonMargin config
+  Gtk.widgetSetHalign label AlignStart
+  Gtk.widgetSetValign label AlignEnd
+  Gtk.widgetAddCssClass label "userbuttonlabel"
+  Gtk.widgetAddCssClass label "deadd-noti-center"
 
   let theButton = Button
         { buttonButton = button
         , buttonLabel = label
         , buttonCommand = command }
-  onButtonClicked button $ do
+  Gtk.onButtonClicked button $ do
     addSource $ do
       setButtonState2 $ theButton
       return False
     runCommand command
     return ()
-  Gtk.containerAdd button label
+  Gtk.buttonSetChild button $ Just label
   return theButton
 
 setButtonState2 :: Button -> IO ()

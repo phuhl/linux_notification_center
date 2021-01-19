@@ -35,7 +35,6 @@ library
                      , Helpers
   build-depends:       base >= 4.7 && < 5
                      , regex-tdfa
-                     , gtk3 >= 0.15.4
                      , transformers
                      , cairo
                      , haskell-gi
@@ -45,7 +44,7 @@ library
                      , gi-glib >= 2.0.17
                      , gi-gdk
                      , gi-gdkpixbuf
-                     , gi-gtk >= 3.0.19
+                     , gi-gtk >= 4.0.3
                      , gi-gio
                      , time
                      , system-locale
