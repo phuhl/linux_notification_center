@@ -222,11 +222,6 @@ instance FromJSON Config where
   -- configGuessIconFromAppname
     <*> inheritingThirdLevel o "notification" "app-icon" "guess-icon-from-name"
     True
-  -- configNotiCenterMaxLinesInBody
-    <*> inheritingThirdLevel o "notification" "in-center" "max-lines-in-body" 0
-  -- configNotiCenterEllipsizeBody
-    <*> ((/= (0 :: Int)) <$>
-          inheritingThirdLevel o "notification" "in-center" "max-lines-in-body" 0)
   -- configNotiCenterHideOnMouseLeave
     <*> secondLevel o "notification-center" "hide-on-mouse-leave" True
   -- configNotiDefaultTimeout
