@@ -130,12 +130,19 @@ updateNotiContent config noti dNoti = do
       labelSetMarkup (view dLabelBody dNoti) $ markupify $ notiBody noti
       else do
       labelSetText (view dLabelBody dNoti) $ notiBody noti
-  labelSetText (view dLabelAppname dNoti) $ notiAppName noti
+  if notiAppName noti /= "" then
+    labelSetText (view dLabelAppname dNoti) $ notiAppName noti
+    else
+    widgetSetVisible (view dLabelAppname dNoti) False
   labelSetXalign (view dLabelTitel dNoti) 0
   labelSetXalign (view dLabelBody dNoti) 0
 
-  setImage (notiIcon noti) (fromIntegral $ configIconSize config)
+  if notiIcon noti /= NoImage then
+    setImage (notiIcon noti) (fromIntegral $ configIconSize config)
     $ view dImgAppIcon dNoti
+    else
+    widgetSetVisible (view dImgAppIcon dNoti) False
+
   setImage (notiImg noti) (fromIntegral $ notiImgSize noti)
     $ view dImgImage dNoti
 

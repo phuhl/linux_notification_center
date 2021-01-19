@@ -117,7 +117,7 @@ data Image = RawImg
   )
   | ImagePath String
   | NamedIcon String
-  | NoImage deriving Show
+  | NoImage deriving (Show, Eq)
 
 parseImageString :: Text.Text -> Image
 parseImageString a = if (Text.isPrefixOf "file://" a) then
