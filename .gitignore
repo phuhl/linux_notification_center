@@ -13,6 +13,7 @@
 .tern-port
 
 .stack-work/
+.out/
 
 com.ph-uhl.deadd.notification.service
 deadd-notification-center.service
