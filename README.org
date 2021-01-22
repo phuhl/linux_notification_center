@@ -1,4 +1,4 @@
-[[https://github.com/phuhl/linux_notification_center/workflows/CI/badge.svg]]
+[[https://github.com/phuhl/linux_notification_center/workflows/CI/badge.svg?branch=master]]
 
 * Linux Notification Center
 
