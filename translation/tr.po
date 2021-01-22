@@ -13,6 +13,7 @@ msgstr ""
 "Last-Translator: \n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Language: tr\n"
+
 #: Main.hs:0
 msgid "Delete all"
 msgstr "Tümünü sil"
