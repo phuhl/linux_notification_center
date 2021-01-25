@@ -93,10 +93,14 @@ endif
 
 
 install-lang:
+	mkdir -p ${DESTDIR}${PREFIX}/share/locale/bn_BD/LC_MESSAGES
 	mkdir -p ${DESTDIR}${PREFIX}/share/locale/de/LC_MESSAGES
 	mkdir -p ${DESTDIR}${PREFIX}/share/locale/en/LC_MESSAGES
+	mkdir -p ${DESTDIR}${PREFIX}/share/locale/tr/LC_MESSAGES
+	install -Dm644 translation/bn_BD/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/bn_BD/LC_MESSAGES/deadd-notification-center.mo
 	install -Dm644 translation/de/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/de/LC_MESSAGES/deadd-notification-center.mo
 	install -Dm644 translation/en/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/en/LC_MESSAGES/deadd-notification-center.mo
+	install -Dm644 translation/tr/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/tr/LC_MESSAGES/deadd-notification-center.mo
 
 install: install-stack install-service install-lang
 
@@ -105,7 +109,7 @@ uninstall:
 	rm -f ${DESTDIR}${MANPREFIX}/man1/deadd-notification-center.1
 	rm -f ${DESTDIR}${SERVICEDIR_DBUS}/com.ph-uhl.deadd.notification.service
 	rm -f ${DESTDIR}${PREFIX}/share/licenses/deadd-notification-center/LICENSE
-	rm -f ${DESTDIR}${PREFIX}/share/locale/{de,en}/LC_MESSAGES/deadd-notification-center.mo
+	rm -f ${DESTDIR}${PREFIX}/share/locale/{bn_BD,de,en,tr}/LC_MESSAGES/deadd-notification-center.mo
 
 ifneq (0,${SYSTEMD})
 uninstall: uninstall-service-systemd
