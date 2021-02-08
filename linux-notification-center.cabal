@@ -38,6 +38,7 @@ library
                      , gtk3 >= 0.15.4
                      , transformers
                      , cairo
+                     , filepath
                      , haskell-gi
                      , haskell-gi-base
                      , gi-cairo
