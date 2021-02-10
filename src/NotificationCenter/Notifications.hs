@@ -34,6 +34,7 @@ import DBus.Client
        , defaultInterface, interfaceName, interfaceMethods
        , nameAllowReplacement, nameReplaceExisting, emit)
 import Data.Char (toLower)
+import Data.Foldable (asum)
 import Data.Text (unpack, Text, pack )
 import qualified Data.Text as Text
 import Data.Word ( Word, Word8, Word32 )
@@ -45,6 +46,9 @@ import Data.Time.LocalTime
 import Data.Maybe (fromMaybe)
 
 import System.Locale.Current
+import System.Directory (getXdgDirectory, XdgDirectory(..))
+import System.Environment (getEnv)
+import System.FilePath (splitSearchPath, (</>))
 import System.IO (readFile)
 import System.IO.Error (tryIOError)
 import Data.GI.Base.GError (catchGErrorJust)
@@ -139,12 +143,21 @@ parseTransient hints =
 
 getDesktopFile :: String -> IO (Maybe String)
 getDesktopFile name = do
-  [try1, try2, try3] <- sequence [ getIt "~/.local/share/applications/"
-                                 , getIt "/usr/local/share/applications/"
-                                 , getIt "/usr/share/applications/"]
-  return $ try1 <|> try2 <|> try3
-  where getIt path = eitherToMaybe <$>
-          (tryIOError $ readFile $ path ++ name ++ ".desktop")
+  xdgDesktopFiles         <- getXdgDirectory XdgData "applications"
+  xdgDataDirsDesktopFiles <-
+    getEnv "XDG_DATA_DIRS" >>= return . splitSearchPath >>= return . fmap
+      (</> "applications")
+  let paths = concat
+        [ [ xdgDesktopFiles
+          , "/usr/local/share/applications"
+          , "/usr/share/applications"
+          ]
+        , xdgDataDirsDesktopFiles
+        ]
+  mapM getIt paths >>= return . asum
+ where
+  getIt path =
+    eitherToMaybe <$> (tryIOError $ readFile $ path </> name ++ ".desktop")
 
 getAppIcon :: String -> IO Image
 getAppIcon name = do
