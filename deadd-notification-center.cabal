@@ -35,9 +35,7 @@ library
                      , Helpers
   build-depends:       base >= 4.7 && < 5
                      , regex-tdfa
-                     , gtk3 >= 0.15.4
                      , transformers
-                     , cairo
                      , filepath
                      , haskell-gi
                      , haskell-gi-base

@@ -94,7 +94,6 @@ extra-package-dbs: []
 
 nix:
   packages:
-    - cairo
     - gobject-introspection
     - gtk3
     - libxml2
