@@ -67,7 +67,6 @@ library
                      , tuple
                      , split
                      , setlocale
-                     , hgettext >= 0.1.5
                      , lens
   default-language:    Haskell2010
 

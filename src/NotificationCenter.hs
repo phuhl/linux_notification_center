@@ -18,7 +18,6 @@ import Helpers
 
 import Prelude
 
-import Text.I18N.GetText
 import System.Locale.SetLocale
 import System.IO.Unsafe
 import System.IO (readFile)
@@ -158,7 +157,7 @@ createNotiCenter tState config = do
   deleteButton <- button objs "button_deleteAll"
 
   onButtonClicked deleteButton $ deleteInCenter tState
-  buttonSetLabel deleteButton $ Text.pack $ translate "Delete all"
+  buttonSetLabel deleteButton $ "Delete all"
 
   let buttons = zip
         (split $ removeOuterLetters $ configLabels config)
@@ -405,8 +404,6 @@ main' = do
   homeDir <- getXdgDirectory XdgConfig ""
   config <- getConfig <$> (readConfigFile
                             (homeDir ++ "/deadd/deadd.conf"))
-
-  initI18n
 
   istate <- getInitialState
   notiState <- startNotificationDaemon config
