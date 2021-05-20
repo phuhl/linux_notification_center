@@ -18,7 +18,6 @@ import Helpers
 
 import Prelude
 
-import Text.I18N.GetText
 import System.Locale.SetLocale
 import System.IO.Unsafe
 import System.IO (readFile)
@@ -27,10 +26,12 @@ import Data.Int (Int32(..))
 import Data.Tuple.Sequence (sequenceT)
 import Data.Maybe
 import Data.IORef
+import Data.Gettext
 import Data.List
 import Data.Time
 import Data.Time.LocalTime
 import qualified Data.Text as Text
+import qualified Data.Text.Lazy as LT
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Map as Map
 import Data.Complex
@@ -137,8 +138,8 @@ setWindowStyle tState = do
   setStyle screen $ BS.pack $ style
   return False
 
-createNotiCenter :: TVar State -> Config -> IO ()
-createNotiCenter tState config = do
+createNotiCenter :: TVar State -> Config -> Catalog -> IO ()
+createNotiCenter tState config catalog = do
   (objs, _) <- createTransparentWindow (Text.pack glade)
     [ "main_window"
     , "label_time"
@@ -158,7 +159,7 @@ createNotiCenter tState config = do
   deleteButton <- button objs "button_deleteAll"
 
   onButtonClicked deleteButton $ deleteInCenter tState
-  buttonSetLabel deleteButton $ Text.pack $ translate "Delete all"
+  buttonSetLabel deleteButton $ LT.toStrict $ gettext catalog "Delete all"
 
   let buttons = zip
         (split $ removeOuterLetters $ configLabels config)
@@ -406,7 +407,7 @@ main' = do
   config <- getConfig <$> (readConfigFile
                             (homeDir ++ "/deadd/deadd.conf"))
 
-  initI18n
+  catalog <- getCatalog
 
   istate <- getInitialState
   notiState <- startNotificationDaemon config
@@ -414,7 +415,7 @@ main' = do
 
   atomically $ modifyTVar' istate $
     \istate' -> istate' { stNotiState = notiState }
-  createNotiCenter istate config
+  createNotiCenter istate config catalog
 
   unixSignalAdd PRIORITY_HIGH (fromIntegral sigUSR1)
     (showNotiCenter istate notiState config)

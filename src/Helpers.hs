@@ -5,33 +5,51 @@ module Helpers where
 import qualified Data.ConfigFile as CF
 import qualified Control.Monad.Except as Error
 import Control.Applicative ((<|>))
-import Data.Maybe (fromMaybe)
+import Control.Monad
+import Data.Foldable
 import Data.Functor (fmap)
+import Data.Gettext
+import Data.Maybe (fromMaybe)
 import Text.HTML.TagSoup (Tag(..), renderTags
                          , canonicalizeTags, parseTags, isTagCloseName)
 
 import Text.Regex.TDFA
 import qualified Data.Text as Text
 import Data.Char ( chr )
-import Text.I18N.GetText (textDomain, bindTextDomain, getText)
-import System.Locale.SetLocale (setLocale, Category(LC_ALL))
-import System.IO.Unsafe (unsafePerformIO)
+import System.Directory
 import System.Environment (getExecutablePath)
+import System.FilePath
+import System.Locale.SetLocale
 
-initI18n = do
-  setLocale LC_ALL (Just "")
-  mypath <- getExecutablePath
-  bindTextDomain "deadd-notification-center"
-    (Just ((reverse $ removeFromLastSlash (reverse mypath))
-            ++ "/../share/locale/"))
-  textDomain (Just "deadd-notification-center")
+import Paths_linux_notification_center
 
-removeFromLastSlash :: String -> String
-removeFromLastSlash ('/':as) = as
-removeFromLastSlash (a:as) = removeFromLastSlash as
+-- i18n related functions
+getMoFile = do
+  currentLocale <- fromMaybe "en" <$> setLocale LC_ALL (Just "")
+  let textDomain = "deadd-notification-center"
+  applicationDirectory <- takeDirectory . takeDirectory <$> getExecutablePath
+  let localesDirectory = applicationDirectory </> "share" </> "locale"
+  -- POSIX.1-2017, section 8.2 Internationalization Variables states the format
+  -- is language[_territory][.codeset]. Since there are translations with
+  -- territory specified, search for locales with reducing granularity.
+  let paths =
+        fmap
+          (</> "LC_MESSAGES" </> textDomain <> ".mo")
+          [ localesDirectory </> currentLocale
+          , localesDirectory </> takeWhile (/= '.') currentLocale
+          , localesDirectory </> takeWhile (/= '_') currentLocale
+          ]
+  pathsFromCabal <-
+    mapM getDataFileName $
+      fmap
+        (</> "LC_MESSAGES" </> textDomain <> ".mo")
+        [ "translation" </> currentLocale
+        , "translation" </> takeWhile (/= '.') currentLocale
+        , "translation" </> takeWhile (/= '_') currentLocale
+        ]
+  filterM doesFileExist pathsFromCabal >>= return . head
 
-translate :: String -> String
-translate = unsafePerformIO . getText
+getCatalog = getMoFile >>= loadCatalog
 
 readConfig :: CF.Get_C a => a -> CF.ConfigParser -> String -> String -> a
 readConfig defaultVal conf sec opt = fromEither defaultVal

@@ -15,7 +15,7 @@
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: lts-12.19
+resolver: mysnapshot.yaml
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -39,29 +39,8 @@ packages:
 - '.'
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
-extra-deps: [ ConfigFile-1.1.4
-            , gi-harfbuzz-0.0.3
-            , env-locale-1.0.0.1
-            , gtk3-0.15.4
-            , stm-2.5.0.0
-            , hgettext-0.1.31.0
-            , glib-0.13.8.1
-            , pango-0.13.8.1
-            , gio-0.13.8.0
-            , gi-pango-1.0.23
-            , haskell-gi-0.24.5
-            , haskell-gi-base-0.24.4
-            , gi-glib-2.0.24
-            , gi-cairo-1.0.24
-            , gi-atk-2.0.22
-            , gi-gdk-3.0.23
-            , gi-gdkpixbuf-2.0.24
-            , gi-gio-2.0.27
-            , gi-gobject-2.0.25
-            , gi-gtk-3.0.36
-            , gi-graphene-1.0.2
-            , ansi-terminal-0.11
-            , tagsoup-0.14.7
+extra-deps: [ env-locale-1.0.0.1
+            , haskell-gettext-0.1.2.0
             ]
 
 # Override default flag values for local packages and extra-deps
@@ -90,7 +69,6 @@ extra-package-dbs: []
 
 nix:
     packages:
-      - cairo
       - gobject-introspection
       - gtk3
       - libxml2

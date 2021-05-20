@@ -1,9 +1,10 @@
+cabal-version:       2.4
 name:                linux-notification-center
 version:             1.6.0
 -- synopsis:
 -- description:
 homepage:            https://github.com/phuhl/linux-notification-center#readme
-license:             BSD3
+license:             BSD-3-Clause
 license-file:        LICENSE
 author:              Philipp Uhl
 maintainer:          git@ph-uhl.com
@@ -15,7 +16,10 @@ extra-source-files:  README.org
                    , notification.glade
                    , notification_in_center.glade
                    , style.css
-cabal-version:       >=1.10
+data-files:          translation/bn_BD/LC_MESSAGES/*.mo
+                   , translation/de/LC_MESSAGES/*.mo
+                   , translation/en/LC_MESSAGES/*.mo
+                   , translation/tr/LC_MESSAGES/*.mo
 
 library
   hs-source-dirs:      src
@@ -33,14 +37,15 @@ library
                      , NotificationCenter.Glade
                      , TransparentWindow
                      , Helpers
+  other-modules:       Paths_linux_notification_center
+  autogen-modules:     Paths_linux_notification_center
   build-depends:       base >= 4.7 && < 5
                      , regex-tdfa
-                     , gtk3 >= 0.15.4
                      , transformers
-                     , cairo
                      , filepath
                      , haskell-gi
                      , haskell-gi-base
+                     , haskell-gettext
                      , gi-cairo
                      , gi-pango
                      , gi-glib >= 2.0.17
@@ -67,7 +72,6 @@ library
                      , tuple
                      , split
                      , setlocale
-                     , hgettext >= 0.1.5
                      , lens
   default-language:    Haskell2010
 

@@ -1,0 +1,31 @@
+resolver: lts-17.12
+
+packages:
+- gi-gtk-3.0.37
+- gi-gdk-3.0.24
+- gi-gdkpixbuf-2.0.26
+- gi-gmodule-2.0.1
+- gi-atk-2.0.23
+- gi-cairo-1.0.25
+- gi-gio-2.0.28
+- gi-gobject-2.0.26
+- gi-harfbuzz-0.0.4
+- gi-pango-1.0.24
+- haskell-gi-0.25.0
+- haskell-gi-base-0.25.0
+- gi-glib-2.0.25
+
+drop-packages:
+- gi-gtk
+- gi-gdk
+- gi-gdkpixbuf
+- gi-gmodule
+- gi-atk
+- gi-cairo
+- gi-gio
+- gi-gobject
+- gi-harfbuzz
+- gi-pango
+- haskell-gi
+- haskell-gi-base
+- glib

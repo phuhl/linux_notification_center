@@ -195,11 +195,13 @@ setImage image imageSize widget = do
             (catchGErrorJustDomain
              (Just <$> pixbufNewFromFileAtScale path imageSize imageSize True)
              ((\err message -> return Nothing)
-              :: PixbufError -> GErrorMessage -> IO (Maybe Pixbuf)))
+              :: PixbufError -> GErrorMessage -> IO (Maybe (Maybe Pixbuf))))
             ((\err message -> return Nothing)
-              :: FileError -> GErrorMessage -> IO (Maybe Pixbuf))
+              :: FileError -> GErrorMessage -> IO (Maybe (Maybe Pixbuf)))
       case pb of
-        (Just pb') -> imageSetFromPixbuf widget (Just pb')
+        (Just pb') -> case pb' of
+                        (Just pb'') -> imageSetFromPixbuf widget (Just pb'')
+                        Nothing -> return ()
         Nothing -> return ()
     (NamedIcon name) -> do
       imageSetFromIconName widget
