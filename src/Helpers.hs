@@ -57,6 +57,12 @@ eitherToMaybe :: Either a b -> Maybe b
 eitherToMaybe (Right b) = Just b
 eitherToMaybe _ = Nothing
 
+orElse :: Maybe a -> Maybe a -> Maybe a
+x `orElse` y = case x of
+                 Just _  -> x
+                 Nothing -> y
+
+
 replace a b c = replace' c a b
 replace' :: Eq a => [a] -> [a] -> [a] -> [a]
 replace' [] _ _ = []

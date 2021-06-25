@@ -20,6 +20,9 @@ import qualified Data.Map as Map ( Map )
 import Data.List ( sortOn )
 import DBus ( Variant (..), Signal )
 
+import qualified Data.Yaml as Y
+import Data.Yaml as Y ((.=))
+
 import GI.GdkPixbuf (Pixbuf(..), pixbufNewFromData, Colorspace(..))
 
 data Urgency = Normal | Low | High deriving Eq
@@ -34,6 +37,7 @@ data Notification = Notification
   , notiId :: Int -- ^ Id
   , notiIcon :: Image -- ^ App icon
   , notiImg :: Image -- ^ Image
+  , notiImgSize :: Int -- ^ Image size
   , notiSummary :: Text.Text -- ^ Summary
   , notiBody :: Text.Text -- ^ Body
   , notiActions :: [Text.Text] -- ^ Actions
@@ -53,28 +57,54 @@ data Notification = Notification
     -- ^ Should be called when an action is used
   , notiPercentage :: Maybe Double
     -- ^ The percentage that should be shown in a percentage bar
+  , notiClassName :: Text.Text
+    -- ^ Class name to be attached to the window of the notification
   }
+
+instance Y.ToJSON Notification where
+  toJSON n = Y.object [
+    "appname" .= notiAppName n
+    , "repId" .= notiRepId n
+    , "id" .= notiId n
+    , "icon" .= ((show $ notiIcon n) :: String)
+    , "image" .= ((show $ notiImg n) :: String)
+    , "imageSize" .= notiImgSize n
+    , "title" .= notiSummary n
+    , "body" .= notiBody n
+    , "actions" .= notiActions n
+    , "actionIcons" .= notiActionIcons n
+--    , "notiHints" .= notiHints n
+--    , "notiUrgency" .= ((show $ notiUrgency n) :: String)
+    , "timeout" .= notiTimeout n
+    , "time" .= notiTime n
+    , "transient" .= notiTransient n
+    , "sendClosedMsg" .= notiSendClosedMsg n
+    , "top" .= notiTop n
+    , "right" .= notiRight n
+    , "percentage" .= notiPercentage n ]
 
 instance Show Notification where
   show n = foldl (++) ""
     [ "Notification { \n"
-    , "  notiAppName = " ++ (show $ notiAppName n) ++ ", \n"
-    , "  notiRepId = " ++ (show $ notiRepId n) ++ ", \n" 
-    , "  notiId = " ++ (show $ notiId n) ++ ", \n" 
-    , "  notiIcon = " ++ (show $ notiIcon n) ++ ", \n" 
-    , "  notiImg = " ++ (show $ notiImg n) ++ ", \n" 
-    , "  notiSummary = " ++ (show $ notiSummary n) ++ ", \n" 
-    , "  notiBody = " ++ (show $ notiBody n) ++ ", \n" 
-    , "  notiActions = " ++ (show $ notiActions n) ++ ", \n" 
-    , "  notiActionIcons = " ++ (show $ notiActionIcons n) ++ ", \n" 
-    , "  notiHints = " ++ (show $ notiHints n) ++ ", \n" 
-    , "  notiTimeout = " ++ (show $ notiTimeout n) ++ ", \n" 
-    , "  notiTime = " ++ (show $ notiTime n) ++ ", \n" 
-    , "  notiTransient = " ++ (show $ notiTransient n) ++ ", \n" 
-    , "  notiSendClosedMsg = " ++ (show $ notiSendClosedMsg n) ++ "\n" 
+    , "  notiAppName = " ++ (Text.unpack $ notiAppName n) ++ ", \n"
+    , "  notiRepId = " ++ (show $ notiRepId n) ++ ", \n"
+    , "  notiId = " ++ (show $ notiId n) ++ ", \n"
+    , "  notiIcon = " ++ (show $ notiIcon n) ++ ", \n"
+    , "  notiImg = " ++ (show $ notiImg n) ++ ", \n"
+    , "  notiImgSize = " ++ (show $ notiImgSize n) ++ ", \n"
+    , "  notiSummary = " ++ (Text.unpack $ notiSummary n) ++ ", \n"
+    , "  notiBody = " ++ (Text.unpack $ notiBody n) ++ ", \n"
+    , "  notiActions = " ++ (show $ Text.unpack <$> notiActions n) ++ ", \n"
+    , "  notiActionIcons = " ++ (show $ notiActionIcons n) ++ ", \n"
+    , "  notiHints = " ++ (show $ notiHints n) ++ ", \n"
+    , "  notiTimeout = " ++ (show $ notiTimeout n) ++ ", \n"
+    , "  notiTime = " ++ (Text.unpack $ notiTime n) ++ ", \n"
+    , "  notiTransient = " ++ (show $ notiTransient n) ++ ", \n"
+    , "  notiSendClosedMsg = " ++ (show $ notiSendClosedMsg n) ++ "\n"
     , "  notiTop = " ++ (show $ notiTop n) ++ "\n"
     , "  notiRight = " ++ (show $ notiRight n) ++ "\n"
-    , " } " ]
+    , "  notiPercentage = " ++ (show $ notiPercentage n) ++ "\n"
+    , " }\n" ]
 
 data Image = RawImg
   ( Int32 -- width
@@ -87,7 +117,7 @@ data Image = RawImg
   )
   | ImagePath String
   | NamedIcon String
-  | NoImage deriving Show
+  | NoImage deriving (Show, Eq)
 
 parseImageString :: Text.Text -> Image
 parseImageString a = if (Text.isPrefixOf "file://" a) then
