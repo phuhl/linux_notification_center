@@ -1,3 +1,21 @@
+* Distribution
+
+** Hackage
+
+[[https://svejcar.dev/posts/2020/02/29/uploading-package-to-hackage/][Uploading Package to Hackage]]
+
+#+BEGIN_SRC sh
+cabal check
+stack sdist
+
+# Upload as package candidate: https://hackage.haskell.org/packages/candidates/upload
+
+# Upload
+# Change version in path:
+cabal upload .stack-work/dist/x86_64-linux-tinfo6/Cabal-2.2.0.1/deadd-notification-center-1.7.3.tar.gz
+#+END_SRC
+
+
 * Issues
 ** DONE Sizes configurable (CLOSED)
 :LOGBOOK:
