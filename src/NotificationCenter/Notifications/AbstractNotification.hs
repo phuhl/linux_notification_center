@@ -1,4 +1,3 @@
-{-# LANGUAGE MonoLocalBinds #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE OverloadedLabels #-}
@@ -28,9 +27,9 @@ import Control.Lens (view, set)
 import Control.Monad (when)
 
 import GI.Gtk (rangeGetValue, onRangeValueChanged, rangeSetValue, widgetShowAll, widgetHide, windowMove, widgetDestroy
-              , widgetSetValign, widgetSetMarginStart, widgetSetMarginEnd
-              , widgetSetMarginTop, widgetSetMarginBottom, labelSetText
-              , labelSetMarkup, widgetSetSizeRequest, labelSetXalign
+              , widgetSetValign, widgetSetMarginStart, widgetSetMarginEnd 
+              , widgetSetMarginTop, widgetSetMarginBottom, labelSetText 
+              , labelSetMarkup, widgetSetSizeRequest, labelSetXalign 
               , widgetGetPreferredHeightForWidth, onWidgetButtonPressEvent
               , imageSetFromPixbuf, imageSetFromIconName, setWidgetWidthRequest
               , setImagePixelSize, widgetSetMarginStart, widgetSetMarginEnd
@@ -194,7 +193,7 @@ setImage image imageSize widget = do
     (ImagePath path) -> do
       pb <- catchGErrorJustDomain
             (catchGErrorJustDomain
-             (pixbufNewFromFileAtScale path imageSize imageSize True)
+             (Just <$> pixbufNewFromFileAtScale path imageSize imageSize True)
              ((\err message -> return Nothing)
               :: PixbufError -> GErrorMessage -> IO (Maybe Pixbuf)))
             ((\err message -> return Nothing)
