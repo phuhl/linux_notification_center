@@ -16,6 +16,10 @@ extra-source-files:  README.org
                    , notification.glade
                    , notification_in_center.glade
                    , style.css
+data-files:          translation/bn_BD/LC_MESSAGES/*.mo
+                   , translation/de/LC_MESSAGES/*.mo
+                   , translation/en/LC_MESSAGES/*.mo
+                   , translation/tr/LC_MESSAGES/*.mo
 
 library
   hs-source-dirs:      src
@@ -33,12 +37,15 @@ library
                      , NotificationCenter.Glade
                      , TransparentWindow
                      , Helpers
+  other-modules:       Paths_deadd_notification_center
+  autogen-modules:     Paths_deadd_notification_center
   build-depends:       base >= 4.7 && < 5
                      , regex-tdfa
                      , transformers
                      , filepath
                      , haskell-gi
                      , haskell-gi-base
+                     , haskell-gettext
                      , gi-cairo
                      , gi-pango
                      , gi-glib >= 2.0.17

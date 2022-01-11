@@ -43,6 +43,7 @@ extra-deps:
   [
     ConfigFile-1.1.4,
     env-locale-1.0.0.1,
+    haskell-gettext-0.1.2.0,
     MissingH-1.4.3.0,
     random-1.1,
   ]

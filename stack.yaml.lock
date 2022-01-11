@@ -19,6 +19,13 @@ packages:
   original:
     hackage: env-locale-1.0.0.1
 - completed:
+    hackage: haskell-gettext-0.1.2.0@sha256:e16fc0521aa6cd53febb7916b178c43afcc7ea7c93cb70818f4ded6cc3cdad98,2930
+    pantry-tree:
+      size: 579
+      sha256: a9a2f74cc9c969be0a5e84fd39190358d9de451d97bc995d3379bcb0b627067a
+  original:
+    hackage: haskell-gettext-0.1.2.0
+- completed:
     hackage: MissingH-1.4.3.0@sha256:32f9892ec98cd21df4f4d3ed8d95a3831ae74287ea0641d6f09b2dc6ef061d39,4859
     pantry-tree:
       size: 5271
