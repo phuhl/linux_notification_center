@@ -15,7 +15,7 @@
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: lts-12.19
+resolver: lts-18.21
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -42,30 +42,9 @@ packages:
 extra-deps:
   [
     ConfigFile-1.1.4,
-    gi-harfbuzz-0.0.5,
     env-locale-1.0.0.1,
-    gtk3-0.15.4,
-    stm-2.5.0.0,
-    hgettext-0.1.31.0,
-    glib-0.13.8.1,
-    pango-0.13.8.1,
-    gio-0.13.8.0,
-    gi-pango-1.0.25,
-    haskell-gi-0.26.0,
-    haskell-gi-base-0.26.0,
-    gi-glib-2.0.26,
-    gi-cairo-1.0.26,
-    gi-atk-2.0.24,
-    gi-gdk-3.0.25,
-    gi-gdkpixbuf-2.0.28,
-    gi-gio-2.0.29,
-    gi-gobject-2.0.27,
-    gi-gtk-3.0.38,
-    gi-graphene-1.0.3,
-    gi-gmodule-2.0.2,
-    ansi-terminal-0.11,
-    tagsoup-0.14.7,
-    gtk2hs-buildtools-0.13.8.2,
+    MissingH-1.4.3.0,
+    random-1.1,
   ]
 
 # Override default flag values for local packages and extra-deps

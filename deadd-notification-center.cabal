@@ -1,9 +1,10 @@
+cabal-version:       2.4
 name:                deadd-notification-center
 version:             1.7.3
 synopsis:            A notification daemon and center
 description:         A customizable notification center for linux. Notifications are recieved via DBUS (like any notification daemon) and shown in the upper right corner of the screen. A notification center can be shown, that displays the last notifications and optionally some user defined buttons. The notification center supports true transparancy.
 homepage:            https://github.com/phuhl/linux-notification-center#readme
-license:             BSD3
+license:             BSD-3-Clause
 license-file:        LICENSE
 author:              Philipp Uhl
 maintainer:          git@ph-uhl.com
@@ -15,7 +16,6 @@ extra-source-files:  README.org
                    , notification.glade
                    , notification_in_center.glade
                    , style.css
-cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
