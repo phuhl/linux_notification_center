@@ -50,7 +50,7 @@ library
                      , gi-pango
                      , gi-glib >= 2.0.17
                      , gi-gdk
-                     , gi-gdkpixbuf
+                     , gi-gdkpixbuf >= 2.0.26
                      , gi-gtk >= 3.0.19
                      , gi-gio
                      , time
