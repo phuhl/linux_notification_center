@@ -79,12 +79,6 @@ import GI.GLib (idleSourceNew, sourceSetCallback, sourceAttach
                , sourceUnref, idleAdd, )
 import GI.GLib.Constants
 import GI.Cairo ()
-import Graphics.Rendering.Cairo
-       (fill, restore, save, stroke, arc, setDash, setLineWidth, rotate
-       , rectangle, setSourceRGBA, setSourceRGB, newPath, translate
-       , lineTo, moveTo, Render)
-import Graphics.Rendering.Cairo.Types (Cairo(..))
-import Graphics.Rendering.Cairo.Internal (Render(..))
 import Foreign.Ptr (castPtr)
 import qualified GHC.Int (Int32(..))
 
@@ -121,16 +115,11 @@ getScreenProportions window = do
   w <- screenGetWidth screen
   return (h, w)
 
-createTransparentWindow :: Text.Text -> [Text.Text] -> Maybe Text.Text
+createTransparentWindow :: Text.Text -- ^ Content of glade-file
+                        -> [Text.Text] -- ^ List of widgets that should be returned, listed by name
+                        -> Maybe Text.Text -- ^ Optional, title of the window
                         -> IO (ObjDict, Gtk.Builder)
-createTransparentWindow
-  glade
--- ^ Content of glade-file
-  objsToGet
--- ^ List of widgets that should be returned, listed by name
-  title
--- ^ Optional, title of the window
-  = do
+createTransparentWindow glade objsToGet title = do
   builder <- Gtk.builderNew
   Gtk.builderAddFromString builder glade (-1)
   let objsToGet' = objsToGet ++
