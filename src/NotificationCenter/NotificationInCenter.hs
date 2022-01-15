@@ -57,41 +57,45 @@ showNotification :: Config -> Gtk.Box -> DisplayingNotificationInCenter
                  -> IO DisplayingNotificationInCenter
 showNotification config mainBox dNoti tNState closeNotification = do
   nState <- readTVarIO tNState
-  let (Just noti) = find (\n -> notiId n == _dNotiId dNoti)
+  let mnoti = find (\n -> notiId n == _dNotiId dNoti)
         $ notiStList nState
+  apply mnoti
 
-  builder <- Gtk.builderNew
-  Gtk.builderAddFromString builder (Text.pack glade) (-1)
-  objs <- getObjs builder
-    [ "label_time"
-    , "button_close" ]
+  where apply Nothing     = do
+          print "Just noti fail"
+          return dNoti
+        apply (Just noti) = do
+          builder <- Gtk.builderNew
+          Gtk.builderAddFromString builder (Text.pack glade) (-1)
+          objs <- getObjs builder
+            [ "label_time"
+            , "button_close" ]
 
-  labelTime <- label objs "label_time"
-  buttonClose <- button objs "button_close"
+          labelTime <- label objs "label_time"
+          buttonClose <- button objs "button_close"
 
-  dispNotiWithoutDestroy <- createNotification config builder noti
-    $ dNoti { _dButtonClose = buttonClose
-            , _dLabelTime = labelTime
-            , _dpopupContent = DisplayingNotificationContent {} }
+          dispNotiWithoutDestroy <- createNotification config builder noti
+            $ dNoti { _dButtonClose = buttonClose
+                    , _dLabelTime = labelTime
+                    , _dpopupContent = DisplayingNotificationContent {} }
 
-  let dispNoti = set dNotiDestroy
-        (Gtk.widgetDestroy (view dContainer dispNoti)) dispNotiWithoutDestroy
-      lblBody = (flip view) dispNoti $ dLabelBody
+          let dispNoti = set dNotiDestroy
+                (Gtk.widgetDestroy (view dContainer dispNoti)) dispNotiWithoutDestroy
+              lblBody = (flip view) dispNoti $ dLabelBody
 
-  setUrgencyLevel (notiUrgency noti) [view dContainer dispNoti]
-  setUrgencyLevel (notiUrgency noti)
-    $ (flip view) dispNoti
-    <$> [dLabelTitel, dLabelBody, dLabelAppname, dLabelTime]
+          setUrgencyLevel (notiUrgency noti) [view dContainer dispNoti]
+          setUrgencyLevel (notiUrgency noti)
+            $ (flip view) dispNoti
+            <$> [dLabelTitel, dLabelBody, dLabelAppname, dLabelTime]
 
-  Gtk.containerAdd mainBox (view dContainer dispNoti)
-  updateNoti config mainBox dispNoti tNState
+          Gtk.containerAdd mainBox (view dContainer dispNoti)
+          updateNoti config mainBox dispNoti tNState
 
-  Gtk.onButtonClicked buttonClose $ do
-    closeNotification dispNoti
+          Gtk.onButtonClicked buttonClose $ do
+            closeNotification dispNoti
 
-  Gtk.widgetShowAll (view dContainer dispNoti)
-  return dispNoti
-
+          Gtk.widgetShowAll (view dContainer dispNoti)
+          return dispNoti
 
 updateNoti :: Config -> Gtk.Box
   -> DisplayingNotificationInCenter -> TVar NotifyState -> IO ()
