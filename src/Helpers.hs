@@ -47,7 +47,7 @@ getMoFile = do
         , "translation" </> takeWhile (/= '.') currentLocale
         , "translation" </> takeWhile (/= '_') currentLocale
         ]
-  filterM doesFileExist pathsFromCabal >>= return . head
+  filterM doesFileExist (pathsFromCabal ++ paths) >>= return . head
 
 getCatalog = getMoFile >>= loadCatalog
 
