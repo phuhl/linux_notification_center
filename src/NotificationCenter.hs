@@ -37,13 +37,14 @@ import qualified Data.Map as Map
 import Data.Complex
 import Data.Monoid ((<>))
 
-import Control.Monad
 import Control.Applicative
+import Control.Exception (finally)
 import Control.Concurrent (forkIO, threadDelay, ThreadId(..))
 import Control.Concurrent.STM
   ( readTVarIO, modifyTVar', TVar(..), atomically, newTVarIO )
+import Control.Monad
 
-import System.Process (runCommand)
+import System.Process (spawnCommand, interruptProcessGroupOf, waitForProcess)
 import System.Locale.Current
 import System.Posix.Signals (sigUSR1)
 import System.Posix.Daemonize (serviced, daemonize)
@@ -420,7 +421,8 @@ main' = do
   unixSignalAdd PRIORITY_HIGH (fromIntegral sigUSR1)
     (showNotiCenter istate notiState config)
 
-  runCommand $ configStartupCommand config
+  ph <- spawnCommand $ configStartupCommand config
+  waitForProcess ph `finally` interruptProcessGroupOf ph
 
   GI.main
 
