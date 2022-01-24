@@ -9,6 +9,8 @@ module NotificationCenter.Button
 import Config (Config(..))
 import TransparentWindow
 
+import Control.Exception (finally)
+
 import GI.Gtk
        (widgetSetHalign, widgetSetHexpand, buttonNew, setWidgetMargin
        , buttonSetRelief, widgetSetSizeRequest, widgetShowAll, widgetShow
@@ -36,7 +38,7 @@ import GI.Gtk.Enums
 
 import qualified GI.Gtk as Gtk (containerAdd, Box(..), Label(..), Button(..))
 import qualified Data.Text as Text
-import System.Process (runCommand)
+import System.Process (spawnCommand, interruptProcessGroupOf, waitForProcess)
 
 data Button = Button
   { buttonButton :: Gtk.Button
@@ -69,7 +71,8 @@ createButton config width height command description = do
     addSource $ do
       setButtonState2 $ theButton
       return False
-    runCommand command
+    ph <- spawnCommand command
+    waitForProcess ph `finally` interruptProcessGroupOf ph
     return ()
   Gtk.containerAdd button label
   return theButton

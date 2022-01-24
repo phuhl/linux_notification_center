@@ -36,7 +36,6 @@ import GI.Gtk.Enums
 
 import qualified GI.Gtk as Gtk (containerAdd, Box(..), Label(..), Button(..))
 import qualified Data.Text as Text
-import System.Process (runCommand)
 
 data Action = Action
   { actionButton :: Gtk.Button
