@@ -145,9 +145,9 @@ isPrefix (a:pf) (b:s) = a == b && isPrefix pf s
 isPrefix [] _ = True
 isPrefix _ _ = False
 
-removeOuterLetters (a:as) = reverse $ tail $ reverse as
 removeOuterLetters [] = []
-
+removeOuterLetters [x] = []
+removeOuterLetters (x:xs) = init xs
 
 splitEvery :: Int -> [a] -> [[a]]
 splitEvery _ [] = []
