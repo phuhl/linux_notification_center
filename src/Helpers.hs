@@ -7,9 +7,9 @@ import qualified Control.Monad.Except as Error
 import Control.Applicative ((<|>))
 import Control.Monad
 import Data.Foldable
-import Data.Functor (fmap)
+import Data.Functor ( fmap, (<&>) )
 import Data.Gettext
-import Data.Maybe (fromMaybe)
+import Data.Maybe ( fromMaybe, listToMaybe )
 import Text.HTML.TagSoup (Tag(..), renderTags
                          , canonicalizeTags, parseTags, isTagCloseName)
 
@@ -17,39 +17,72 @@ import Text.Regex.TDFA
 import qualified Data.Text as Text
 import Data.Char ( chr )
 import System.Directory
-import System.Environment (getExecutablePath)
+import System.Environment ( getExecutablePath )
+import System.Exit ( die )
 import System.FilePath
 import System.Locale.SetLocale
 
 import Paths_deadd_notification_center
 
--- i18n related functions
+i18nInit :: IO Catalog
+i18nInit = do
+  mo <- getMoFile
+  case mo of
+    Just mo -> loadCatalog mo
+    Nothing -> die "Unable to set up localization."
+
+getMoFile :: IO (Maybe FilePath)
 getMoFile = do
-  currentLocale <- fromMaybe "en" <$> setLocale LC_ALL (Just "")
-  let textDomain = "deadd-notification-center"
+  currentLocale        <- fromMaybe "en" <$> setLocale LC_ALL (Just "")
+
+  -- Find location of folder holding translations installed by the Makefile.
   applicationDirectory <- takeDirectory . takeDirectory <$> getExecutablePath
   let localesDirectory = applicationDirectory </> "share" </> "locale"
+
+  -- Create a list of paths to search for translations.
+  possiblePaths <- generateCabalAndMakefilePaths localesDirectory currentLocale
+
+  -- Verify a path exists for the currentLocale if not, warn and use English.
+  -- If English does not exist, return Nothing
+  verifiedPath  <- findExistingPath possiblePaths
+  case verifiedPath of
+    Just p  -> return $ Just p
+    Nothing -> do
+      putStrLn $ unlines
+        [ "No existing translations for " ++ currentLocale ++ "."
+        , "Consider contributing your language."
+        , "https://github.com/phuhl/linux_notification_center/tree/master/translation"
+        , "Trying English instead..."
+        ]
+      enPossiblePaths <- generateCabalAndMakefilePaths localesDirectory "en"
+      enVerifiedPath  <- findExistingPath enPossiblePaths
+      case enVerifiedPath of
+        Just p  -> return $ Just p
+        Nothing -> do
+          putStrLn "Could not find English locale."
+          return Nothing
+ where
+  -- Returns the first existing path to the mo file, if none exist, returns Nothing.
+  findExistingPath :: [FilePath] -> IO (Maybe FilePath)
+  findExistingPath p = filterM doesFileExist p <&> listToMaybe
+  -- Generate a list of possible locale paths from Cabal and the Makefile.
+  generateCabalAndMakefilePaths :: FilePath -> String -> IO [FilePath]
+  generateCabalAndMakefilePaths localesDirectory locale = do
+    let pathsFromMakefile = generatePossiblePaths localesDirectory locale
+    pathsFromCabal <- mapM getDataFileName
+                           (generatePossiblePaths "translation" locale)
+    return $ pathsFromCabal ++ pathsFromMakefile
   -- POSIX.1-2017, section 8.2 Internationalization Variables states the format
   -- is language[_territory][.codeset]. Since there are translations with
   -- territory specified, search for locales with reducing granularity.
-  let paths =
-        fmap
-          (</> "LC_MESSAGES" </> textDomain <> ".mo")
-          [ localesDirectory </> currentLocale
-          , localesDirectory </> takeWhile (/= '.') currentLocale
-          , localesDirectory </> takeWhile (/= '_') currentLocale
-          ]
-  pathsFromCabal <-
-    mapM getDataFileName $
-      fmap
-        (</> "LC_MESSAGES" </> textDomain <> ".mo")
-        [ "translation" </> currentLocale
-        , "translation" </> takeWhile (/= '.') currentLocale
-        , "translation" </> takeWhile (/= '_') currentLocale
-        ]
-  filterM doesFileExist (pathsFromCabal ++ paths) >>= return . head
-
-getCatalog = getMoFile >>= loadCatalog
+  generatePossiblePaths :: FilePath -> String -> [FilePath]
+  generatePossiblePaths localesDirectory locale = fmap
+    (</> "LC_MESSAGES" </> textDomain <> ".mo")
+    [ localesDirectory </> locale
+    , localesDirectory </> takeWhile (/= '.') locale
+    , localesDirectory </> takeWhile (/= '_') locale
+    ]
+    where textDomain = "deadd-notification-center"
 
 readConfig :: CF.Get_C a => a -> CF.ConfigParser -> String -> String -> a
 readConfig defaultVal conf sec opt = fromEither defaultVal

@@ -408,7 +408,7 @@ main' = do
   config <- getConfig <$> (readConfigFile
                             (homeDir ++ "/deadd/deadd.conf"))
 
-  catalog <- getCatalog
+  catalog <- i18nInit
 
   istate <- getInitialState
   notiState <- startNotificationDaemon config
