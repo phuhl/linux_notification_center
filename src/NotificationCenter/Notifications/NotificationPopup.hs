@@ -21,7 +21,7 @@ import NotificationCenter.Notifications.Notification.Glade (glade)
 import Control.Lens.TH (makeClassy)
 import Control.Lens (view, set)
 
-import Data.Text as Text
+import Data.Text as Text hiding (elem)
 import Data.Word ( Word32 )
 import Data.Int ( Int32 )
 import qualified Data.Map as Map ( Map )
