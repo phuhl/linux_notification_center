@@ -5,43 +5,22 @@
 
 packages:
 - completed:
-    hackage: ConfigFile-1.1.4@sha256:ca56261e1deae6ef958a337b03812987bfd94ab37b047e27f262bc3137813165,2056
     pantry-tree:
-      size: 1016
-      sha256: 58c2dbae1878d8f5bcac2848712ccfe90391bb1e6b719f43d044ead6c496f748
-  original:
-    hackage: ConfigFile-1.1.4
-- completed:
-    hackage: env-locale-1.0.0.1@sha256:aedab9b7bbed9f523f9821771b4c67d64f34a00be2be60de1d25b1a97278d475,894
-    pantry-tree:
-      size: 271
       sha256: 091cde93ceb962d18f21ec926436dc03bab61137db9eae9841f6c75725e09e5f
+      size: 271
+    hackage: env-locale-1.0.0.1@sha256:aedab9b7bbed9f523f9821771b4c67d64f34a00be2be60de1d25b1a97278d475,894
   original:
     hackage: env-locale-1.0.0.1
 - completed:
-    hackage: haskell-gettext-0.1.2.0@sha256:e16fc0521aa6cd53febb7916b178c43afcc7ea7c93cb70818f4ded6cc3cdad98,2930
     pantry-tree:
-      size: 579
       sha256: a9a2f74cc9c969be0a5e84fd39190358d9de451d97bc995d3379bcb0b627067a
+      size: 579
+    hackage: haskell-gettext-0.1.2.0@sha256:e16fc0521aa6cd53febb7916b178c43afcc7ea7c93cb70818f4ded6cc3cdad98,2930
   original:
     hackage: haskell-gettext-0.1.2.0
-- completed:
-    hackage: MissingH-1.4.3.0@sha256:32f9892ec98cd21df4f4d3ed8d95a3831ae74287ea0641d6f09b2dc6ef061d39,4859
-    pantry-tree:
-      size: 5271
-      sha256: 6cd6a7213615d72a7db3234c7fcd4346ceb4889bc8fb14b302b5878768018fcd
-  original:
-    hackage: MissingH-1.4.3.0
-- completed:
-    hackage: random-1.1@sha256:7b67624fd76ddf97c206de0801dc7e888097e9d572974be9b9ea6551d76965df,1777
-    pantry-tree:
-      size: 637
-      sha256: 14a1b01728c5584e87c9fa00746a66e28ffd89dd2c0eabd334c8463953496e1b
-  original:
-    hackage: random-1.1
 snapshots:
 - completed:
-    size: 586110
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/18/21.yaml
-    sha256: ce4fb8d44f3c6c6032060a02e0ebb1bd29937c9a70101c1517b92a87d9515160
-  original: lts-18.21
+    sha256: d4ee004c46ba878d2f304f5d748d493057be579192a8d148527f3ba55c9df57f
+    size: 618683
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/19/4.yaml
+  original: lts-19.4
