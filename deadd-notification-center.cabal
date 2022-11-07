@@ -47,7 +47,7 @@ library
                      , haskell-gi-base
                      , haskell-gettext
                      , gi-cairo
-                     , gi-pango
+                     , gi-pango >= 1.0.26
                      , gi-glib >= 2.0.17
                      , gi-gdk
                      , gi-gdkpixbuf >= 2.0.26
