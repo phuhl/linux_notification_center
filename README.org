@@ -6,6 +6,113 @@ A haskell-written notification center for users that like a desktop with style..
 
 Take part in the discussion on our [[https://github.com/phuhl/linux_notification_center/discussions][discussion board]]!
 
+#+BEGIN_EXAMPLE
+
+
+
+          ▙              █  █ ████████████  ███▙                  █   ▄██████▄
+          ███▄           █  █ ████        █  ███▙                █    ████    ██
+          ▜█████▄        █  █ ████         █  ███▙              █   █  ████    ▜█
+            ▜██████▄     █  █ ████          █  ███▙      ▙     █     █  ████
+          █▄   ▜██████▄  █  █ ████████████   █  ███▙    ██▙   █       █  ████
+          █ ▜█▄   ▜█████▄█  █ ████            █  ███▙   ███▙ █         █  ████
+          █    ▜█▄   ▜████  █ ████             █  ███▙█  ████           █  ████
+          █       ▜█▄   ▜█  █ ████              █  ███ █  ██       █▙    █  ████
+          █          ▜█▄    █ ████               █  █   █           █▙    █  ████
+          █             ▜▄  █ ████████████        █      █           ▜████▛  ██▛
+
+
+    ▄▇▇▀▀▀▀█▌        ▄▄▄▄▄▀▀██▇█▄▄▀▀▀▀▀    ▄▄▄▄▄▄      ▄▄█▇██▀▀▄▄▄▄▄        ▐█▀▀▀▀▇▇▄
+   ▐██▌   ▀▀    ▄▄▄████████▄▄█▀        ▄█████▀▀▀███▄      ▀█▄▄████████▄▄▄    ▀▀   ▐██▌
+   ████▄  ▄▄▄██████████▀▀   ▀▀▀█▄     ▇████▀    ▀▀██▌   ▄█▀▀▀   ▀▀██████████▄▄▄  ▄████
+    ▀███████████████▀▀         ▐█▌   ██████    ▄ ▐███  ▐█▌         ▀▀███████████████▀
+       ▀▀▀▀██████▀             ▀▀   ▐██▐▇▇     ▀▀▀▀      ▀▀             ▀██████▀▀▀▀
+       ▄▄██████▀                     ██ ██▌         ▄                     ▀██████▄▄
+     ▄███████▀                      █▀██ ▀█▄▄      ▄▄                       ▀███████▄
+    ▄███████                          ▀██▄▄█████████▀                         ███████▄
+    ██████                               ▀▀█████▀▀▀                            ███████
+    ▐████▌                                                                      ▐████▌
+     ███▄▄▄▄▄▌                                                             ▐▄▄▄▄▄███
+      ▀▀▀▀▀▀                                                                 ▀▀▀▀▀▀
+
+
+                                      ╒══════╕
+                                  NEW │ 2023 │ Update:
+                                      ╘══════╛
+
+
+                          For all users of the non-git packages:
+                                  ¨¨¨¨¨        ¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
+
+       Customize all CSS might [probably will] brake your current styling settings.
+             (more information on this in the file updateyourconfig2021.org)
+
+
+                                     New config style
+                                     ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+                  █▀▄ █▀▄ █▀█ █ █ ▀█▀ █▀█ █▀▀   █▀▀ █ █ █▀█ █▀█ █▀▀ █▀▀
+                  █▀▄ █▀▄ █▀█ █▀▄  █  █ █ █ █   █   █▀█ █▀█ █ █ █ █ █▀▀
+                  ▀▀  ▀ ▀ ▀ ▀ ▀ ▀ ▀▀▀ ▀ ▀ ▀▀▀   ▀▀▀ ▀ ▀ ▀ ▀ ▀ ▀ ▀▀▀ ▀▀▀
+
+            The configuration file is now in YAML format. It's also massively
+                       cleaned up thanks to the input of MyriaCore!
+
+                            The new configuration allows for:
+
+                                  Extended Scriptability
+                                  ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+             Now any notification can be modified by an external script. This
+            allows for all the logic you could possibly do on a notification.
+
+                     Define special styles for special notifications!
+
+
+                                     Many more fixes
+                                     ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+                            Additional new Features from 2021
+                            ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+                             New deadd.css configuration file
+                               Style all elements yourself
+
+                              Reload CSS styling on the fly
+
+                    Use CSS transitions when loading a new colortheme
+                               and smoothly change the mood
+
+
+
+                       As always, many thanks to our contributors:
+
+
+        (¯`·.¸¸.·´                                                     `·.¸¸.·´¯)
+       ( \                                                                     / )
+       ( \ )          MyriaCore S-NA ahmubashshir mgil2 resolritter          ( / )
+      ( ) (           woutervb avdv TaylanTatli rbowden91 kianmeng            ) ( )
+       ( / )          opalmay balsoft trk9001 CobaltSpace lierdakil          ( \ )
+       ( /                                                                     \ )
+        (_.·´¯`·.¸                                                    ¸.·´¯`·.¸_)
+
+
+                                   Thank you very much!
+
+
+            Finally, thank you to everyone who created issues, commented, and
+                             helped to further this project.
+
+                                                                                         ▝
+                                                                                         ▝
+▖                                                                                        ▐
+▖                                                                                        ▐
+▌                                                       Further news in releasenotes.org ▐
+▙▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▟
+
+#+END_EXAMPLE
+
+
 ** Features
 
 The notification center receives notifications via DBUS (like any
