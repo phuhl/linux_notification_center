@@ -72,8 +72,8 @@ Take part in the discussion on our [[https://github.com/phuhl/linux_notification
                                      Many more fixes
                                      ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
-                            Additional new Features from 2021
-                            ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+                               Additional Features from 2021
+                               ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
 
                              New deadd.css configuration file
                                Style all elements yourself
