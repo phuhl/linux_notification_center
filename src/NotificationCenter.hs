@@ -18,7 +18,6 @@ import Helpers
 
 import Prelude
 
-import Text.I18N.GetText
 import System.Locale.SetLocale
 import System.IO.Unsafe
 import System.IO (readFile)
@@ -28,22 +27,25 @@ import Data.Int (Int32(..))
 import Data.Tuple.Sequence (sequenceT)
 import Data.Maybe
 import Data.IORef
+import Data.Gettext
 import Data.List
 import Data.Time
 import Data.Time.LocalTime
 import qualified Data.Text as Text
+import qualified Data.Text.Lazy as LT
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.Map as Map
 import Data.Complex
 import Data.Monoid ((<>))
 
-import Control.Monad
 import Control.Applicative
+import Control.Exception (finally)
 import Control.Concurrent (forkIO, threadDelay, ThreadId(..))
 import Control.Concurrent.STM
   ( readTVarIO, modifyTVar', TVar(..), atomically, newTVarIO )
+import Control.Monad
 
-import System.Process (runCommand)
+import System.Process (spawnCommand, interruptProcessGroupOf, waitForProcess)
 import System.Locale.Current
 import System.Posix.Signals (sigUSR1)
 import System.Posix.Daemonize (serviced, daemonize)
@@ -138,8 +140,8 @@ setWindowStyle tState = do
   setStyle screen $ BS.pack $ style
   return False
 
-createNotiCenter :: TVar State -> Config -> IO ()
-createNotiCenter tState config = do
+createNotiCenter :: TVar State -> Config -> Catalog -> IO ()
+createNotiCenter tState config catalog = do
   (objs, _) <- createTransparentWindow (Text.pack glade)
     [ "main_window"
     , "label_time"
@@ -159,7 +161,7 @@ createNotiCenter tState config = do
   deleteButton <- button objs "button_deleteAll"
 
   onButtonClicked deleteButton $ deleteInCenter tState
-  buttonSetLabel deleteButton $ Text.pack $ translate "Delete all"
+  buttonSetLabel deleteButton $ LT.toStrict $ gettext catalog "Delete all"
 
   let buttons = configButtons config
       margin = fromIntegral $ configButtonMargin config
@@ -407,7 +409,7 @@ main' = do
     Text.pack <$> readFile (homeDir ++ "/deadd/deadd.yml"))
   config <- getConfig configData
 
-  initI18n
+  catalog <- i18nInit
 
   istate <- getInitialState
   notiState <- startNotificationDaemon config
@@ -415,12 +417,13 @@ main' = do
 
   atomically $ modifyTVar' istate $
     \istate' -> istate' { stNotiState = notiState }
-  createNotiCenter istate config
+  createNotiCenter istate config catalog
 
   unixSignalAdd PRIORITY_HIGH (fromIntegral sigUSR1)
     (showNotiCenter istate notiState config)
 
-  runCommand $ configStartupCommand config
+  ph <- spawnCommand $ configStartupCommand config
+  waitForProcess ph `finally` interruptProcessGroupOf ph
 
   GI.main
 

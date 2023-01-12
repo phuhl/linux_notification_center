@@ -15,7 +15,7 @@
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: lts-12.19
+resolver: lts-19.4
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -36,33 +36,17 @@ resolver: lts-12.19
 # non-dependency (i.e. a user package), and its test suites and benchmarks
 # will not be run. This is useful for tweaking upstream packages.
 packages:
-- '.'
+  - "."
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
-extra-deps: [ ConfigFile-1.1.4
-            , gi-harfbuzz-0.0.3
-            , env-locale-1.0.0.1
-            , gtk3-0.15.4
-            , stm-2.5.0.0
-            , hgettext-0.1.31.0
-            , glib-0.13.8.1
-            , pango-0.13.8.1
-            , gio-0.13.8.0
-            , gi-pango-1.0.23
-            , haskell-gi-0.24.5
-            , haskell-gi-base-0.24.4
-            , gi-glib-2.0.24
-            , gi-cairo-1.0.24
-            , gi-atk-2.0.22
-            , gi-gdk-3.0.23
-            , gi-gdkpixbuf-2.0.24
-            , gi-gio-2.0.27
-            , gi-gobject-2.0.25
-            , gi-gtk-3.0.36
-            , gi-graphene-1.0.2
-            , ansi-terminal-0.11
-            , tagsoup-0.14.7
-            ]
+extra-deps:
+  [
+    env-locale-1.0.0.1,
+    haskell-gettext-0.1.2.0,
+    gi-pango-1.0.27@sha256:3e9c5497382e8f112e834269de624980578cb6401e46f6537e694f94094b3af2,
+    gi-harfbuzz-0.0.6,
+    gi-freetype2-2.0.2,
+  ]
 
 # Override default flag values for local packages and extra-deps
 flags: {}
@@ -89,11 +73,12 @@ extra-package-dbs: []
 # compiler-check: newer-minor
 
 nix:
-    packages:
-      - cairo
-      - gobject-introspection
-      - gtk3
-      - libxml2
-      - pango
-      - pkgconfig
-      - zlib
+  packages:
+    - gobject-introspection
+    - gtk3
+    - libxml2
+    - pango
+    - pkgconfig
+    - zlib
+
+pvp-bounds: both
