@@ -4,7 +4,7 @@
 
 A haskell-written notification center for users that like a desktop with style...
 
-Take part in the discussion on our new [[https://github.com/phuhl/linux_notification_center/discussions][discussion board]]!
+Take part in the discussion on our [[https://github.com/phuhl/linux_notification_center/discussions][discussion board]]!
 
 ** Features
 
@@ -497,11 +497,13 @@ notification:
 
 *** CSS styling
 
-In the file =${XDG_CONFIG_HOME}/deadd/deadd.css= (usually
-=.config/deadd/deadd.css=) you can add CSS styles (GTK3-flavor). Should the
+The default CSS style can be found in =/etc/xdg/deadd/deadd.css=. It is
+advised to copy this file to =${XDG_CONFIG_HOME}/deadd/deadd.css= (usually
+=.config/deadd/deadd.css=) if you want to make changes.
+
+In the file you can change CSS styles (GTK3-flavor). Should the
 installation not have created a =dead.css=, you can use the content of
-[[https://github.com/phuhl/linux_notification_center/blob/master/style.css][style.css]]
-as a foundation.
+[[https://github.com/phuhl/linux_notification_center/blob/master/style.css][style.css]] as a foundation.
 
 The following class-names for labels are defined:
 - Notifications:

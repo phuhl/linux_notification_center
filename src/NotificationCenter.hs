@@ -135,7 +135,8 @@ deleteInCenter tState = do
 setWindowStyle tState = do
   state <- readTVarIO tState
   homeDir <- getXdgDirectory XdgConfig ""
-  style <- readFile (homeDir ++ "/deadd/deadd.css")
+  style <- fromEither <$> (readFile ("/etc/xdg/deadd/deadd.css"))
+           <*> (tryIOError $ readFile (homeDir ++ "/deadd/deadd.css"))
   screen <- windowGetScreen $ stMainWindow state
   setStyle screen $ BS.pack $ style
   return False

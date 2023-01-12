@@ -18,6 +18,7 @@ import Data.Int ( Int32, Int )
 import qualified Data.Map as Map
 import qualified Data.Yaml as Y
 import Data.Yaml ((.=), (.!=), (.:?), FromJSON(..), (.:))
+import Data.Aeson.Key as AesonKey
 
 import System.Process (readCreateProcess, shell)
 
@@ -138,7 +139,7 @@ data Config = Config
   mO <- po
   case mO of
     Nothing -> return Nothing
-    (Just x) -> x .:? name
+    (Just x) -> x .:? AesonKey.fromString (Text.unpack name)
 
 (.!=>) :: FromJSON a => Y.Parser (Maybe a) -> Y.Parser (Maybe a) -> Y.Parser (Maybe a)
 (.!=>) a b = orElse <$> a <*> b
@@ -161,13 +162,13 @@ fourthLevel o firstKey secondKey thirdKey fourthKey alt =
 
 inheritingSecondLevel o firstKey secondKey alt =
   o .:? firstKey .:. secondKey
-  .!=> (o .:? secondKey)
+  .!=> (o .:? AesonKey.fromString (Text.unpack secondKey))
   .!= alt
 
 inheritingThirdLevel o firstKey secondKey thirdKey alt =
   o .:? firstKey .:. secondKey .:. thirdKey
-  .!=> (o .:? secondKey .:. thirdKey)
-  .!=> (o .:? thirdKey)
+  .!=> (o .:? AesonKey.fromString (Text.unpack secondKey) .:. thirdKey)
+  .!=> (o .:? AesonKey.fromString (Text.unpack thirdKey))
   .!= alt
 
 instance FromJSON Config where

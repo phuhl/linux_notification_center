@@ -6,6 +6,7 @@ MANPREFIX = ${PREFIX}/share/man
 PKG_CONFIG ?= pkg-config
 SYSTEMCTL ?= systemctl
 XDG_CONFIG_HOME ?= ${HOME}/.config
+XDG_CONFIG_SYSTEM ?= /etc/xdg
 
 
 ifeq (,${SYSTEMD})
@@ -67,14 +68,15 @@ install-stack:
 	install -Dm644 docs/linux-notification-center.man ${DESTDIR}${MANPREFIX}/man1/deadd-notification-center.1
 	install -Dm644 LICENSE ${DESTDIR}${PREFIX}/share/licenses/deadd-notification-center/LICENSE
 
-CSS_CONFIG_FILE = ${XDG_CONFIG_HOME}/deadd/deadd.css
+CSS_CONFIG_DIR = ${XDG_CONFIG_SYSTEM}/deadd
+CSS_CONFIG_FILE = ${CSS_CONFIG_DIR}/deadd.css
 install-config:
-	mkdir -p ${XDG_CONFIG_HOME}/deadd/
+	mkdir -p ${CSS_CONFIG_DIR}
 ifneq ("$(wildcard $(CSS_CONFIG_FILE))","")
-	install -Dm644 style.css ${XDG_CONFIG_HOME}/deadd/deadd.css_new
-	$(warning Warning: $(XDG_CONFIG_HOME)/deadd/deadd.css exists. Instead of overwriting, created $(XDG_CONFIG_HOME)/deadd.css_new)
+	install -Dm644 style.css ${CSS_CONFIG_FILE}_new
+	$(warning Warning: $(CSS_CONFIG_FILE) exists. Instead of overwriting, created $(CSS_CONFIG_FILE)_new)
 else
-	install -Dm644 style.css ${XDG_CONFIG_HOME}/deadd/deadd.css
+	install -Dm644 style.css ${CSS_CONFIG_FILE}
 endif
 
 
@@ -102,7 +104,7 @@ install-lang:
 	install -Dm644 translation/en/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/en/LC_MESSAGES/deadd-notification-center.mo
 	install -Dm644 translation/tr/LC_MESSAGES/deadd-notification-center.mo ${DESTDIR}${PREFIX}/share/locale/tr/LC_MESSAGES/deadd-notification-center.mo
 
-install: install-stack install-service install-lang
+install: install-stack install-service install-lang install-config
 
 uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/deadd-notification-center
