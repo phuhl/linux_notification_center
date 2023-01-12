@@ -18,6 +18,7 @@ module TransparentWindow
   , getObjs
   , getScreenPos
   , getMouseActiveScreenPos
+  , getMouseActiveScreen
   -- * General
   , getScreenProportions
   , runAfterDelay
@@ -172,6 +173,18 @@ getScreenPos window number = do
   monitor <- fromMaybe (error "Unknown screen")
     <$> displayGetMonitor display number
   getMonitorProps monitor
+
+getMouseActiveScreen :: Gtk.Window -> GHC.Int.Int32
+  -> IO Monitor
+getMouseActiveScreen window number = do
+  screen <- window `get` #screen
+  display <- screenGetDisplay screen
+  mPointerPos <- getPointerPos
+  case mPointerPos of
+    Just (x, y) -> displayGetMonitorAtPoint display x y
+    Nothing -> fromMaybe (error "Unknown screen")
+               <$> displayGetMonitor display number
+
 
 getMouseActiveScreenPos :: Gtk.Window -> GHC.Int.Int32
   -> IO (GHC.Int.Int32, GHC.Int.Int32, GHC.Int.Int32)

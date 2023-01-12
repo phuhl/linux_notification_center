@@ -46,6 +46,7 @@ extra-deps:
     gi-pango-1.0.27@sha256:3e9c5497382e8f112e834269de624980578cb6401e46f6537e694f94094b3af2,
     gi-harfbuzz-0.0.6,
     gi-freetype2-2.0.2,
+    gi-gtk-layer-shell-0.1.3@sha256:76240ff466fa3cf14db42e20cdf5266408baf279d45b817c1f90d846d4e72bdb,
   ]
 
 # Override default flag values for local packages and extra-deps

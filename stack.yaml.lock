@@ -39,6 +39,13 @@ packages:
       size: 306
   original:
     hackage: gi-freetype2-2.0.2
+- completed:
+    hackage: gi-gtk-layer-shell-0.1.3@sha256:76240ff466fa3cf14db42e20cdf5266408baf279d45b817c1f90d846d4e72bdb,2674
+    pantry-tree:
+      sha256: bcd2406b3ebefc98a47ec3baba30054738fcc7c0d0e407daea6dd4f1cbceaed6
+      size: 376
+  original:
+    hackage: gi-gtk-layer-shell-0.1.3@sha256:76240ff466fa3cf14db42e20cdf5266408baf279d45b817c1f90d846d4e72bdb
 snapshots:
 - completed:
     sha256: d4ee004c46ba878d2f304f5d748d493057be579192a8d148527f3ba55c9df57f
