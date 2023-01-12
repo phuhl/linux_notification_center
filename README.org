@@ -36,9 +36,9 @@ Take part in the discussion on our [[https://github.com/phuhl/linux_notification
       ▀▀▀▀▀▀                                                                 ▀▀▀▀▀▀
 
 
-                                      ╒══════╕
-                                  NEW │ 2023 │ Update:
-                                      ╘══════╛
+                                        ╒══════╕
+                                    NEW │ 2023 │ Update:
+                                        ╘══════╛
 
 
                           For all users of the non-git packages:
