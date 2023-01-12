@@ -1,26 +1,97 @@
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric #-}
 
 module Config
   (
     Config(..)
+  , ButtonConfig(..)
+  , ModificationRule(..)
   , getConfig
   )where
 
 import Data.List.Split (splitOn)
-import Helpers (split, removeOuterLetters, readConfig, replace)
+import Helpers (orElse, split, removeOuterLetters, readConfig, replace)
 import Data.Maybe (fromMaybe)
 import qualified Data.Text as Text
+import Data.Text.Encoding (decodeUtf8, encodeUtf8)
 import Data.Int ( Int32, Int )
 import qualified Data.Map as Map
+import qualified Data.Yaml as Y
+import Data.Yaml ((.=), (.!=), (.:?), FromJSON(..), (.:))
+import Data.Aeson.Key as AesonKey
+
+import System.Process (readCreateProcess, shell)
 
 import NotificationCenter.Notifications.Data
   (notiSendClosedMsg, notiTransient, notiIcon, notiTime, notiAppName
   , notiBody, notiSummary, Notification(..), parseImageString)
 
 
-data Config = Config
+data ModificationRule = Modify
   {
-  -- notification-center
-    configBarHeight :: Int
+    mMatch :: Map.Map String String
+  , modifyTitle :: Maybe String
+  , modifyBody :: Maybe String
+  , modifyAppname :: Maybe String
+  , modifyAppicon :: Maybe String
+  , modifyTimeout :: Maybe Int32
+  , modifyRight :: Maybe Int
+  , modifyTop :: Maybe Int
+  , modifyImage :: Maybe String
+  , modifyImageSize :: Maybe Int
+  , modifyTransient :: Maybe Bool
+  , modifyNoClosedMsg :: Maybe Bool
+  , modifyRemoveActions :: Maybe Bool
+  , modifyClassName :: Maybe String
+  } |
+  Script
+  {
+    mMatch :: Map.Map String String
+  , mScript :: String
+  }
+
+instance FromJSON ModificationRule where
+  parseJSON (Y.Object o) = do
+    mScript <- o .:? "script"
+    case mScript of
+      Nothing -> Modify
+        <$> o .: "match"
+      -- modifyTitle
+        <*> o .: "modify" .:. "title"
+      -- modifyBody
+        <*> o .: "modify" .:. "body"
+      -- modifyAppname
+        <*> o .: "modify" .:. "app-name"
+      -- modifyAppicon
+        <*> o .: "modify" .:. "app-icon"
+      -- modifyTimeout
+        <*> o .: "modify" .:. "timeout"
+      -- modifyRight
+        <*> o .: "modify" .:. "margin-right"
+      -- modifyTop
+        <*> o .: "modify" .:. "margin-top"
+      -- modifyImage
+        <*> o .: "modify" .:. "image"
+      -- modifyImageSize
+        <*> o .: "modify" .:. "image-size"
+      -- modifyTransient
+        <*> o .: "modify" .:. "transient"
+      -- modifyNoClosedMsg
+        <*> o .: "modify" .:. "send-noti-closed"
+      -- modifyRemoveActions
+        <*> o .: "modify" .:. "remove-actions"
+      -- modifyClassName
+        <*> o .: "modify" .:. "class-name"
+      Just (script)-> Script
+        <$> o .: "match"
+      -- mScript
+        <*> return script
+
+
+data Config = Config
+ {
+   -- notification-center
+   configBarHeight :: Int
   , configBottomBarHeight :: Int
   , configRightMargin :: Int
   , configWidth :: Int
@@ -29,7 +100,7 @@ data Config = Config
   , configNotiCenterFollowMouse :: Bool
   , configNotiCenterNewFirst :: Bool
   , configIgnoreTransient :: Bool
-  , configMatchingRules :: [((Notification -> Bool), (Notification -> Notification), Maybe String)]
+  , configMatchingRules :: [ModificationRule]
   , configActionIcons :: Bool
   , configNotiMarkup :: Bool
   , configNotiParseHtmlEntities :: Bool
@@ -60,112 +131,138 @@ data Config = Config
   , configButtonsPerRow :: Int
   , configButtonHeight :: Int
   , configButtonMargin :: Int
-  , configLabels :: String
-  , configCommands :: String
-  }
+  , configButtons :: [ButtonConfig]
+}
 
+(.:.) :: FromJSON a => Y.Parser (Maybe Y.Object) -> Text.Text -> Y.Parser (Maybe  a)
+(.:.) po name = do
+  mO <- po
+  case mO of
+    Nothing -> return Nothing
+    (Just x) -> x .:? AesonKey.fromString (Text.unpack name)
 
-getConfig p =
-  Config
+(.!=>) :: FromJSON a => Y.Parser (Maybe a) -> Y.Parser (Maybe a) -> Y.Parser (Maybe a)
+(.!=>) a b = orElse <$> a <*> b
+
+firstLevel o firstKey alt =
+  o .:? firstKey
+  .!= alt
+
+secondLevel o firstKey secondKey alt =
+  o .:? firstKey .:. secondKey
+  .!= alt
+
+thirdLevel o firstKey secondKey thirdKey alt =
+  o .:? firstKey .:. secondKey .:. thirdKey
+  .!= alt
+
+fourthLevel o firstKey secondKey thirdKey fourthKey alt =
+  o .:? firstKey .:. secondKey .:. thirdKey .:. fourthKey
+  .!= alt
+
+inheritingSecondLevel o firstKey secondKey alt =
+  o .:? firstKey .:. secondKey
+  .!=> (o .:? AesonKey.fromString (Text.unpack secondKey))
+  .!= alt
+
+inheritingThirdLevel o firstKey secondKey thirdKey alt =
+  o .:? firstKey .:. secondKey .:. thirdKey
+  .!=> (o .:? AesonKey.fromString (Text.unpack secondKey) .:. thirdKey)
+  .!=> (o .:? AesonKey.fromString (Text.unpack thirdKey))
+  .!= alt
+
+instance FromJSON Config where
+  parseJSON (Y.Object o) =
+    Config
+  --configBarHeight
+    <$> inheritingSecondLevel o "notification-center" "margin-top" 0
+  -- configBottomBarHeight
+    <*> inheritingSecondLevel o "notification-center" "margin-bottom" 0
+  -- configRightMargin
+    <*> inheritingSecondLevel o "notification-center" "margin-right" 0
+  -- configWidth
+    <*> inheritingSecondLevel o "notification-center" "width" 500
+  -- configStartupCommand
+    <*> firstLevel o "startup-command" ""
+  -- configNotiCenterMonitor
+    <*> inheritingSecondLevel o "notification-center" "monitor" 0
+  -- configNotiCenterFollowMouse
+    <*> inheritingSecondLevel o "notification-center" "follow-mouse" False
+  -- configNotiCenterNewFirst
+    <*> secondLevel o "notification-center" "new-first" True
+  -- configIgnoreTransient
+    <*> secondLevel o "notification-center" "ignore-transient" False
+  -- configMatchingRules
+    <*> secondLevel o "notification" "modifications" []
+  -- configActionIcons
+    <*> secondLevel o "notification" "use-action-icons" True
+  -- configNotiMarkup
+    <*> secondLevel o "notification" "use-markup" True
+  -- configNotiParseHtmlEntities
+    <*> secondLevel o "notification" "parse-html-entities" True
+  -- configSendNotiClosedDbusMessage
+    <*> thirdLevel o "notification" "dbus" "send-noti-closed" False
+  -- configGuessIconFromAppname
+    <*> inheritingThirdLevel o "notification" "app-icon" "guess-icon-from-name"
+    True
+  -- configNotiCenterHideOnMouseLeave
+    <*> secondLevel o "notification-center" "hide-on-mouse-leave" True
+  -- configNotiDefaultTimeout
+    <*> thirdLevel o "notification" "popup" "default-timeout" 1000
+  -- configDistanceTop
+    <*> inheritingThirdLevel o "notification" "popup" "margin-top" 50
+  -- configDistanceRight
+    <*> inheritingThirdLevel o "notification" "popup" "margin-top" 50
+  -- configDistanceBetween
+    <*> thirdLevel o "notification" "popup" "margin-between" 20
+  -- configWidthNoti
+    <*> inheritingThirdLevel o "notification" "popup" "width" 300
+  -- configNotiFollowMouse
+    <*> inheritingThirdLevel o "notification" "popup" "follow-mouse" False
+  -- configNotiMonitor
+    <*> inheritingThirdLevel o "notification" "popup" "monitor" 0
+  -- configImgSize
+    <*> thirdLevel o "notification" "image" "size" 100
+  -- configImgMarginTop
+    <*> thirdLevel o "notification" "image" "margin-top" 15
+  -- configImgMarginLeft
+    <*> thirdLevel o "notification" "image" "margin-left" 15
+  -- configImgMarginBottom
+    <*> thirdLevel o "notification" "image" "margin-bottom" 15
+  -- configImgMarginRight
+    <*> thirdLevel o "notification" "image" "margin-right" 0
+  -- configIconSize
+    <*> thirdLevel o "notification" "app-icon" "icon-size" 20
+  -- configPopupMaxLinesInBody
+    <*> inheritingThirdLevel o "notification" "pop-up" "max-lines-in-body" 3
+  -- configPopupEllipsizeBody
+    <*> ((/= (0 :: Int)) <$>
+          inheritingThirdLevel o "notification" "pop-up" "max-lines-in-body" 3)
+  -- configPopupDismissButton
+    <*> fourthLevel o "notification" "popup" "click-behavior" "dismiss" "mouse1"
+  -- configPopupDefaultActionButton
+    <*> fourthLevel o "notification" "popup" "click-behavior" "default-action" "mouse3"
+  -- configButtonsPerRow
+    <*> thirdLevel o "notification-center" "buttons" "buttons-per-row" 5
+  -- configButtonHeight
+    <*> thirdLevel o "notification-center" "buttons" "buttons-height" 60
+  -- configButtonMargin
+    <*> thirdLevel o "notification-center" "buttons" "buttons-height" 2
+  -- configLabels
+    <*> thirdLevel o "notification-center" "buttons" "actions" []
+  parseJSON _ = fail "Expected Object for Config value"
+
+data ButtonConfig = Button
   {
-    -- notification-center
-    configBarHeight = r 0 p nCenter "marginTop"
-  , configBottomBarHeight = r 0 p nCenter "marginBottom"
-  , configRightMargin = r 0 p nCenter "marginRight"
-  , configWidth = r 500 p nCenter "width"
-  , configStartupCommand = r' "" p nCenter "startupCommand"
-  , configNotiCenterMonitor = r 0 p nCenter "monitor"
-  , configNotiCenterFollowMouse = r'' False p nCenter "followMouse"
-  , configNotiCenterNewFirst = r'' True p nCenter "newFirst"
-    , configIgnoreTransient = r'' False p nCenter "ignoreTransient"
-  , configMatchingRules = zip3 match (modify ++ repeat id) $ run ++ repeat Nothing -- run
-  , configNotiMarkup = r'' True p nCenter "useMarkup"
-  , configActionIcons = r'' True p nCenter "useActionIcons"
-  , configNotiParseHtmlEntities = r'' True p nCenter "parseHtmlEntities"
-  , configSendNotiClosedDbusMessage = r'' False p nCenter "configSendNotiClosedDbusMessage"
-  , configGuessIconFromAppname = r'' True p nCenter "guessIconFromAppname"
-  , configNotiCenterHideOnMouseLeave = r'' True p nCenter "hideOnMouseLeave"
-
-    -- notification-center-notification-popup
-  , configNotiDefaultTimeout = r 10000 p nPopup "notiDefaultTimeout"
-  , configDistanceTop = r 50 p nPopup "distanceTop"
-  , configDistanceRight = r 50 p nPopup "distanceRight"
-  , configDistanceBetween = r 20 p nPopup "distanceBetween"
-  , configWidthNoti = r 300 p nPopup "width"
-  , configNotiMonitor = r 0 p nPopup "monitor"
-  , configNotiFollowMouse = r'' False p nPopup "followMouse"
-  , configImgSize = r 100 p nPopup "maxImageSize"
-  , configImgMarginTop = r 15 p nPopup "imageMarginTop"
-  , configImgMarginBottom = r 15 p nPopup "imageMarginBottom"
-  , configImgMarginLeft = r 15 p nPopup "imageMarginLeft"
-  , configImgMarginRight = r 0 p nPopup "imageMarginRight"
-  , configIconSize = r 20 p nPopup "iconSize"
-  , configPopupMaxLinesInBody = r 5 p nPopup "shortenBody"
-  , configPopupEllipsizeBody = (r 5 p nPopup "shortenBody") /= -1
-  , configPopupDismissButton = r' "mouse1" p nPopup "dismissButton"
-  , configPopupDefaultActionButton = r' "mouse3" p nPopup "defaultActionButton"
-
-    -- buttons
-  , configButtonsPerRow = r 5 p buttons "buttonsPerRow"
-  , configButtonHeight = r 60 p buttons "buttonHeight"
-  , configButtonMargin = r 2 p buttons "buttonMargin"
-  , configLabels = r' "" p buttons "labels"
-  , configCommands = r' "" p buttons "commands"
-
+    configButtonLabel :: String
+  , configButtonCommand :: String
   }
-  where nPopup = "notification-center-notification-popup"
-        nCenter = "notification-center"
-        colors = "colors"
-        buttons = "buttons"
-        r = readConfig
-        r' = readConfig
-        r'' = readConfig
-        keys conditions = map (\c -> if length (splitted c) == 2
-                                     then (splitted c) else ["", ""]) conditions
-          where splitted condition = splitOn "=" condition
 
-        match = map (matcherFunction) $ splitOn ";" <$>
-                (split $ removeOuterLetters $ r' "" p nCenter "match")
-                where lookupFun name noti = Text.unpack $ fromMaybe (Text.pack "")
-                        ((lookup name
-                          [ ("title", notiSummary)
-                          , ("body", notiBody)
-                          , ("app", notiAppName)
-                          , ("time", notiTime) ]) <*> (Just noti))
-                      matcherFunction conditions = \noti -> foldl (
-                        \matches (k:v:[]) -> matches && ((v == lookupFun k noti)))
-                                                      True (keys conditions)
-        modify = map (matcherFunction) $ splitOn ";" <$>
-                 (split $ removeOuterLetters $ r' "" p nCenter "modify")
-          where matcherFunction condition = \noti -> foldl (
-                  \noti (k:v:[]) -> switch k v noti) noti (keys condition)
-                        where switch k v noti
-                                | k == "title"
-                                = noti { notiSummary = Text.pack v }
-                                | k == "body"
-                                = noti { notiBody = Text.pack v }
-                                | k == "app"
-                                = noti { notiAppName = Text.pack v }
-                                | k == "time"
-                                = noti { notiTime = Text.pack v }
-                                | k == "timeout"
-                                = noti { notiTimeout = read v :: Int32 }
-                                | k == "right"
-                                = noti { notiRight = Just . (read :: String -> Int) $ v }
-                                | k == "top"
-                                = noti { notiTop = Just . (read :: String -> Int) $ v }
-                                | k == "icon"
-                                = noti { notiIcon = parseImageString $ Text.pack v }
-                                | k == "image"
-                                = noti { notiImg = parseImageString $ Text.pack v }
-                                | k == "transient" && v == "true"
-                                = noti { notiTransient = True }
-                                | k == "transient" && v == "false"
-                                = noti { notiTransient = False }
-                                | k == "noClosedMsg" && v == "true"
-                                = noti { notiSendClosedMsg = False }
-                                | k == "removeActions"
-                                = noti { notiActions = [] }
-                                | otherwise = noti
+instance FromJSON ButtonConfig where
+  parseJSON (Y.Object o) = Button
+        <$> o .: "label"
+        <*> o .: "command"
 
-        run = [Nothing]
+
+getConfig :: Text.Text -> IO Config
+getConfig configYml = Y.decodeThrow $ encodeUtf8 configYml

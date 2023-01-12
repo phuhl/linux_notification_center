@@ -4,7 +4,114 @@
 
 A haskell-written notification center for users that like a desktop with style...
 
-Take part in the discussion on our new [[https://github.com/phuhl/linux_notification_center/discussions][discussion board]]!
+Take part in the discussion on our [[https://github.com/phuhl/linux_notification_center/discussions][discussion board]]!
+
+#+BEGIN_EXAMPLE
+
+
+
+          ▙              █  █ ████████████  ███▙                  █   ▄██████▄
+          ███▄           █  █ ████        █  ███▙                █    ████    ██
+          ▜█████▄        █  █ ████         █  ███▙              █   █  ████    ▜█
+            ▜██████▄     █  █ ████          █  ███▙      ▙     █     █  ████
+          █▄   ▜██████▄  █  █ ████████████   █  ███▙    ██▙   █       █  ████
+          █ ▜█▄   ▜█████▄█  █ ████            █  ███▙   ███▙ █         █  ████
+          █    ▜█▄   ▜████  █ ████             █  ███▙█  ████           █  ████
+          █       ▜█▄   ▜█  █ ████              █  ███ █  ██       █▙    █  ████
+          █          ▜█▄    █ ████               █  █   █           █▙    █  ████
+          █             ▜▄  █ ████████████        █      █           ▜████▛  ██▛
+
+
+    ▄▇▇▀▀▀▀█▌        ▄▄▄▄▄▀▀██▇█▄▄▀▀▀▀▀    ▄▄▄▄▄▄      ▄▄█▇██▀▀▄▄▄▄▄        ▐█▀▀▀▀▇▇▄
+   ▐██▌   ▀▀    ▄▄▄████████▄▄█▀        ▄█████▀▀▀███▄      ▀█▄▄████████▄▄▄    ▀▀   ▐██▌
+   ████▄  ▄▄▄██████████▀▀   ▀▀▀█▄     ▇████▀    ▀▀██▌   ▄█▀▀▀   ▀▀██████████▄▄▄  ▄████
+    ▀███████████████▀▀         ▐█▌   ██████    ▄ ▐███  ▐█▌         ▀▀███████████████▀
+       ▀▀▀▀██████▀             ▀▀   ▐██▐▇▇     ▀▀▀▀      ▀▀             ▀██████▀▀▀▀
+       ▄▄██████▀                     ██ ██▌         ▄                     ▀██████▄▄
+     ▄███████▀                      █▀██ ▀█▄▄      ▄▄                       ▀███████▄
+    ▄███████                          ▀██▄▄█████████▀                         ███████▄
+    ██████                               ▀▀█████▀▀▀                            ███████
+    ▐████▌                                                                      ▐████▌
+     ███▄▄▄▄▄▌                                                             ▐▄▄▄▄▄███
+      ▀▀▀▀▀▀                                                                 ▀▀▀▀▀▀
+
+
+                                      ╒══════╕
+                                  NEW │ 2023 │ Update:
+                                      ╘══════╛
+
+
+                          For all users of the non-git packages:
+                                  ¨¨¨¨¨        ¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
+
+       Customize all CSS might [probably will] brake your current styling settings.
+             (more information on this in the file updateyourconfig2021.org)
+
+
+                                     New config style
+                                     ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+                  █▀▄ █▀▄ █▀█ █ █ ▀█▀ █▀█ █▀▀   █▀▀ █ █ █▀█ █▀█ █▀▀ █▀▀
+                  █▀▄ █▀▄ █▀█ █▀▄  █  █ █ █ █   █   █▀█ █▀█ █ █ █ █ █▀▀
+                  ▀▀  ▀ ▀ ▀ ▀ ▀ ▀ ▀▀▀ ▀ ▀ ▀▀▀   ▀▀▀ ▀ ▀ ▀ ▀ ▀ ▀ ▀▀▀ ▀▀▀
+
+            The configuration file is now in YAML format. It's also massively
+                       cleaned up thanks to the input of MyriaCore!
+
+                            The new configuration allows for:
+
+                                  Extended Scriptability
+                                  ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+             Now any notification can be modified by an external script. This
+            allows for all the logic you could possibly do on a notification.
+
+                     Define special styles for special notifications!
+
+
+                                     Many more fixes
+                                     ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+                            Additional new Features from 2021
+                            ┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈
+
+                             New deadd.css configuration file
+                               Style all elements yourself
+
+                              Reload CSS styling on the fly
+
+                    Use CSS transitions when loading a new colortheme
+                               and smoothly change the mood
+
+
+
+                       As always, many thanks to our contributors:
+
+
+        (¯`·.¸¸.·´                                                     `·.¸¸.·´¯)
+       ( \                                                                     / )
+       ( \ )          MyriaCore S-NA ahmubashshir mgil2 resolritter          ( / )
+      ( ) (           woutervb avdv TaylanTatli rbowden91 kianmeng            ) ( )
+       ( / )          opalmay balsoft trk9001 CobaltSpace lierdakil          ( \ )
+       ( /                                                                     \ )
+        (_.·´¯`·.¸                                                    ¸.·´¯`·.¸_)
+
+
+                                   Thank you very much!
+
+
+            Finally, thank you to everyone who created issues, commented, and
+                             helped to further this project.
+
+                                                                                         ▝
+                                                                                         ▝
+▖                                                                                        ▐
+▖                                                                                        ▐
+▌                                                       Further news in releasenotes.org ▐
+▙▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▟
+
+#+END_EXAMPLE
+
 
 ** Features
 
@@ -263,181 +370,247 @@ sensible defaults™.
 All colors and sizes are customizable, as well as the default timeout
 for notifications and the optional buttons in the notification
 center. Below are possible configurable options shown. The
-configuration file must be located at =~/.config/deadd/deadd.conf= (or,
+configuration file must be located at =~/.config/deadd/deadd.yml= (or,
 if configured differently on your system:
-=${XDG_CONFIG_HOME}/deadd/deadd.conf=).
+=${XDG_CONFIG_HOME}/deadd/deadd.yml=).
 
 Additionally, a =deadd.css= will be loaded from the same folder. It
 contains the styling of the notification center. You can load changes
 from the =deadd.css= file by using the command described in the section
 "Usage".
 
-#+BEGIN_SRC ini
-[notification-center]
+#+BEGIN_SRC yaml
+### Margins for notification-center/notifications
+margin-top: 0
+margin-right: 0
 
-# Hide the notification center when the mouse leaves the window
-hideOnMouseLeave = True
+### Margins for notification-center
+margin-bottom: 0
 
-# Margin at the top of the notification center in pixels. This can be
-# used to avoid overlap between the notification center and bars such
-# as polybar or i3blocks.
-marginTop = 0
+### Width of the notification center/notifications in pixels.
+width: 500
 
-# Margin at the bottom of the notification center in pixels.
-marginBottom = 0
+### Command to run at startup. This can be used to setup
+### button states.
+# startup-command: deadd-notification-center-startup
 
-# Margin to the right of the notification center in pixels.
-marginRight = 0
+### Monitor on which the notification center/notifications will be
+### printed. If "follow-mouse" is set true, this does nothing.
+monitor: 0
 
+### If true, the notification center/notifications will open on the
+### screen, on which the mouse is. Overrides the "monitor" setting.
+follow-mouse: false
 
-# Width of the notification center in pixels. 
-width = 500
+notification-center:
+  ### Margin at the top/right/bottom of the notification center in
+  ### pixels. This can be used to avoid overlap between the notification
+  ### center and bars such as polybar or i3blocks.
+  # margin-top: 0
+  # margin-right: 0
+  # margin-bottom: 0
 
-# Monitor on which the notification center will be printed.
-monitor = 0
+  ### Width of the notification center in pixels.
+  # width: 500
 
-# If true, the notification center will open on the screen, on which the
-# mouse is
-followMouse = false
+  ### Monitor on which the notification center will be printed. If
+  ### "follow-mouse" is set true, this does nothing.
+  # monitor: 0
 
+  ### If true, the notification center will open on the screen, on which
+  ### the mouse is. Overrides the "monitor" setting.
+  # follow-mouse: false
 
-# (Optional) Command to run at startup.  This can be used to setup
-# button states.
-# startupCommand = "deadd-notification-center-startup"
+  ### Notification center closes when the mouse leaves it
+  hide-on-mouse-leave: true
 
-# If newFirst is set to true, newest notifications appear on the top
-# of the notification center. Else, notifications stack, from top to
-# bottom.
-newFirst = true
+  ### If newFirst is set to true, newest notifications appear on the top
+  ### of the notification center. Else, notifications stack, from top to
+  ### bottom.
+  new-first: true
 
-# If useActionIcons is set to true, Action Buttons can show Icon
-useActionIcons = true
+  ### If true, the transient field in notifications will be ignored,
+  ### thus the notification will be persisted in the notification
+  ### center anyways
+  ignore-transient: false
 
-# If true, the transient field in notifications will be ignored and
-# the notification will be persisted in the notification center anyways
-ignoreTransient = false
+  ### Custom buttons in notification center
+  buttons:
+    ### Numbers of buttons that can be drawn on a row of the notification
+    ### center.
+    # buttons-per-row: 5
 
-# If true, markup (<u>, <i>, <b>, <a>) will be displayed properly
-useMarkup = true
+    ### Height of buttons in the notification center (in pixels).    
+    # button-height: 60
 
-# If true, html entities (&#38; for &, &#37; for %, etc) will be parsed 
-# properly. This is useful for chromium-based apps, which tend to send 
-# these in notifications. 
-parseHtmlEntities = true
+    ### Horizontal and vertical margin between each button in the 
+    ### notification center (in pixels).
+    # button-margin: 2
 
-# If set to true, the parameter noClosedMsg can be set on
-# notifications. If noClosedMsg is set to true on a notification,
-# DBUS NotificationClosed messages will not be send for this
-# notification.
-configSendNotiClosedDbusMessage = false
+    ### Button actions and labels. For each button you must specify a
+    ### label and a command.
+    actions:
+      # - label: VPN
+      #   command: "sudo vpnToggle"
+      # - label: Bluetooth
+      #   command: bluetoothToggle
+      # - label: Wifi
+      #   command: wifiToggle
+      # - label: Screensaver
+      #   command: screensaverToggle
+      # - label: Keyboard
+      #   command: keyboardToggle
 
-# If set to true: If no icon is passed by the app_icon parameter 
-# and no application "desktop-entry"-hint is present, the notification
-# center will try to guess the icon from the application name (if present).
-# Default is true.
-guessIconFromAppname = true
+notification:
+  ### If true, markup (<u>, <i>, <b>, <a>) will be displayed properly
+  use-markup: true
 
-# See section "Notification based scripting" for an explanation
-#match = "title=Abc;body=abc":"app=notify-send"
-#modify = "transient=false"
-#run = "":"killall notify-send"
+  ### If true, html entities (&#38; for &, &#37; for %, etc) will be
+  ### parsed properly. This is useful for chromium-based apps, which
+  ### tend to send these in notifications.
+  parse-html-entities: true
 
-[notification-center-notification-popup]
+  dbus:
 
-# Default timeout used for notifications in milli-seconds.  This can
-# be overwritten with the "-t" option (or "--expire-time") of the
-# notify-send command.
-notiDefaultTimeout = 10000
+    ### If noti-closed messages are enabled, the sending application
+    ### will know that a notification was closed/timed out. This can
+    ### be an issue for certain applications, that overwrite
+    ### notifications on status updates (e.g. Spotify on each
+    ### song). When one of these applications thinks, the notification
+    ### has been closed/timed out, they will not overwrite existing
+    ### notifications but send new ones. This can lead to redundant
+    ### notifications in the notification center, as the close-message
+    ### is send regardless of the notification being persisted.
+    send-noti-closed: false
 
-# Margin above notifications (in pixels). This can be used to avoid
-# overlap between notifications and a bar such as polybar or i3blocks.
-distanceTop = 50
+  app-icon:
 
-# Margin on the right of the notification (in pixels).
-distanceRight = 50
+    ### If set to true: If no icon is passed by the app_icon parameter
+    ### and no application "desktop-entry"-hint is present, deadd will
+    ### try to guess the icon from the application name (if present).
+    guess-icon-from-name: true
 
-# Vertical distance between 2 notifications (in pixels).
-distanceBetween = 20
+    ### The display size of the application icons in the notification 
+    ### pop-ups and in the notification center
+    icon-size: 20
 
-# Width of the notifications.
-width = 300
+  image:
 
-# Monitor on which the notification will be printed.
-monitor = 0
+    ### The maximal display size of images that are part of
+    ### notifications for notification pop-ups and in the notification
+    ### center
+    size: 100
 
-# If true, the notifications will open on the screen, on which the
-# mouse is
-followMouse = false
+    ### The margin around the top, bottom, left, and right of
+    ### notification images.
+    margin-top: 15
+    margin-bottom: 15
+    margin-left: 15
+    margin-right: 0
 
-# The display size of the application icons in the notification 
-# pop-ups and in the notification center
-iconSize = 20
+  ### Apply modifications to certain notifications:
+  ### Each modification rule needs a "match" and either a "modify" or
+  ### a "script" entry.
+  modifications:
+  ### Match:
+  ### Matches the notifications against these rules. If all of the
+  ### values (of one modification rule) match, the "modify"/"script"
+  ### part is applied.
+  # - match:
+      ### Possible match criteria:
+      # title: "Notification title"
+      # body: "Notification body"
+      # time: "12:44"
+      # app-name: "App name"
 
-# The maximal display size of images that are part of notifications
-# for notification pop-ups and in the notification center
-maxImageSize = 100
+    # modify:
+      ### Possible modifications
+      # title: "abc"
+      # body: "abc"
+      # app-name: "abc"
+      # app-icon: "file:///abc.png"
+      ### The timeout has three special values:
+      ### timeout: 0 -> don't time out at all
+      ### timeout: -1 -> use default timeout
+      ### timeout: 1 -> don't show as pop-up
+      ### timeout: >1 -> milliseconds until timeout
+      # timeout: 1
+      # margin-right: 10
+      # margin-top: 10
+      # image: "file:///abc.png"
+      # image-size: 10
+      # transient: true
+      # send-noti-closed: false
+      ### Remove action buttons from notifications
+      # remove-actions: true
+      ### Add a class-name to the notification container, that can be
+      ### used for specific styling of notifications using the
+      ### deadd.css file
+      # class-name: "abc"
 
-# The margin around the top, bottom, left, and right of notification
-# images. Applies to popup notifications and in-center notifications.
-imageMarginTop = 15
-imageMarginBottom = 15
-imageMarginLeft = 15
-imageMarginRight = 0
+  # - match:
+      # app-name: "Chromium"
 
-# Truncates notification bodies with '...' at the specified number of 
-# lines. If -1 is specified, the body text will not be truncated.
-# Applies only to popup notifications
-shortenBody = 5
+    ### Instead of modifying a notification directly, a script can be
+    ### run, which will receive the notification as JSON on STDIN. It
+    ### is expected to return JSON/YAML configuration that defines the
+    ### modifications that should be applied. Minimum complete return
+    ### value must be '{"modify": {}, "match": {}}'. Always leave the "match"
+    ### object empty (technical reasons, i.e. I am lazy).
+    # script: "linux-notification-center-parse-chromium"
+  - match:
+      app-name: "Spotify"
+    modify:
+      image-size: 80
+      timeout: 1
+      send-noti-closed: true
+      class-name: "Spotify"
+  # - match:
+  #     title: Bildschirmhelligkeit
+  #   modify:
+  #     image-size: 60
+  popup:
 
-# The mouse button for closing a popup. Must be either "mouse1", 
-# "mouse2", "mouse3", "mouse4", or "mouse5"
-dismissButton = mouse1
+    ### Default timeout used for notifications in milli-seconds.  This can
+    ### be overwritten with the "-t" option (or "--expire-time") of the
+    ### notify-send command.
+    default-timeout: 10000
 
-# The mouse button for opening a popup with the default action.
-# Must be either "mouse1", "mouse2", "mouse3", "mouse4", or "mouse5"
-defaultActionButton = mouse3
+    # Margin above/right/between notifications (in pixels). This can
+    # be used to avoid overlap between notifications and a bar such as
+    # polybar or i3blocks.
+    margin-top: 50
+    margin-right: 50
+    margin-between: 20
 
-[buttons]
-### This section describes the configurable buttons within the
-### notification center and NOT the buttons that appear in the
-### notifications
+    ### Monitor on which the notifications will be
+    ### printed. If "follow-mouse" is set true, this does nothing.
+    # monitor: 0
 
-# Note: If you want your buttons in the notification center to be
-#       squares you should verify that the following equality holds:
-#       [notification-center]::width
-#          == [buttons]::buttonsPerRow * [buttons]::buttonHeight
-#             + ([buttons]::buttonsPerRow + 1) * [buttons]::buttonMargin
+    ### If true, the notifications will open on the
+    ### screen, on which the mouse is. Overrides the "monitor" setting.
+    # follow-mouse: false
 
-# Numbers of buttons that can be drawn on a row of the notification
-# center.
-buttonsPerRow = 5
+    click-behavior:
+      
+      ### The mouse button for dismissing a popup. Must be either "mouse1", 
+      ### "mouse2", "mouse3", "mouse4", or "mouse5"
+      dismiss: mouse1
 
-# Height of buttons in the notification center (in pixels).
-buttonHeight = 60
-
-# Horizontal and vertical margin between each button in the 
-# notification center (in pixels).
-buttonMargin = 2
-
-# Labels written on the buttons in the notification center. Labels
-# should be written between quotes and separated by a colon. For
-# example:
-# labels = "VPN":"Bluetooth":"Wifi":"Screensaver"
-
-# Each label is represented as a clickable button in the notification
-# center. The commands variable below define the commands that should
-# be launched when the user clicks on the associated button.  There
-# should be the same number of entries in `commands` and in `labels`
-# commands = "sudo vpnToggle":"bluetoothToggle":"wifiToggle":"screensaverToggle"
+      ### The mouse button for opening a popup with the default action.
+      ### Must be either "mouse1", "mouse2", "mouse3", "mouse4", or "mouse5"
+      default-action: mouse3
 #+END_SRC
 
 *** CSS styling
 
-In the file =${XDG_CONFIG_HOME}/deadd/deadd.css= (usually
-=.config/deadd/deadd.css=) you can add CSS styles (GTK3-flavor). Should the
+The default CSS style can be found in =/etc/xdg/deadd/deadd.css=. It is
+advised to copy this file to =${XDG_CONFIG_HOME}/deadd/deadd.css= (usually
+=.config/deadd/deadd.css=) if you want to make changes.
+
+In the file you can change CSS styles (GTK3-flavor). Should the
 installation not have created a =dead.css=, you can use the content of
-[[https://github.com/phuhl/linux_notification_center/blob/master/style.css][style.css]]
-as a foundation.
+[[https://github.com/phuhl/linux_notification_center/blob/master/style.css][style.css]] as a foundation.
 
 The following class-names for labels are defined:
 - Notifications:
@@ -454,15 +627,20 @@ The following class-names for labels are defined:
   - =image.deadd-noti-center.in-center.image= :: Image of a notification
   - =image.deadd-noti-center.in-center.icon= :: Appicon
   - =button.deadd-noti-center.in-center.button-close= :: Close button on notification
-
 - Notification-center:
   - =label.deadd-noti-center.noti-center.time= :: The big time at the top
   - =label.deadd-noti-center.noti-center.date= :: The date text
   - =label.deadd-noti-center.noti-center.delete-all= :: "Delete all" Button
 
-_Examples:_
+Additionally, you can specify custom class-names in the
+modifications-section of your =deadd.yml=. These class names will be
+defined on the notification container (all notification elements lie
+within) of pop-ups and in-center.
 
-#+CAPTION: Remove appname and icon from notifications
+**** Examples:
+
+*Remove appname and icon from notifications*
+
 #+BEGIN_SRC css
 image.deadd-noti-center.notification.icon,
 label.deadd-noti-center.notification.appname,
@@ -473,11 +651,36 @@ label.deadd-noti-center.in-center.appname {
 #+END_SRC
 
 
-#+CAPTION: Change font
+*Change font*
+
 #+BEGIN_SRC css
 .deadd-noti-center {
     font-family: monospace;
 }
+#+END_SRC
+
+
+
+*Specify special background for one app*
+
+[[file:README.org.img/org_20210119_120536_adyKnd.jpg]]
+
+#+BEGIN_SRC css
+.notificationInCenter.Spotify {
+    background: linear-gradient(130deg, rgba(0, 0, 0, 0.1), rgba(0, 255, 0, 0.3));
+    border-radius: 5px;
+}
+#+END_SRC
+
+This change requires a modification in your deadd.yml:
+
+#+BEGIN_SRC yaml
+notification:
+  modifications:
+  - match:
+      app-name: "Spotify"
+    modify:
+      class-name: "Spotify"
 #+END_SRC
 
 *** Notification-based scripting
@@ -489,54 +692,105 @@ _Matching:_
 The criteria you can specify are equality for the following parameters:
 - title
 - body
-- app
+- app-name
 - time
-- icon
 
-You can test a parameter like this: =title=Abc=.
-If you want to test for more than one parameter (for all of them to be
-true) you can concatenate the criteria with =;= like this:
-=title=Abc;body=You can baz yourself=.
+The matching parameters can be specified in the section
+=notification.modifications.match= of your =deadd.yml=.
 
 _Modifying:_
 
 You can set the following parameters:
-- title
-- body
-- app
-- time
-- timeout (specified in milliseconds)
-- right (overrides ~distanceRight~ from the configuration)
-- top (overrides ~distanceTop~ from the configuration)
-- icon (overrides the app-icon, value must be either empty, a path to
+
+- =title=
+- =body=
+- =app-name=
+- =timeout= (specified in milliseconds)
+- =margin-right= (overrides ~distanceRight~ from the configuration)
+- =margin-top= (overrides ~distanceTop~ from the configuration)
+- =icon= (overrides the app-icon, value must be either empty, a path to
   an image or a gtk-icon-name)
-- image (overrides the image of the notification, value must be either
+- =image= (overrides the image of the notification, value must be either
   empty, a path to an image or a gtk-icon-name)
-- transient (value has to be =true= or =false=)
-- noClosedMsg (value has to be =true= or =false=, if set to true it
+- =image-size=
+- =transient= (value has to be =true= or =false=)
+- =send-noti-closed= (value has to be =true= or =false=, if set to true it
   will prevent that a DBUS =NotificationClosed= message will be send
   for this notification. Only applies if the configuration parameter
   =configSendNotiClosedDbusMessage= is set to =true=)
-- removeActions (value can be anything, if used, no action buttons
+- =remove-actions= (value can be anything, if used, no action buttons
   will be displayed on the notifications)
+- =class-name= (adds a CSS-class name to the container of the
+  notification for styling)
 
-If you want to set more than one parameter you can concatenate them
-with =;= like this: =app=Crashmaster 2000;time=4:20=.
+The modification parameters can be specified in the section
+=notification.modifications.modify= of your =deadd.yml=.
 
-_Running Commands:_
 
-Not implemented, yet.
+_Running Scripts:_
 
-#+BEGIN_SRC ini
-[notification-center]
-match = "title=Abc;body=abc":"app=notify-send"
-modify = "transient=false"
-run = "":"killall notify-send"
+Instead of modifying a notification directly, a script can be run,
+which will receive the notification as JSON on STDIN. The script is
+expected to return JSON/YAML configuration that defines the
+modifications that should be applied. Minimum complete return value
+must be ={"modify": {}, "match": {}}=. Always leave the "match" object
+empty (technical reasons, i.e. I am lazy).
+
+*Example script* to turn a notification from WhatsApp in Chromium into
+something sensible:
+
+Before:
+
+[[file:README.org.img/org_20210119_122628_AUuEu3.jpg]]
+
+After:
+
+[[file:README.org.img/org_20210119_122031_BNYKTp.jpg]]
+
+Configuration:
+
+#+BEGIN_SRC yaml
+notification:
+  modifications:
+  - match:
+      app-name: "Chromium"
+    script: "linux-notification-center-parse-chromium"
+
 #+END_SRC
 
-** Issues and goals
 
-See here: [[file:Worklog.org][Log of issues]]
+Script executed on Chromium notifications:
+
+#+BEGIN_SRC sh
+#!/bin/bash
+
+# Read notification from STDIN
+noti=""
+while read line
+do
+    noti=${noti}${line}
+done < "${1:-/dev/stdin}"
+
+# Use jq to parse JSON and get the body field of the notification
+body=$(echo $noti | jq '.body')
+if [[ "$body" == "\"<a href=\\\"https://web.whatsapp.com/\\\">web.whatsapp.com</a>"* ]]; then
+      # It's Whatsapp web, lets modify the notification
+      isWhatsapp=1
+      body=$(echo $body | cut -c 64-)
+      img=$(echo $noti | jq '.image')
+      if [[ "$img" == "\"NamedIcon \\\""* ]]; then
+          filepath=$(echo $img | cut -c 14- | head -c -4)
+          cp $filepath /tmp/whatsappimg.png
+      fi
+fi
+
+if [[ "$isWhatsapp" == "1" ]]; then
+    # Returning the modifications to dnc as JSON
+    echo "{\"modify\": {\"app-icon\": \"whatsapp-desktop\", \"app-name\": \"WhatsApp\", \"image-size\": 50, \"image\": \"file:///tmp/whatsappimg.png\", \"remove-actions\": true, \"class-name\": \"WhatsApp\", \"body\":\"${body}}, \"match\": {}}"
+else
+    echo '{"modify": {}, "match": {}}'
+fi
+#+END_SRC
 
 ** Contribute
 
@@ -545,13 +799,13 @@ First of all: Contribution is obviously 100% optional.
 If you do want to contribute, feel free to send me an email (for the
 address, see on my profile).
 
-If you do not want to contribute with your time, you can buy me a beer
-;). Someone mentioned, she would be willing to donate, so here is my
-PayPal link: [[https://paypal.me/phuhl]]. Should you consider to donate,
-please be aware that this does not buy you the right to demand
-anything. This is a hobby. And will be. But if you just want to give
-me some motivation by showing me that someone appreciates my work,
-feel free to do so.
+If you do not want to contribute with your time, you can buy me a
+beer. Someone mentioned, they would be willing to donate, so here is
+my PayPal link: [[https://paypal.me/phuhl]]. Should you consider to
+donate, please be aware that this does not buy you the right to demand
+anything. This is a hobby and will be. But if you just want to give me
+some motivation by showing me that someone appreciates my work, feel
+free to do so :)
 
 ** See also
 

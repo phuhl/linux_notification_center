@@ -131,14 +131,20 @@ updateNotiContent config noti dNoti = do
       labelSetMarkup (view dLabelBody dNoti) $ markupify $ notiBody noti
       else do
       labelSetText (view dLabelBody dNoti) $ notiBody noti
-  labelSetText (view dLabelAppname dNoti) $ notiAppName noti
+  if notiAppName noti /= "" then
+    labelSetText (view dLabelAppname dNoti) $ notiAppName noti
+    else
+    widgetSetVisible (view dLabelAppname dNoti) False
   labelSetXalign (view dLabelTitel dNoti) 0
   labelSetXalign (view dLabelBody dNoti) 0
-  let iconSize = 15
-      imageSize = 100
-  setImage (notiIcon noti) (fromIntegral $ configIconSize config)
+
+  if notiIcon noti /= NoImage then
+    setImage (notiIcon noti) (fromIntegral $ configIconSize config)
     $ view dImgAppIcon dNoti
-  setImage (notiImg noti) (fromIntegral $ configImgSize config)
+    else
+    widgetSetVisible (view dImgAppIcon dNoti) False
+
+  setImage (notiImg noti) (fromIntegral $ notiImgSize noti)
     $ view dImgImage dNoti
 
   let takeTwo (a:b:cs) = (a,b):(takeTwo cs)
@@ -152,6 +158,8 @@ updateNotiContent config noti dNoti = do
   currentButtons <- Gtk.containerGetChildren (view dActions dNoti)
   sequence $ Gtk.containerRemove (view dActions dNoti) <$> currentButtons
   sequence $ Gtk.containerAdd (view dActions dNoti) <$> actionButton <$> actionButtons
+
+  addClass (view dContainer dNoti) (notiClassName noti)
 
   widgetShowAll (view dActions dNoti)
 
