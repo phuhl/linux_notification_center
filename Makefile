@@ -68,7 +68,7 @@ install-stack:
 	install -Dm644 docs/linux-notification-center.man ${DESTDIR}${MANPREFIX}/man1/deadd-notification-center.1
 	install -Dm644 LICENSE ${DESTDIR}${PREFIX}/share/licenses/deadd-notification-center/LICENSE
 
-CSS_CONFIG_DIR = ${XDG_CONFIG_SYSTEM}/deadd
+CSS_CONFIG_DIR = ${DESTDIR}${XDG_CONFIG_SYSTEM}/deadd
 CSS_CONFIG_FILE = ${CSS_CONFIG_DIR}/deadd.css
 install-config:
 	mkdir -p ${CSS_CONFIG_DIR}
