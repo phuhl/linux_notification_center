@@ -212,7 +212,7 @@ instance FromJSON Config where
   -- configDistanceTop
     <*> inheritingThirdLevel o "notification" "popup" "margin-top" 50
   -- configDistanceRight
-    <*> inheritingThirdLevel o "notification" "popup" "margin-top" 50
+    <*> inheritingThirdLevel o "notification" "popup" "margin-right" 50
   -- configDistanceBetween
     <*> thirdLevel o "notification" "popup" "margin-between" 20
   -- configWidthNoti
