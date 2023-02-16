@@ -249,7 +249,7 @@ instance FromJSON Config where
   -- configButtonMargin
     <*> thirdLevel o "notification-center" "buttons" "buttons-margin" 2
   -- configLabels
-    <*> thirdLevel o "notification-center" "buttons" "labels" []
+    <*> thirdLevel o "notification-center" "buttons" "actions" []
   parseJSON _ = fail "Expected Object for Config value"
 
 data ButtonConfig = Button
