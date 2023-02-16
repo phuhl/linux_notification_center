@@ -234,10 +234,10 @@ instance FromJSON Config where
   -- configIconSize
     <*> thirdLevel o "notification" "app-icon" "icon-size" 20
   -- configPopupMaxLinesInBody
-    <*> inheritingThirdLevel o "notification" "pop-up" "max-lines-in-body" 3
+    <*> inheritingThirdLevel o "notification" "popup" "max-lines-in-body" 3
   -- configPopupEllipsizeBody
     <*> ((/= (0 :: Int)) <$>
-          inheritingThirdLevel o "notification" "pop-up" "max-lines-in-body" 3)
+          inheritingThirdLevel o "notification" "popup" "max-lines-in-body" 3)
   -- configPopupDismissButton
     <*> fourthLevel o "notification" "popup" "click-behavior" "dismiss" "mouse1"
   -- configPopupDefaultActionButton
