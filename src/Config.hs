@@ -247,7 +247,7 @@ instance FromJSON Config where
   -- configButtonHeight
     <*> thirdLevel o "notification-center" "buttons" "buttons-height" 60
   -- configButtonMargin
-    <*> thirdLevel o "notification-center" "buttons" "buttons-height" 2
+    <*> thirdLevel o "notification-center" "buttons" "buttons-margin" 2
   -- configLabels
     <*> thirdLevel o "notification-center" "buttons" "actions" []
   parseJSON _ = fail "Expected Object for Config value"
