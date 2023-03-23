@@ -335,11 +335,16 @@ modifyNoti config noti =
           Map.foldrWithKey (\k v matches -> matches && ((v == lookupFun k noti)))
           True (mMatch rule)
         lookupFun name noti = Text.unpack $ fromMaybe (Text.pack "")
-          ((lookup name
-             [ ("title", notiSummary)
-             , ("body", notiBody)
-             , ("app-name", notiAppName)
-             , ("time", notiTime) ]) <*> (Just noti))
+          (let notiUrgencyStr = (\n -> case (notiUrgency n) of
+                                         Low -> "low"
+                                         Normal -> "normal"
+                                         High -> "critical")
+           in ((lookup name
+                [ ("title", notiSummary)
+                , ("body", notiBody)
+                , ("app-name", notiAppName)
+                , ("urgency", notiUrgencyStr)
+                , ("time", notiTime) ]) <*> (Just noti)))
         replace ('\\':cs) = "\\\\" ++ replace cs
         replace (c:cs) = c : replace cs
         replace ([]) = []
