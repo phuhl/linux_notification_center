@@ -522,6 +522,7 @@ notification:
       # body: "Notification body"
       # time: "12:44"
       # app-name: "App name"
+      # urgency: "low" # "low", "normal" or "critical"
 
     # modify:
       ### Possible modifications
