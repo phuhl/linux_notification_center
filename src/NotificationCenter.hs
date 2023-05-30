@@ -49,7 +49,7 @@ import System.Process (spawnCommand, interruptProcessGroupOf, waitForProcess)
 import System.Locale.Current
 import System.Posix.Signals (sigUSR1)
 import System.Posix.Daemonize (serviced, daemonize)
-import System.Directory (getXdgDirectory, XdgDirectory(..))
+import System.Directory (doesFileExist, getXdgDirectory, XdgDirectory(..))
 
 import DBus ( fromVariant )
 
@@ -135,8 +135,8 @@ deleteInCenter tState = do
 setWindowStyle tState = do
   state <- readTVarIO tState
   homeDir <- getXdgDirectory XdgConfig ""
-  style <- fromEither <$> (readFile ("/etc/xdg/deadd/deadd.css"))
-           <*> (tryIOError $ readFile (homeDir ++ "/deadd/deadd.css"))
+  let paths = [ "/etc/xdg/deadd/deadd.css", homeDir ++ "/deadd/deadd.css" ]
+  style <- readFile =<< (filterM doesFileExist paths >>= return . head)
   screen <- windowGetScreen $ stMainWindow state
   setStyle screen $ BS.pack $ style
   return False
