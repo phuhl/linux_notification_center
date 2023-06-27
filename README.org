@@ -441,11 +441,11 @@ notification-center:
     # buttons-per-row: 5
 
     ### Height of buttons in the notification center (in pixels).    
-    # button-height: 60
+    # buttons-height: 60
 
     ### Horizontal and vertical margin between each button in the 
     ### notification center (in pixels).
-    # button-margin: 2
+    # buttons-margin: 2
 
     ### Button actions and labels. For each button you must specify a
     ### label and a command.
