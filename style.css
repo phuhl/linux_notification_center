@@ -11,6 +11,10 @@
 
 /* Notifications */
 
+.notification.content {
+    margin-left: 15px;
+}
+
 .title {
     font-weight: bold;
     font-size: 16px;
