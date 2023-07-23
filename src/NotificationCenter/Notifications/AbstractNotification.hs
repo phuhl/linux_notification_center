@@ -199,6 +199,7 @@ setImage image imageSize widget = do
     NoImage -> do
       widgetSetMarginStart widget 0
       widgetSetMarginEnd widget 0
+      widgetSetVisible widget False
     (ImagePath path) -> do
       pb <- catchGErrorJustDomain
             (catchGErrorJustDomain
