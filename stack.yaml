@@ -15,7 +15,7 @@
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: lts-19.4
+resolver: lts-21.3
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -40,13 +40,8 @@ packages:
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
 extra-deps:
-  [
-    env-locale-1.0.0.1,
-    haskell-gettext-0.1.2.0,
-    gi-pango-1.0.27@sha256:3e9c5497382e8f112e834269de624980578cb6401e46f6537e694f94094b3af2,
-    gi-harfbuzz-0.0.6,
-    gi-freetype2-2.0.2,
-  ]
+  - env-locale-1.0.0.1
+  - haskell-gettext-0.1.2.0
 
 # Override default flag values for local packages and extra-deps
 flags: {}
