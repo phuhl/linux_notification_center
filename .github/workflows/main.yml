@@ -20,6 +20,13 @@ jobs:
           key: stack-global-${{ hashFiles('stack.yaml') }}
           restore-keys: stack-global-
 
+      - uses: actions/cache@v3
+        name: Cachek .stack-work
+        with:
+          path: .stack-work
+          key: stack-work-${{ hashFiles('stack.yaml') }}-${{ hashFiles('package.yaml') }}-${{ hashFiles('**/*.hs') }}
+          restore-keys: stack-work-
+
       - uses: haskell/actions/setup@v2
         name: Setup Haskell Stack
         with:
