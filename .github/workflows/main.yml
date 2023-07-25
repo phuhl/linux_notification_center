@@ -21,7 +21,7 @@ jobs:
           restore-keys: stack-global-
 
       - uses: actions/cache@v3
-        name: Cachek .stack-work
+        name: Cache .stack-work
         with:
           path: .stack-work
           key: stack-work-${{ hashFiles('stack.yaml') }}-${{ hashFiles('package.yaml') }}-${{ hashFiles('**/*.hs') }}
