@@ -12,8 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-        if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/main'
+      - uses: actions/checkout@v3
 
       - uses: haskell/actions/setup@v2
         name: Setup Haskell Stack
