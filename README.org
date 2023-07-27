@@ -801,7 +801,9 @@ fi
 
 First of all: Contribution is obviously 100% optional.
 
-If you want to join the development chat, join our matrix channel: #deadd-notification-center:beeper.com or drop by on the discussion board: https://github.com/phuhl/linux_notification_center/discussions
+If you want to join the development chat, join our *matrix channel: 
+#deadd-notification-center:beeper.com* or drop by on the discussion 
+board: https://github.com/phuhl/linux_notification_center/discussions
 
 If you do not want to contribute with your time, you can buy me a
 beer. Someone mentioned, they would be willing to donate, so here is
