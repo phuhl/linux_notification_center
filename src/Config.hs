@@ -89,9 +89,9 @@ instance FromJSON ModificationRule where
 
 
 data Config = Config
- {
-   -- notification-center
-   configBarHeight :: Int
+  {
+  -- notification-center
+    configBarHeight :: Int
   , configBottomBarHeight :: Int
   , configRightMargin :: Int
   , configWidth :: Int
@@ -132,7 +132,7 @@ data Config = Config
   , configButtonHeight :: Int
   , configButtonMargin :: Int
   , configButtons :: [ButtonConfig]
-}
+  }
 
 (.:.) :: FromJSON a => Y.Parser (Maybe Y.Object) -> Text.Text -> Y.Parser (Maybe  a)
 (.:.) po name = do
