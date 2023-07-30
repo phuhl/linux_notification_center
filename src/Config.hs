@@ -126,6 +126,7 @@ data Config = Config
   , configPopupEllipsizeBody :: Bool
   , configPopupDismissButton :: String
   , configPopupDefaultActionButton :: String
+  , configPopupHideBodyIfEmpty :: Bool
 
   -- buttons
   , configButtonsPerRow :: Int
@@ -242,6 +243,8 @@ instance FromJSON Config where
     <*> fourthLevel o "notification" "popup" "click-behavior" "dismiss" "mouse1"
   -- configPopupDefaultActionButton
     <*> fourthLevel o "notification" "popup" "click-behavior" "default-action" "mouse3"
+  -- configPopupHideBodyIfEmpty
+    <*> thirdLevel o "notification" "popup" "hide-body-if-empty" False
   -- configButtonsPerRow
     <*> thirdLevel o "notification-center" "buttons" "buttons-per-row" 5
   -- configButtonHeight
