@@ -62,7 +62,7 @@ instance HasDisplayingNotificationContent DisplayingNotificationPopup where
 
 
 showNotificationWindow :: Config -> Notification
-  -> [DisplayingNotificationPopup] -> (IO ()) -> IO DisplayingNotificationPopup
+  -> [DisplayingNotificationPopup] -> (Config -> IO ()) -> IO DisplayingNotificationPopup
 showNotificationWindow config noti dispNotis onClose = do
 
   let distanceTopFromConfig = configDistanceTop config
@@ -99,7 +99,7 @@ showNotificationWindow config noti dispNotis onClose = do
   setUrgencyLevel (notiUrgency noti)
     $ (flip view) dispNoti <$> [dLabelTitel, dLabelBody, dLabelAppname]
 
-  height <- updateNoti' config onClose noti dispNoti
+  height <- updateNoti' config (onClose config) noti dispNoti
 
   -- Ellipsization of Body
   numLines <- fromIntegral <$> (layoutGetLineCount =<< labelGetLayout lblBody)
@@ -154,23 +154,23 @@ showNotificationWindow config noti dispNotis onClose = do
         defaultAction = configPopupDefaultActionButton config == mouseButton
     if | valid && dismiss -> do
            notiOnClosed noti $ User
-           onClose
+           onClose config
        | valid && defaultAction -> do 
            notiOnAction noti "default" Nothing
            notiOnClosed noti $ User
-           onClose
+           onClose config
        | not validDismiss -> do
            putStrLn $ "Warning: Unknown mouse button '" ++ (show $ configPopupDismissButton config) ++ "'."
            notiOnClosed noti $ User
-           onClose
+           onClose config
        | not validDefaultAction -> do
            putStrLn $ "Warning: Unknown mouse button '" ++ (show $ configPopupDefaultActionButton config) ++ "'."
            notiOnClosed noti $ User
-           onClose
+           onClose config
        | otherwise -> do
            putStrLn $ "Warning: Popup received unknown mouse input '" ++ (show mouseButton) ++ "'."
            notiOnClosed noti $ User
-           onClose
+           onClose config
     return False
 
   widgetShow mainWindow
