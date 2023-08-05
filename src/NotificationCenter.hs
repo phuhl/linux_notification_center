@@ -223,28 +223,36 @@ setNotificationCenterPosition mainWindow config = do
     getMouseActiveScreenPos mainWindow (fromIntegral $ configNotiMonitor config)
     else
     getScreenPos mainWindow (fromIntegral $ configNotiCenterMonitor config)
-  monitor <- getMouseActiveScreen mainWindow (fromIntegral $ configNotiMonitor config)
+
+  monitor <- if configNotiFollowMouse config then
+               getMouseActiveScreen mainWindow (fromIntegral $ configNotiMonitor config)
+             else
+               getMonitorFromNumber mainWindow $ configNotiMonitor config
 
   windowSetDefaultSize mainWindow
     width -- w
     (screenH - barHeightTop - barHeightBottom) -- h
-  --windowMove mainWindow
-  --  (screenW - width - marginRight) -- x
-  --  (screenY + barHeightTop)  -- y
 
-  supported <- isSupported
-  isLayered <- isLayerWindow mainWindow
-  when (supported && not isLayered) $ do
+
+  layerShellSupported <- LayerShell.isSupported
+  isLayered <- LayerShell.isLayerWindow mainWindow
+  when (layerShellSupported && not isLayered) $ do
     LayerShell.initForWindow mainWindow
     LayerShell.setLayer mainWindow LayerOverlay
     LayerShell.autoExclusiveZoneEnable mainWindow
+    LayerShell.setExclusiveZone mainWindow 0
+    LayerShell.setNamespace mainWindow "deadd-notification-center"
+
+  if layerShellSupported then do
+    LayerShell.setMonitor mainWindow monitor
     LayerShell.setMargin mainWindow EdgeRight marginRight
     LayerShell.setMargin mainWindow EdgeTop barHeightTop
     LayerShell.setMargin mainWindow EdgeBottom barHeightBottom
     LayerShell.setAnchor mainWindow EdgeRight True
-    LayerShell.setNamespace mainWindow "deadd-notification-center"
-    putStrLn "layer setup done"
-    LayerShell.setMonitor mainWindow monitor
+    else
+    windowMove mainWindow
+      (screenW - width - marginRight) -- x
+      (screenY + barHeightTop)  -- y
 
   return ()
     where
@@ -313,9 +321,7 @@ hideNotiCenter tState = do
 showNotiCenter tState notiState config = do
   state <- readTVarIO tState
   mainWindow <- stMainWindow <$> readTVarIO tState
-  putStrLn "show"
   setNotificationCenterPosition mainWindow config
-  putStrLn "after setNotificationCenterPosition"
   newShown <- if stCenterShown state then
     do
       widgetHide mainWindow
@@ -324,9 +330,7 @@ showNotiCenter tState notiState config = do
     do
       hideAllNotis $ stNotiState state
       widgetShow mainWindow
-      putStrLn "after widgetShow"
       return True
-  putStrLn "after newShow"
 
   atomically $ modifyTVar' tState
     (\state -> state {stCenterShown = newShown })
