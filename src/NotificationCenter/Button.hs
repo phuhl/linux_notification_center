@@ -68,9 +68,7 @@ createButton config width height command description = do
         , buttonLabel = label
         , buttonCommand = command }
   onButtonClicked button $ do
-    addSource $ do
-      setButtonState2 $ theButton
-      return False
+    addSource $ setButtonState2 $ theButton
     ph <- spawnCommand command
     waitForProcess ph `finally` interruptProcessGroupOf ph
     return ()
