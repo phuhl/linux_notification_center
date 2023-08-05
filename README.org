@@ -587,7 +587,12 @@ notification:
     ### Defines after how many lines of text the body will be truncated. 
     ### Use 0 if you want to disable truncation.
     max-lines-in-body: 3
-    
+
+    ### Determines whether the GTK widget that displays the notification body
+    ### in the notification popup will be hidden when empty. This is especially
+    ### useful for transient notifications that display a progress bar.
+    # hide-body-if-empty: false
+
     ### Monitor on which the notifications will be
     ### printed. If "follow-mouse" is set true, this does nothing.
     # monitor: 0

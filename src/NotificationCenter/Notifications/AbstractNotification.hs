@@ -127,10 +127,14 @@ updateNotiContent :: HasDisplayingNotificationContent dn
   => Config -> Notification -> dn -> IO ()
 updateNotiContent config noti dNoti = do
   labelSetText (view dLabelTitel dNoti) $ notiSummary noti
-  if (configNotiMarkup config) then do
-      labelSetMarkup (view dLabelBody dNoti) $ markupify $ notiBody noti
-      else do
-      labelSetText (view dLabelBody dNoti) $ notiBody noti
+
+  if configNotiMarkup config
+    then labelSetMarkup (view dLabelBody dNoti) . markupify $ notiBody noti
+    else labelSetText (view dLabelBody dNoti) $ notiBody noti
+
+  when (configPopupHideBodyIfEmpty config && notiBody noti == "") $ do
+    widgetSetVisible (view dLabelBody dNoti) False
+
   if notiAppName noti /= "" then
     labelSetText (view dLabelAppname dNoti) $ notiAppName noti
     else
