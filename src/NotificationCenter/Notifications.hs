@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, TupleSections #-}
 
 module NotificationCenter.Notifications
   ( startNotificationDaemon
@@ -46,7 +46,7 @@ import Data.List
 import qualified Data.Map as Map
 import Data.Time
 import Data.Time.LocalTime
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, fromJust, isNothing)
 
 import qualified Data.Yaml as Yaml
 import qualified Data.Aeson as Aeson
@@ -62,6 +62,7 @@ import Data.GI.Base.GError (catchGErrorJust)
 
 import GI.Gio.Interfaces.AppInfo (appInfoGetIcon, appInfoGetAll, appInfoGetName)
 import GI.Gio.Interfaces.Icon (iconToString, Icon(..))
+import GI.Gtk (windowMove, windowGetPosition)
 
 data NotifyState = NotifyState
   { notiStList :: [ Notification ]
@@ -414,7 +415,10 @@ insertNewNoti newNoti tState = do
         (notiConfig state)
         newNoti
         (notiDisplayingList state)
-        (removeNotiFromDistList tState $ notiId newNoti)
+        (\cfg -> do
+          removeNotiFromDistList tState $ notiId newNoti
+          readjustNotificationPositions cfg tState
+        )
       atomically $ modifyTVar' tState $ \state ->
         state { notiDisplayingList = dnoti : notiDisplayingList state }
       return ()
@@ -438,17 +442,56 @@ removeNotiFromDistList tState id = do
     maybe (return ()) _dNotiDestroy mDn
   return ()
 
+-- | Adjusts the position of all displayed notifications so they follow standardized placement rules.
+readjustNotificationPositions :: Config -> TVar NotifyState -> IO ()
+readjustNotificationPositions config tState = do
+  sortedDisplayedPopups <- sortOn _dNotiTop . filter (not . _dHasCustomPosition) . notiDisplayingList <$> readTVarIO tState
+  newDisplayedPopups <- pushNotificationsUp config sortedDisplayedPopups
+  atomically $ modifyTVar' tState $ \state ->
+    state { notiDisplayingList = newDisplayedPopups ++ filter _dHasCustomPosition (notiDisplayingList state) }
+
+pushNotificationsUp :: Config -> [DisplayingNotificationPopup] -> IO [DisplayingNotificationPopup]
+pushNotificationsUp _      [ ]   = return [ ]
+pushNotificationsUp config (f:r) = do
+  newFirst <- autoplaceNotification config Nothing f
+  pushNotificationsUp' config (newFirst:r)
+
+pushNotificationsUp' :: Config -> [DisplayingNotificationPopup] -> IO [DisplayingNotificationPopup]
+pushNotificationsUp' _      [ ]     = return [ ]
+pushNotificationsUp' _      [l]     = return [l]
+pushNotificationsUp' config (f:s:r) = do
+  newSecond <- autoplaceNotification config (Just f) s
+  newRest <- pushNotificationsUp' config (newSecond:r)
+  return (f:newRest)
+
+-- | Places a notification popup on the screen automatically given a preceding notification.
+autoplaceNotification :: Config -> Maybe DisplayingNotificationPopup -> DisplayingNotificationPopup -> IO DisplayingNotificationPopup
+autoplaceNotification config preceding newpopup = do
+  let monitorId = fromIntegral $ configNotiMonitor config
+      notificationWidth = fromIntegral $ configWidthNoti config
+      distanceRight = fromIntegral $ configDistanceRight config
+      distanceTop = fromIntegral $ configDistanceTop config
+      distanceBetween = fromIntegral $ configDistanceBetween config
+  (screenWidth, screenHeight, _) <- getScreenPos (_dMainWindow newpopup) monitorId
+  let x = screenWidth - (notificationWidth + distanceRight)
+  y <- calculateY preceding distanceBetween distanceTop
+  windowMove (_dMainWindow newpopup) x y
+  return newpopup { _dNotiTop = y }
+  where calculateY Nothing   _  d = return d
+        calculateY (Just dn) db _ = (db + _dNotiTop dn +) <$> _dNotiGetHeight dn
+
 hideAllNotis tState = do
   state <- readTVarIO tState
   mapM (removeNotiFromDistList tState . _dNotiId)
     $ notiDisplayingList state
   return ()
 
-closeNotification tState id = do
+closeNotification config tState id = do
   state <- readTVarIO tState
   let notis = filter (\n -> (notiId n) /= fromIntegral id) (notiStList state)
   sequence $ (\noti -> addSource $ notiOnClosed noti $ CloseByCall ) <$> notis
   removeNotiFromDistList' tState id
+  readjustNotificationPositions config tState
 
 
 notificationDaemon :: (AutoMethod f1, AutoMethod f2) =>
@@ -472,5 +515,5 @@ startNotificationDaemon :: Config -> IO () ->  IO () ->  IO (TVar NotifyState)
 startNotificationDaemon config onUpdate onUpdateForMe = do
   istate <- newTVarIO $ NotifyState [] [] 1 onUpdate onUpdateForMe config []
   forkIO (notificationDaemon config (notify config istate)
-          (closeNotification istate))
+          (closeNotification config istate))
   return istate
