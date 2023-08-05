@@ -141,9 +141,11 @@ runAfterDelay :: Int -> IO () -> IO ThreadId
 runAfterDelay t f = forkIO (threadDelay t >> f)
 
 
-addSource :: IO Bool -> IO Word32
+addSource :: IO () -> IO Word32
 addSource f = do
-  idleAdd PRIORITY_DEFAULT f
+  idleAdd PRIORITY_DEFAULT $ do
+    f
+    return False
 
 
 setStyle :: Screen -> BS.ByteString -> IO ()

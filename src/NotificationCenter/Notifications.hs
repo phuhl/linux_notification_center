@@ -401,7 +401,6 @@ replaceNoti newNoti tState = do
            (removeNotiFromDistList tState $ notiId newNoti)
            newNoti) notis
     notiStOnUpdate state
-    return False
   return ()
  where repId = fromIntegral (notiRepId newNoti)
 
@@ -421,7 +420,6 @@ insertNewNoti newNoti tState = do
       return ()
     -- trigger update in noti-center
     notiStOnUpdate state
-    return False
   return ()
 
 removeNotiFromDistList' :: TVar NotifyState -> Word32 -> IO ()
@@ -438,7 +436,6 @@ removeNotiFromDistList tState id = do
   addSource $ do
     let mDn = find (\n -> _dNotiId n == id) $ notiDisplayingList state
     maybe (return ()) _dNotiDestroy mDn
-    return False
   return ()
 
 hideAllNotis tState = do
@@ -450,8 +447,7 @@ hideAllNotis tState = do
 closeNotification tState id = do
   state <- readTVarIO tState
   let notis = filter (\n -> (notiId n) /= fromIntegral id) (notiStList state)
-  sequence $ (\noti -> addSource $ do notiOnClosed noti $ CloseByCall
-                                      return False) <$> notis
+  sequence $ (\noti -> addSource $ notiOnClosed noti $ CloseByCall ) <$> notis
   removeNotiFromDistList' tState id
 
 

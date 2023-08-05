@@ -186,15 +186,14 @@ updateNoti' config onClose noti dNoti = do
   let notiDefaultTimeout = configNotiDefaultTimeout config
   startTimeoutThread notiDefaultTimeout
     (fromIntegral $ notiTimeout noti) (
-    do addSource $ do notiOnClosed noti $ Timeout
-                      return False
+    do addSource $ notiOnClosed noti $ Timeout
        onClose)
   return height
 
 updateNoti config onClose noti dNoti  = do
   addSource $ do
     updateNoti' config onClose noti dNoti
-    return False
+    return ()
   return ()
 
 getHeight widget config = do
@@ -207,9 +206,7 @@ startTimeoutThread notiDefaultTimeout timeout onClose = do
     let timeout' = if timeout > 0 then timeout
                    else notiDefaultTimeout
     runAfterDelay (1000 * timeout') $ do
-      addSource $ do
-        onClose
-        return False
+      addSource $ onClose
       return ()
     return ()
   return ()

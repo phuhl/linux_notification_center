@@ -107,5 +107,5 @@ updateNoti config mainBox dNoti tNState = do
         when (configNotiCenterNewFirst config)
           (Gtk.boxReorderChild mainBox (view dContainer dNoti) 0)
       Nothing -> return ()
-    return False
+    return ()
   return ()
