@@ -445,7 +445,11 @@ main' = do
   createNotiCenter istate config catalog
 
   unixSignalAdd PRIORITY_HIGH (fromIntegral sigUSR1)
-    (showNotiCenter istate notiState config)
+    (do
+        addSource $ do
+          showNotiCenter istate notiState config
+          return False
+        return True)
 
   ph <- spawnCommand $ configStartupCommand config
   waitForProcess ph `finally` interruptProcessGroupOf ph
