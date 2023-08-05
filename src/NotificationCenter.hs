@@ -4,7 +4,7 @@
 module NotificationCenter where
 
 import Config
-  (getConfig,Config(..))
+  (getConfig, Config(..), ButtonConfig(..))
 import NotificationCenter.NotificationInCenter
   (DisplayingNotificationInCenter(..), showNotification, updateNoti)
 import NotificationCenter.Notifications
@@ -21,6 +21,7 @@ import Prelude
 import System.Locale.SetLocale
 import System.IO.Unsafe
 import System.IO (readFile)
+import System.IO.Error (tryIOError)
 
 import Data.Int (Int32(..))
 import Data.Tuple.Sequence (sequenceT)
@@ -48,7 +49,7 @@ import System.Process (spawnCommand, interruptProcessGroupOf, waitForProcess)
 import System.Locale.Current
 import System.Posix.Signals (sigUSR1)
 import System.Posix.Daemonize (serviced, daemonize)
-import System.Directory (getXdgDirectory, XdgDirectory(..))
+import System.Directory (doesFileExist, getXdgDirectory, XdgDirectory(..))
 
 import DBus ( fromVariant )
 
@@ -137,7 +138,8 @@ deleteInCenter tState = do
 setWindowStyle tState = do
   state <- readTVarIO tState
   homeDir <- getXdgDirectory XdgConfig ""
-  style <- readFile (homeDir ++ "/deadd/deadd.css")
+  let paths = [homeDir ++ "/deadd/deadd.css", "/etc/xdg/deadd/deadd.css"]
+  style <- readFile =<< (filterM doesFileExist paths >>= return . head)
   screen <- windowGetScreen $ stMainWindow state
   setStyle screen $ BS.pack $ style
   return False
@@ -165,10 +167,7 @@ createNotiCenter tState config catalog = do
   onButtonClicked deleteButton $ deleteInCenter tState
   buttonSetLabel deleteButton $ LT.toStrict $ gettext catalog "Delete all"
 
-  let buttons = zip
-        (split $ removeOuterLetters $ configLabels config)
-        (split $ removeOuterLetters $ configCommands config)
-      (buttonLabels, buttonCommands) = unzip buttons
+  let buttons = configButtons config
       margin = fromIntegral $ configButtonMargin config
       width = fromIntegral (((configWidth config) - 20)
                             `div` (configButtonsPerRow config))
@@ -178,7 +177,9 @@ createNotiCenter tState config catalog = do
         $ ((fromIntegral $ length buttons) / (fromIntegral $ configButtonsPerRow config))
   lines' <- sequence $ take linesNeeded $ repeat $ boxNew OrientationHorizontal 0
   buttons' <- sequence $ map
-    (\(label, command) -> createButton config width height command label)
+    (\(button) -> createButton config width height
+                  (configButtonCommand button)
+                  (configButtonLabel button))
     buttons
 
 
@@ -429,8 +430,9 @@ main' = do
   GI.init Nothing
 
   homeDir <- getXdgDirectory XdgConfig ""
-  config <- getConfig <$> (readConfigFile
-                            (homeDir ++ "/deadd/deadd.conf"))
+  configData <- fromEither (Text.pack "{}") <$> (tryIOError $ do
+    Text.pack <$> readFile (homeDir ++ "/deadd/deadd.yml"))
+  config <- getConfig configData
 
   catalog <- i18nInit
 

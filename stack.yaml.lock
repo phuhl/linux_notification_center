@@ -19,36 +19,15 @@ packages:
   original:
     hackage: haskell-gettext-0.1.2.0
 - completed:
-    hackage: gi-pango-1.0.27@sha256:3e9c5497382e8f112e834269de624980578cb6401e46f6537e694f94094b3af2,7461
-    pantry-tree:
-      sha256: a9fbc13fa28da5d18e2ab39e9f8045b92e89d2ff65bdb7046955e965b1f398be
-      size: 361
-  original:
-    hackage: gi-pango-1.0.27@sha256:3e9c5497382e8f112e834269de624980578cb6401e46f6537e694f94094b3af2
-- completed:
-    hackage: gi-harfbuzz-0.0.6@sha256:c3f90157c220ba9aa8d1e221e5d7d73c528dac62fa4866058432c7dc14f76c90,6512
-    pantry-tree:
-      sha256: 1c26234a2de28fac847086802bdaa3a973b9f852141c2fc52ae9bc4ae0df5ac3
-      size: 364
-  original:
-    hackage: gi-harfbuzz-0.0.6
-- completed:
-    hackage: gi-freetype2-2.0.2@sha256:3ceda91744fbec02b0f5972822e43f633807929ca0c719bbc1fb3d7598c96f0b,2754
-    pantry-tree:
-      sha256: c340d45b834b8494964c214c4b0958d768d374056e7a813eca09f512eebc42e9
-      size: 306
-  original:
-    hackage: gi-freetype2-2.0.2
-- completed:
     hackage: gi-gtk-layer-shell-0.1.3@sha256:76240ff466fa3cf14db42e20cdf5266408baf279d45b817c1f90d846d4e72bdb,2674
     pantry-tree:
       sha256: bcd2406b3ebefc98a47ec3baba30054738fcc7c0d0e407daea6dd4f1cbceaed6
       size: 376
   original:
-    hackage: gi-gtk-layer-shell-0.1.3@sha256:76240ff466fa3cf14db42e20cdf5266408baf279d45b817c1f90d846d4e72bdb
+    hackage: gi-gtk-layer-shell-0.1.3
 snapshots:
 - completed:
-    sha256: d4ee004c46ba878d2f304f5d748d493057be579192a8d148527f3ba55c9df57f
-    size: 618683
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/19/4.yaml
-  original: lts-19.4
+    sha256: 97710f56bf093fca0ee5d8dbe19d96b654c752e405b66795b4baedd84a794c60
+    size: 640010
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/21/3.yaml
+  original: lts-21.3
