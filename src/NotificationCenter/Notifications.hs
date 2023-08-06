@@ -344,7 +344,8 @@ modifyNoti config noti =
                 , ("body", notiBody)
                 , ("app-name", notiAppName)
                 , ("urgency", notiUrgencyStr)
-                , ("time", notiTime) ]) <*> (Just noti)))
+                , ("time", notiTime)
+                ]) <*> (Just noti)))
         replace ('\\':cs) = "\\\\" ++ replace cs
         replace (c:cs) = c : replace cs
         replace ([]) = []
@@ -380,8 +381,11 @@ modifyNoti config noti =
                   $ modifyTransient modify
                 , notiSendClosedMsg = fromMaybe (notiSendClosedMsg noti)
                   $ modifyNoClosedMsg modify
-                , notiActions = fromMaybe (notiActions noti)
-                  $ (\_ -> []) <$> modifyRemoveActions modify
+                , notiActions = (pack <$> (fromMaybe [] $  modifyActions modify))
+                                ++ (maybe (notiActions noti)
+                                    (\_ -> []) $ modifyRemoveActions modify)
+                , notiActionIcons = fromMaybe (notiActionIcons noti)
+                  $ modifyActionIcons modify
                 , notiClassName = fromMaybe (notiClassName noti)
                   $ pack <$> modifyClassName modify }
           return newnoti
