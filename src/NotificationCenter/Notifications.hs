@@ -46,12 +46,13 @@ import Data.List
 import qualified Data.Map as Map
 import Data.Time
 import Data.Time.LocalTime
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, isJust)
 
 import qualified Data.Yaml as Yaml
 import qualified Data.Aeson as Aeson
 
-import System.Process (readCreateProcess, shell)
+import Control.Exception (finally)
+import System.Process (readCreateProcess, shell, spawnCommand, interruptProcessGroupOf, waitForProcess)
 import System.Locale.Current
 import System.Directory (getXdgDirectory, XdgDirectory(..))
 import System.Environment (getEnv)
@@ -115,11 +116,17 @@ emitNotificationClosed doSend onClose id ctype =
                                    _ -> 4 :: Word32)] }
   else return ()
 
-emitAction :: (Signal -> IO ()) -> Int -> String -> Maybe String -> IO ()
-emitAction onAction id key mParam = do
-  onAction $ (signal "/org/freedesktop/Notifications"
-               "org.freedesktop.Notifications"
-               "ActionInvoked")
+emitAction :: (Signal -> IO ()) -> Int -> [(String, String)] -> String -> Maybe String -> IO ()
+emitAction onAction id actionCommands key mParam = do
+  let mCommand = lookup key actionCommands
+  if isJust mCommand then do
+    ph <- spawnCommand $ fromMaybe "" mCommand
+    waitForProcess ph `finally` interruptProcessGroupOf ph
+    return ()
+    else
+    onAction $ (signal "/org/freedesktop/Notifications"
+                "org.freedesktop.Notifications"
+                "ActionInvoked")
     { signalBody = [ toVariant (fromIntegral id :: Word32)
                    , toVariant key]
                    ++ if mParam == Nothing then
@@ -259,6 +266,7 @@ notify config tState emit
         , notiBody = htmlEntitiesStrip config $ xmlStrip config body
         , notiActions = actions
         , notiActionIcons = parseActionIcons hints
+        , notiActionCommands = []
         , notiHints = hints
         , notiUrgency = parseUrgency hints
         , notiTimeout = timeout
@@ -302,7 +310,7 @@ notify config tState emit
                { notiId = notiStNextId state
                , notiOnClosed = emitNotificationClosed (notiSendClosedMsg newNoti)
                  emit (notiStNextId state)
-                              , notiOnAction = emitAction
+               , notiOnAction = emitAction
                                 emit (notiStNextId state) })
               (fromIntegral (notiRepId newNoti))
           })
@@ -386,6 +394,8 @@ modifyNoti config noti =
                                     (\_ -> []) $ modifyRemoveActions modify)
                 , notiActionIcons = fromMaybe (notiActionIcons noti)
                   $ modifyActionIcons modify
+                , notiActionCommands = fromMaybe (notiActionCommands noti)
+                $ Map.assocs <$> modifyActionCommands modify
                 , notiClassName = fromMaybe (notiClassName noti)
                   $ pack <$> modifyClassName modify }
           return newnoti

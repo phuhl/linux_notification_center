@@ -43,6 +43,7 @@ data ModificationRule = Modify
   , modifyNoClosedMsg :: Maybe Bool
   , modifyRemoveActions :: Maybe Bool
   , modifyActionIcons :: Maybe Bool
+  , modifyActionCommands :: Maybe (Map.Map String String)
   , modifyActions :: Maybe [String]
   , modifyClassName :: Maybe String
   } |
@@ -84,6 +85,8 @@ instance FromJSON ModificationRule where
         <*> o .: "modify" .:. "remove-actions"
       -- modifyActionIcons
         <*> o .: "modify" .:. "action-icons"
+      -- modifyActionIcons
+        <*> o .: "modify" .:. "action-commands"
       -- modifyActions
         <*> o .: "modify" .:. "actions"
       -- modifyClassName

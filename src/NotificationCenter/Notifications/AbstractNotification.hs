@@ -95,7 +95,7 @@ createNotification config builder noti dispNoti = do
     (fromIntegral $ configImgMarginRight config)
 
   onWidgetButtonPressEvent container $ \(_) -> do
-    notiOnAction noti "default" Nothing
+    notiOnAction noti (notiActionCommands noti) "default" Nothing
     return False
 
 
@@ -154,7 +154,15 @@ updateNotiContent config noti dNoti = do
   let takeTwo (a:b:cs) = (a,b):(takeTwo cs)
       takeTwo _ = []
   actionButtons <- sequence
-    $ (\(a, b) -> createAction config (notiActionIcons noti) (notiOnAction noti) 20 20 a b)
+    $ (\(a, b) -> createAction
+                  config
+                  (notiActionCommands noti)
+                  (notiActionIcons noti)
+                  (notiOnAction noti)
+                  20
+                  20
+                  a
+                  b)
     <$> (Prelude.filter (\(a, b) -> a /= "default"
                            && (notiPercentage noti == Nothing
                                || a /= "changeValue"))
@@ -180,7 +188,7 @@ updateNotiContent config noti dNoti = do
         (fromMaybe 0 $ notiPercentage noti)
       onRangeValueChanged (view dScale dNoti) $ do
         value <- rangeGetValue (view dScale dNoti)
-        (notiOnAction noti) "changeValue" $ Just $ show value
+        (notiOnAction noti) (notiActionCommands noti) "changeValue" $ Just $ show value
         return ()
       widgetSetVisible (view dScale dNoti) True
       widgetSetVisible (view dProgressbar dNoti) False
