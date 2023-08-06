@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
   <!-- interface-css-provider-path style.css -->
@@ -175,6 +175,11 @@
                 <property name="position">2</property>
               </packing>
             </child>
+            <style>
+              <class name="body"/>
+              <class name="deadd-noti-center"/>
+              <class name="noti-center"/>
+            </style>
           </object>
         </child>
       </object>
