@@ -107,7 +107,7 @@ data State = State
   }
 
 
-setTime :: TVar State -> IO Bool
+setTime :: TVar State -> IO ()
 setTime tState = do
   state <- readTVarIO tState
   now <- zonedTimeToLocalTime <$> getZonedTime
@@ -115,7 +115,7 @@ setTime tState = do
   let format = Text.pack . flip (formatTime zone) now
   labelSetText (stTimeLabel state) $ format "%H:%M"
   labelSetText (stDateLabel state) $ format "%A, %x"
-  return False
+
 
 startSetTimeThread :: TVar State -> IO ()
 startSetTimeThread tState = do
@@ -142,7 +142,6 @@ setWindowStyle tState = do
   style <- readFile =<< (filterM doesFileExist paths >>= return . head)
   screen <- windowGetScreen $ stMainWindow state
   setStyle screen $ BS.pack $ style
-  return False
 
 createNotiCenter :: TVar State -> Config -> Catalog -> IO ()
 createNotiCenter tState config catalog = do
@@ -310,7 +309,7 @@ parseNotisForMe tState = do
                    addSource $ setWindowStyle tState
                    return ()
       ) myNotiHints
-  return False
+  return ()
 
 hideNotiCenter tState = do
   state <- readTVarIO tState
@@ -410,9 +409,7 @@ removeNoti tState dNoti = do
     state { notiStList = filter
                          (\n -> notiId n /= _dNotiId dNoti) $
                          notiStList state }
-  addSource $ do
-    _dNotiDestroy dNoti
-    return False
+  addSource $ _dNotiDestroy dNoti
   return ()
 
 setDeleteAllState tState = do
@@ -422,7 +419,6 @@ setDeleteAllState tState = do
       widgetShow $ stDeleteAll state
       else
       widgetHide $ stDeleteAll state
-    return False
   return ()
 
 getInitialState = do
@@ -454,7 +450,7 @@ main' = do
     (do
         addSource $ do
           showNotiCenter istate notiState config
-          return False
+          return ()
         return True)
 
   ph <- spawnCommand $ configStartupCommand config

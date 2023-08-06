@@ -95,9 +95,9 @@ instance FromJSON ModificationRule where
 
 
 data Config = Config
- {
-   -- notification-center
-   configBarHeight :: Int
+  {
+  -- notification-center
+    configBarHeight :: Int
   , configBottomBarHeight :: Int
   , configRightMargin :: Int
   , configWidth :: Int
@@ -132,13 +132,14 @@ data Config = Config
   , configPopupEllipsizeBody :: Bool
   , configPopupDismissButton :: String
   , configPopupDefaultActionButton :: String
+  , configPopupHideBodyIfEmpty :: Bool
 
   -- buttons
   , configButtonsPerRow :: Int
   , configButtonHeight :: Int
   , configButtonMargin :: Int
   , configButtons :: [ButtonConfig]
-}
+  }
 
 (.:.) :: FromJSON a => Y.Parser (Maybe Y.Object) -> Text.Text -> Y.Parser (Maybe  a)
 (.:.) po name = do
@@ -248,6 +249,8 @@ instance FromJSON Config where
     <*> fourthLevel o "notification" "popup" "click-behavior" "dismiss" "mouse1"
   -- configPopupDefaultActionButton
     <*> fourthLevel o "notification" "popup" "click-behavior" "default-action" "mouse3"
+  -- configPopupHideBodyIfEmpty
+    <*> thirdLevel o "notification" "popup" "hide-body-if-empty" False
   -- configButtonsPerRow
     <*> thirdLevel o "notification-center" "buttons" "buttons-per-row" 5
   -- configButtonHeight

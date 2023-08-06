@@ -587,7 +587,12 @@ notification:
     ### Defines after how many lines of text the body will be truncated. 
     ### Use 0 if you want to disable truncation.
     max-lines-in-body: 3
-    
+
+    ### Determines whether the GTK widget that displays the notification body
+    ### in the notification popup will be hidden when empty. This is especially
+    ### useful for transient notifications that display a progress bar.
+    # hide-body-if-empty: false
+
     ### Monitor on which the notifications will be
     ### printed. If "follow-mouse" is set true, this does nothing.
     # monitor: 0
@@ -624,6 +629,7 @@ The following class-names for labels are defined:
   - =label.deadd-noti-center.notification.title= :: Notification title
   - =image.deadd-noti-center.notification.image= :: Image of a notification
   - =image.deadd-noti-center.notification.icon= :: Appicon
+  - =button.deadd-noti-center.notification.actionbutton= :: Action buttons
 - Notifications in the notification center:
   - =label.deadd-noti-center.in-center.appname= :: Appname
   - =label.deadd-noti-center.in-center.body= :: Textbody
@@ -632,10 +638,12 @@ The following class-names for labels are defined:
   - =image.deadd-noti-center.in-center.image= :: Image of a notification
   - =image.deadd-noti-center.in-center.icon= :: Appicon
   - =button.deadd-noti-center.in-center.button-close= :: Close button on notification
+  - =button.deadd-noti-center.in-center.actionbutton= :: Action buttons
 - Notification-center:
   - =label.deadd-noti-center.noti-center.time= :: The big time at the top
   - =label.deadd-noti-center.noti-center.date= :: The date text
   - =label.deadd-noti-center.noti-center.delete-all= :: "Delete all" Button
+  - =button.deadd-noti-center.noti-center.userbutton= :: User buttons
 
 Additionally, you can specify custom class-names in the
 modifications-section of your =deadd.yml=. These class names will be
