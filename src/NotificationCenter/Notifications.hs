@@ -88,7 +88,7 @@ getServerInformation =
   return ("haskell-notification-daemon",
           "abc",
           "0.0.1",
-          "1.0")
+          "1.2")
 
 getCapabilities :: Config -> IO [Text]
 getCapabilities config = return ( [ "body"
