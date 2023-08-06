@@ -249,6 +249,8 @@ setNotificationCenterPosition mainWindow config = do
     LayerShell.setMargin mainWindow EdgeTop barHeightTop
     LayerShell.setMargin mainWindow EdgeBottom barHeightBottom
     LayerShell.setAnchor mainWindow EdgeRight True
+    LayerShell.setAnchor mainWindow EdgeTop True
+    LayerShell.setAnchor mainWindow EdgeBottom True
     else
     windowMove mainWindow
       (screenW - width - marginRight) -- x
