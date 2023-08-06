@@ -19,3 +19,5 @@ deadd-notification-center.service
 
 pkg/
 !pkg/PKGBUILD
+
+.out/

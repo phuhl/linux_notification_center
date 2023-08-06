@@ -1,0 +1,50 @@
+name: Releases
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        name: Cache ~/.stack
+        with:
+          path: ~/.stack
+          key: stack-global-${{ hashFiles('stack.yaml') }}
+          restore-keys: stack-global-
+
+      - uses: actions/cache@v3
+        name: Cache .stack-work
+        with:
+          path: .stack-work
+          key: stack-work-${{ hashFiles('stack.yaml') }}-${{ hashFiles('package.yaml') }}-${{ hashFiles('**/*.hs') }}
+          restore-keys: stack-work-
+
+      - uses: haskell/actions/setup@v2
+        name: Setup Haskell Stack
+        with:
+          stack-version: latest
+          stack-no-global: true
+          stack-setup-ghc: true
+          enable-stack: true
+
+      - name: Install non-hs dependencies
+        run: sudo apt-get update && sudo apt-get install libgtk-3-dev gobject-introspection libgirepository1.0-dev libwebkit2gtk-4.0-dev libgtksourceview-3.0-dev
+
+      - name: Install dependencies
+        run: stack build --only-dependencies
+
+      - name: Build
+        run: stack build
+
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: ".out/deadd-notification-center"
