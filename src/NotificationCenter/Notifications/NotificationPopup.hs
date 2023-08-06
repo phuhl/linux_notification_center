@@ -17,6 +17,7 @@ import TransparentWindow (getMouseActiveScreenPos
                          , getScreenPos
                          , label
                          , window
+                         , addClass
                          , createTransparentWindow)
 import Config (Config(..))
 import NotificationCenter.Notifications.AbstractNotification
@@ -211,6 +212,7 @@ showNotificationWindow config noti dispNotis onClose = do
 updateNoti' :: Config -> (IO ()) -> Notification -> DisplayingNotificationPopup -> IO Int32
 updateNoti' config onClose noti dNoti = do
   updateNotiContent config noti dNoti
+  addClass (view dMainWindow dNoti) (notiClassName noti)
 
   height <- getHeight (view dContainer dNoti) config
   widgetSetSizeRequest (_dLabelBG dNoti) (-1) height
