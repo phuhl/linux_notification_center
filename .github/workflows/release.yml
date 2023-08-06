@@ -43,7 +43,7 @@ jobs:
         run: stack build --only-dependencies
 
       - name: Build
-        run: stack build
+        run: stack install --local-bin-path .out
 
       - uses: ncipollo/release-action@v1
         with:
