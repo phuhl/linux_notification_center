@@ -143,8 +143,6 @@ showNotificationWindow config noti dispNotis onClose = do
              else
                getMonitorFromNumber mainWindow $ configNotiMonitor config
 
-  mMonitorModel <- getMonitorModel monitor
-
 
   hBefores <- sortOn fst <$> mapM
     (\n -> (,) (_dNotiTop n) <$> (_dNotiGetHeight n)) (Data.List.filter (not . _dHasCustomPosition) dispNotis)
