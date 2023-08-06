@@ -41,6 +41,7 @@ data Notification = Notification
   , notiSummary :: Text.Text -- ^ Summary
   , notiBody :: Text.Text -- ^ Body
   , notiActions :: [Text.Text] -- ^ Actions
+  , notiActionCommands :: [(String, String)] -- ^ Actions
   , notiActionIcons :: Bool -- ^ Use icons for action-buttons
   , notiHints :: Map.Map Text.Text Variant -- ^ Hints
   , notiUrgency :: Urgency
@@ -53,7 +54,7 @@ data Notification = Notification
   , notiRight :: Maybe Int
     -- ^ Should be called when the notification is closed, either by
     --   timeout or by user
-  , notiOnAction :: String -> Maybe String -> IO ()
+  , notiOnAction :: [(String, String)] -> String -> Maybe String -> IO ()
     -- ^ Should be called when an action is used
   , notiPercentage :: Maybe Double
     -- ^ The percentage that should be shown in a percentage bar

@@ -44,8 +44,10 @@ data Action = Action
     -- ^ Shell command to execute
   }
 
-createAction :: Config -> Bool -> (String -> Maybe String -> IO ()) -> Int -> Int -> String -> String -> IO Action
-createAction config useIcons onAction width height command description = do
+createAction :: Config -> [(String, String)] -> Bool
+  -> ([(String, String)] -> String -> Maybe String
+  -> IO ()) -> Int -> Int -> String -> String -> IO Action
+createAction config actionCommands useIcons onAction width height command description = do
   button <- buttonNew
   widgetSetSizeRequest button (fromIntegral width) (fromIntegral height)
   addClass button "actionbutton"
@@ -59,7 +61,7 @@ createAction config useIcons onAction width height command description = do
         { actionButton = button
         , actionCommand = command }
   onButtonClicked button $ do
-    onAction command Nothing
+    onAction actionCommands command Nothing
     return ()
   if useIcons && configActionIcons config then do
     img <-imageNewFromIconName (Just $ Text.pack description) (fromIntegral $ fromEnum IconSizeButton)
