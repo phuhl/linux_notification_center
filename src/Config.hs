@@ -42,6 +42,8 @@ data ModificationRule = Modify
   , modifyTransient :: Maybe Bool
   , modifyNoClosedMsg :: Maybe Bool
   , modifyRemoveActions :: Maybe Bool
+  , modifyActionIcons :: Maybe Bool
+  , modifyActions :: Maybe [String]
   , modifyClassName :: Maybe String
   } |
   Script
@@ -80,6 +82,10 @@ instance FromJSON ModificationRule where
         <*> o .: "modify" .:. "send-noti-closed"
       -- modifyRemoveActions
         <*> o .: "modify" .:. "remove-actions"
+      -- modifyActionIcons
+        <*> o .: "modify" .:. "action-icons"
+      -- modifyActions
+        <*> o .: "modify" .:. "actions"
       -- modifyClassName
         <*> o .: "modify" .:. "class-name"
       Just (script)-> Script
