@@ -48,7 +48,7 @@ createAction :: Config -> Bool -> (String -> Maybe String -> IO ()) -> Int -> In
 createAction config useIcons onAction width height command description = do
   button <- buttonNew
   widgetSetSizeRequest button (fromIntegral width) (fromIntegral height)
-  addClass button "userbutton"
+  addClass button "actionbutton"
   addClass button "deadd-noti-center"
   buttonSetRelief button ReliefStyleNone
   setWidgetMargin button $ fromIntegral $ configButtonMargin config
@@ -66,7 +66,7 @@ createAction config useIcons onAction width height command description = do
     Gtk.containerAdd button img
   else do
     label <- labelNew $ Just $ Text.pack description
-    addClass label "userbuttonlabel"
+    addClass label "actionbuttonlabel"
     addClass label "deadd-noti-center"
     Gtk.containerAdd button label
   return theButton
