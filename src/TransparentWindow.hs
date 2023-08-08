@@ -170,19 +170,19 @@ removeClass w clazz = do
 getScreenPos :: Gtk.Window -> GHC.Int.Int32
   -> IO (GHC.Int.Int32, GHC.Int.Int32, GHC.Int.Int32)
 getScreenPos window number = do
-  screen <- window `get` #screen
-  display <- screenGetDisplay screen
-  monitor <- fromMaybe (error "Unknown screen")
-    <$> displayGetMonitor display number
+  monitor <- getMonitorFromNumber window $ fromIntegral number
   getMonitorProps monitor
 
 getMonitorFromNumber :: Gtk.Window -> Int -> IO Monitor
 getMonitorFromNumber window number = do
   screen <- window `get` #screen
   display <- screenGetDisplay screen
-  monitor <- fromMaybe (error "Unknown screen")
-    <$> (displayGetMonitor display $ fromIntegral number)
-  return monitor
+  monitorFromNum display number
+    =<< monitorFromNum display 0 (error "Unknown screen")
+  where
+    monitorFromNum :: Display -> Int -> Monitor -> IO Monitor
+    monitorFromNum display num alt =
+      fromMaybe alt <$> displayGetMonitor display (fromIntegral num)
 
 getMouseActiveScreen :: Gtk.Window -> GHC.Int.Int32
   -> IO Monitor
