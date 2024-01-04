@@ -135,10 +135,15 @@ deleteInCenter tState = do
 setWindowStyle tState = do
   state <- readTVarIO tState
   homeDir <- getXdgDirectory XdgConfig ""
-  let paths = [homeDir ++ "/deadd/deadd.css", "/etc/xdg/deadd/deadd.css"]
-  style <- readFile =<< (filterM doesFileExist paths >>= return . head)
-  screen <- windowGetScreen $ stMainWindow state
-  setStyle screen $ BS.pack $ style
+  paths <- filterM doesFileExist
+    $ [homeDir ++ "/deadd/deadd.css", "/etc/xdg/deadd/deadd.css"]
+    >>= return
+  if length paths > 0 then do
+    style <- readFile =<< (filterM doesFileExist paths >>= return . head)
+    screen <- windowGetScreen $ stMainWindow state
+    setStyle screen $ BS.pack $ style
+    else
+    return ()
 
 createNotiCenter :: TVar State -> Config -> Catalog -> IO ()
 createNotiCenter tState config catalog = do
