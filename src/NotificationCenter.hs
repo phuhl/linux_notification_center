@@ -76,6 +76,8 @@ import GI.Gtk
        , onButtonClicked, windowGetScreen, boxNew, widgetSetValign)
 import qualified GI.Gtk as Gtk (containerAdd, Window(..), Box(..), Label(..), Button(..), Adjustment(..))
 
+import GI.GtkLayerShell.Functions as LayerShell
+
 import qualified GI.Gtk as GI (init, main)
 import GI.GLib (sourceRemove, timeoutAdd, unixSignalAdd)
 import GI.GLib.Constants
@@ -86,6 +88,7 @@ import GI.Gtk.Enums
        , PositionType(..), ReliefStyle(..), Align(..))
 import Data.GI.Base.BasicConversions (gflagsToWord)
 import qualified GI.Gdk.Objects.Window
+import GI.GtkLayerShell.Enums (Edge(EdgeRight, EdgeTop, EdgeBottom), Layer (LayerOverlay))
 
 
 data State = State
@@ -225,12 +228,38 @@ setNotificationCenterPosition mainWindow config = do
     else
     getScreenPos mainWindow (fromIntegral $ configNotiCenterMonitor config)
 
+  monitor <- if configNotiFollowMouse config then
+               getMouseActiveScreen mainWindow (fromIntegral $ configNotiMonitor config)
+             else
+               getMonitorFromNumber mainWindow $ configNotiMonitor config
+
   windowSetDefaultSize mainWindow
     width -- w
     (screenH - barHeightTop - barHeightBottom) -- h
-  windowMove mainWindow
-    (screenW - width - marginRight) -- x
-    (screenY + barHeightTop)  -- y
+
+
+  layerShellSupported <- LayerShell.isSupported
+  isLayered <- LayerShell.isLayerWindow mainWindow
+  when (layerShellSupported && not isLayered) $ do
+    LayerShell.initForWindow mainWindow
+    LayerShell.setLayer mainWindow LayerOverlay
+    LayerShell.autoExclusiveZoneEnable mainWindow
+    LayerShell.setExclusiveZone mainWindow 0
+    LayerShell.setNamespace mainWindow "deadd-notification-center"
+
+  if layerShellSupported then do
+    LayerShell.setMonitor mainWindow monitor
+    LayerShell.setMargin mainWindow EdgeRight marginRight
+    LayerShell.setMargin mainWindow EdgeTop barHeightTop
+    LayerShell.setMargin mainWindow EdgeBottom barHeightBottom
+    LayerShell.setAnchor mainWindow EdgeRight True
+    LayerShell.setAnchor mainWindow EdgeTop True
+    LayerShell.setAnchor mainWindow EdgeBottom True
+    else
+    windowMove mainWindow
+      (screenW - width - marginRight) -- x
+      (screenY + barHeightTop)  -- y
+
   return ()
     where
       barHeightTop = fromIntegral $ configBarHeight config
@@ -308,6 +337,7 @@ showNotiCenter tState notiState config = do
       hideAllNotis $ stNotiState state
       widgetShow mainWindow
       return True
+
   atomically $ modifyTVar' tState
     (\state -> state {stCenterShown = newShown })
 
@@ -422,7 +452,11 @@ main' = do
   createNotiCenter istate config catalog
 
   unixSignalAdd PRIORITY_HIGH (fromIntegral sigUSR1)
-    (showNotiCenter istate notiState config)
+    (do
+        addSource $ do
+          showNotiCenter istate notiState config
+          return ()
+        return True)
 
   ph <- spawnCommand $ configStartupCommand config
   waitForProcess ph `finally` interruptProcessGroupOf ph

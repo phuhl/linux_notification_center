@@ -10,6 +10,8 @@ module NotificationCenter.Notifications.NotificationPopup
   ) where
 
 import TransparentWindow (getMouseActiveScreenPos
+                         , getMouseActiveScreen
+                         , getMonitorFromNumber
                          , addSource
                          , runAfterDelay
                          , getScreenPos
@@ -47,7 +49,8 @@ import GI.Pango.Enums (EllipsizeMode(..))
 import GI.Pango.Objects.Layout (layoutGetLinesReadonly, layoutGetLineCount)
 import GI.Pango.Structs.LayoutLine (getLayoutLineLength, getLayoutLineStartIndex)
 import qualified GI.Gtk as Gtk (Window(..), Label(..))
-
+import GI.GtkLayerShell.Functions as LayerShell
+import GI.GtkLayerShell.Enums (Edge(EdgeRight, EdgeTop), Layer (LayerOverlay))
 
 instance Eq DisplayingNotificationPopup where
   a == b = _dNotiId a == _dNotiId b
@@ -137,6 +140,12 @@ showNotificationWindow config noti dispNotis onClose = do
                                    getScreenPos mainWindow
                                    (fromIntegral $ configNotiMonitor config)
 
+  monitor <- if configNotiFollowMouse config then
+               getMouseActiveScreen mainWindow (fromIntegral $ configNotiMonitor config)
+             else
+               getMonitorFromNumber mainWindow $ configNotiMonitor config
+
+
   hBefores <- sortOn fst <$> mapM
     (\n -> (,) (_dNotiTop n) <$> (_dNotiGetHeight n)) (Data.List.filter (not . _dHasCustomPosition) dispNotis)
   let hBefore = if hasCustomPosition then
@@ -145,10 +154,27 @@ showNotificationWindow config noti dispNotis onClose = do
                   findBefore hBefores (distanceTop + screenY)
                   height (fromIntegral distanceBetween)
 
-  windowMove mainWindow
-    (screenW - fromIntegral
-     (configWidthNoti config + distanceRight))
-    hBefore
+  layerShellSupported <- LayerShell.isSupported
+  isLayered <- LayerShell.isLayerWindow mainWindow
+  when (layerShellSupported && not isLayered) $ do
+    LayerShell.initForWindow mainWindow
+    LayerShell.setLayer mainWindow LayerOverlay
+    LayerShell.autoExclusiveZoneEnable mainWindow
+    LayerShell.setExclusiveZone mainWindow 0
+    LayerShell.setNamespace mainWindow "deadd-notification-center"
+
+  if layerShellSupported then do
+    LayerShell.setMonitor mainWindow monitor
+    LayerShell.setMargin mainWindow EdgeRight
+      (fromIntegral distanceRight)
+    LayerShell.setMargin mainWindow EdgeTop hBefore
+    LayerShell.setAnchor mainWindow EdgeRight True
+    LayerShell.setAnchor mainWindow EdgeTop True
+    else
+    windowMove mainWindow
+      (screenW - fromIntegral
+       (configWidthNoti config + distanceRight))
+      hBefore
 
   onWidgetButtonPressEvent mainWindow $ \eventButton -> do
     mouseButton <- (\n -> "mouse" ++ n) . show <$> getEventButtonButton eventButton

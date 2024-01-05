@@ -18,6 +18,13 @@ packages:
       size: 579
   original:
     hackage: haskell-gettext-0.1.2.0
+- completed:
+    hackage: gi-gtk-layer-shell-0.1.3@sha256:76240ff466fa3cf14db42e20cdf5266408baf279d45b817c1f90d846d4e72bdb,2674
+    pantry-tree:
+      sha256: bcd2406b3ebefc98a47ec3baba30054738fcc7c0d0e407daea6dd4f1cbceaed6
+      size: 376
+  original:
+    hackage: gi-gtk-layer-shell-0.1.3
 snapshots:
 - completed:
     sha256: 97710f56bf093fca0ee5d8dbe19d96b654c752e405b66795b4baedd84a794c60

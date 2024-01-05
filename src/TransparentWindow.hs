@@ -18,6 +18,8 @@ module TransparentWindow
   , getObjs
   , getScreenPos
   , getMouseActiveScreenPos
+  , getMouseActiveScreen
+  , getMonitorFromNumber
   -- * General
   , getScreenProportions
   , runAfterDelay
@@ -68,7 +70,7 @@ import qualified GI.Gtk as Gtk
   , builderNew, Builder(..), Label(..), Box(..), Button(..), Image(..), Adjustment(..))
 import GI.Gtk.Constants
 import GI.Gdk (getRectangleHeight, getRectangleWidth, getRectangleY
-              , getRectangleX, Monitor, monitorGetGeometry, displayGetMonitor
+              , getRectangleX, Monitor, Display, monitorGetGeometry, displayGetMonitor
               , screenGetDisplay, screenGetHeight, screenGetWidth, Screen (..)
               , displayGetPointer, displayGetDefault, displayGetDefaultSeat
               , deviceGetPosition, seatGetPointer, displayGetMonitorAtPoint)
@@ -140,7 +142,6 @@ createTransparentWindow glade objsToGet title = do
 runAfterDelay :: Int -> IO () -> IO ThreadId
 runAfterDelay t f = forkIO (threadDelay t >> f)
 
-
 addSource :: IO () -> IO Word32
 addSource f = do
   idleAdd PRIORITY_DEFAULT $ do
@@ -169,18 +170,38 @@ removeClass w clazz = do
 getScreenPos :: Gtk.Window -> GHC.Int.Int32
   -> IO (GHC.Int.Int32, GHC.Int.Int32, GHC.Int.Int32)
 getScreenPos window number = do
+  monitor <- getMonitorFromNumber window $ fromIntegral number
+  getMonitorProps monitor
+
+getMonitorFromNumber :: Gtk.Window -> Int -> IO Monitor
+getMonitorFromNumber window number = do
   screen <- window `get` #screen
   display <- screenGetDisplay screen
-  monitor <- fromMaybe (error "Unknown screen")
-    <$> displayGetMonitor display number
-  getMonitorProps monitor
+  monitorFromNum display number
+    =<< monitorFromNum display 0 (error "Unknown screen")
+  where
+    monitorFromNum :: Display -> Int -> Monitor -> IO Monitor
+    monitorFromNum display num alt =
+      fromMaybe alt <$> displayGetMonitor display (fromIntegral num)
+
+getMouseActiveScreen :: Gtk.Window -> GHC.Int.Int32
+  -> IO Monitor
+getMouseActiveScreen window number = do
+  screen <- window `get` #screen
+  display <- screenGetDisplay screen
+  mPointerPos <- getPointerPos display
+  case mPointerPos of
+    Just (x, y) -> displayGetMonitorAtPoint display x y
+    Nothing -> fromMaybe (error "Unknown screen")
+               <$> displayGetMonitor display number
+
 
 getMouseActiveScreenPos :: Gtk.Window -> GHC.Int.Int32
   -> IO (GHC.Int.Int32, GHC.Int.Int32, GHC.Int.Int32)
 getMouseActiveScreenPos window number = do
   screen <- window `get` #screen
   display <- screenGetDisplay screen
-  mPointerPos <- getPointerPos
+  mPointerPos <- getPointerPos display
   monitor <- case mPointerPos of
                Just (x, y) -> displayGetMonitorAtPoint display x y
                Nothing -> fromMaybe (error "Unknown screen")
@@ -197,16 +218,13 @@ getMonitorProps monitor = do
   return (monitorX + monitorWidth, monitorY, monitorHeight)
 
 
-getPointerPos :: IO (Maybe (Int32, Int32))
-getPointerPos = do
-  mDisplay <- displayGetDefault
-  mSeat <- sequence $ displayGetDefaultSeat <$> mDisplay
-  case mSeat of
-    Just (seat) -> do
-      mPointer <- seatGetPointer seat
-      case mPointer of
-        Just (pointer) -> do
-          (screen, x, y) <- deviceGetPosition pointer
-          return $ Just (x, y)
-        Nothing -> return Nothing
+getPointerPos :: Display -> IO (Maybe (Int32, Int32))
+getPointerPos display = do
+  seat <- displayGetDefaultSeat display
+  mPointer <- seatGetPointer seat
+  case mPointer of
+    Just (pointer) -> do
+      (screen, x, y) <- deviceGetPosition pointer
+      return $ Just (x, y)
     Nothing -> return Nothing
+

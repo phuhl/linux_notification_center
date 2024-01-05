@@ -42,6 +42,7 @@ packages:
 extra-deps:
   - env-locale-1.0.0.1
   - haskell-gettext-0.1.2.0
+  - gi-gtk-layer-shell-0.1.3
 
 # Override default flag values for local packages and extra-deps
 flags: {}
