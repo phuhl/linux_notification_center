@@ -18,9 +18,20 @@ packages:
       size: 579
   original:
     hackage: haskell-gettext-0.1.2.0
+- completed:
+    commit: 83ee30b43f74d2b6781269072cf5ed0f0e00012f
+    git: https://github.com/rvl/configfile
+    name: ConfigFile
+    pantry-tree:
+      sha256: aed82f71ef30a2132aca35d12dc77fdfbae67616b94dd8ce93f822be256545bb
+      size: 1525
+    version: 1.2.0
+  original:
+    commit: 83ee30b43f74d2b6781269072cf5ed0f0e00012f
+    git: https://github.com/rvl/configfile
 snapshots:
 - completed:
-    sha256: 97710f56bf093fca0ee5d8dbe19d96b654c752e405b66795b4baedd84a794c60
-    size: 640010
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/21/3.yaml
-  original: lts-21.3
+    sha256: 87da71cb0ae9ee1ea1bf51a8eb9812f39f779be76abc0a3c926defd8afda05d1
+    size: 719139
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/22/28.yaml
+  original: lts-22.28
