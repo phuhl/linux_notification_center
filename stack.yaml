@@ -15,7 +15,7 @@
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: lts-21.3
+resolver: lts-22.28
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -42,6 +42,12 @@ packages:
 extra-deps:
   - env-locale-1.0.0.1
   - haskell-gettext-0.1.2.0
+  # ConfigFile-1.2.0
+  #
+  # https://github.com/jgoerzen/configfile holds version 1.1.4 that has not been
+  # updated in 10 years and does not build with GHC after 9.4.
+  - git: https://github.com/rvl/configfile
+    commit: '83ee30b43f74d2b6781269072cf5ed0f0e00012f'
 
 # Override default flag values for local packages and extra-deps
 flags: {}
