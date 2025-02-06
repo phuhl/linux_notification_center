@@ -1,3 +1,6 @@
+
+Discalimer: Currently no active development going on.
+
 [[https://github.com/phuhl/linux_notification_center/workflows/CI/badge.svg?branch=master]]
 
 * Linux Notification Center
